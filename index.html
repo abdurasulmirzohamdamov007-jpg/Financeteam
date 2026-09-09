@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FINANCE TEAM — Buxgalteriya Testlar</title>
+<link rel="icon" id="faviconLink" type="image/png" href="">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -130,7 +131,8 @@
   .tab{padding:10px 18px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid var(--edge);color:var(--ink-soft);font-size:0.85rem;font-weight:600;cursor:pointer;}
   .tab.active{background:var(--teal);color:#06231E;border-color:var(--teal);}
   .tab.owner-tab.active{background:var(--white-ac);color:#0F2A26;border-color:var(--white-ac);}
-  table{width:100%;border-collapse:collapse;font-size:0.87rem;}
+  table{width:100%;border-collapse:collapse;font-size:0.87rem;display:block;overflow-x:auto;white-space:nowrap;}
+  table thead, table tbody{display:table;width:100%;}
   th{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:0.7rem;text-transform:uppercase;color:var(--ink-soft);padding:9px 8px;border-bottom:1px solid var(--edge);}
   td{padding:11px 8px;border-bottom:1px solid var(--edge);}
   .pct-cell{font-family:'IBM Plex Mono',monospace;font-weight:600;}
@@ -783,6 +785,9 @@ async function listLiveAnswersForQuestion(sessionId, qIndex){
 
 /* ============ INIT ============ */
 window.addEventListener('DOMContentLoaded', async ()=>{
+  const logoImg = document.querySelector('.brand img');
+  const faviconLink = document.getElementById('faviconLink');
+  if(logoImg && faviconLink) faviconLink.href = logoImg.src;
   state.config = await loadConfig();
   state.examConfig = await loadExamConfig();
   const urlParams = new URLSearchParams(window.location.search);
