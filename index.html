@@ -1171,19 +1171,19 @@ async function submitExamForGrading(){
 
   const openAnswers = state.examAnswers[openSec.id] || {};
   const openMax = openSec.questions.length * 5;
-  let openScore = 0;
-  let openFeedback = [];
-  try{
-    const gradingResult = await gradeOpenAnswersWithAI(openSec.questions, openAnswers);
-    gradingResult.forEach(g=>{ openScore += g.score; });
-    openFeedback = gradingResult;
-  }catch(e){
-    openFeedback = openSec.questions.map(()=>({score:0, feedback:"AI baholashda xatolik yuz berdi — administrator qo'lda tekshiradi."}));
-  }
+  // AI grading requires a server-side proxy (not available on an independent
+  // site without one) — open answers are stored as-is and graded manually
+  // by the admin/rahbar afterwards.
+  const openAnswersText = openSec.questions.map((q,qi)=> (openAnswers[qi]||'').trim());
+  const openScores = openSec.questions.map(()=> null); // null = not graded yet
+  const openNotes = openSec.questions.map(()=> '');
+  const openGraded = openSec.questions.length===0; // nothing to grade if section is empty
 
-  const totalScore = mcqScore + practicalScore + openScore;
-  const totalMax = mcqMax + practicalMax + openMax;
-  const overallPercentage = totalMax>0 ? Math.round((totalScore/totalMax)*100) : 0;
+  const autoScore = mcqScore + practicalScore;
+  const autoMax = mcqMax + practicalMax;
+  const totalScore = autoScore; // open section added once graded (see gradeOpenAnswersManually)
+  const totalMax = autoMax + openMax;
+  const overallPercentage = autoMax>0 ? Math.round((autoScore/autoMax)*100) : 0;
 
   const record = {
     studentName: state.studentName,
@@ -1192,8 +1192,8 @@ async function submitExamForGrading(){
     examTitle: ex.title,
     mcqScore, mcqMax,
     practicalScore, practicalMax,
-    openScore, openMax,
-    openFeedback,
+    openScore: 0, openMax,
+    openAnswersText, openScores, openNotes, openGraded,
     totalScore, totalMax,
     overallPercentage,
     timestamp: new Date().toISOString()
@@ -1210,17 +1210,22 @@ async function showExamResultToStudent(examId){
   if(!record){ await customAlert("Natija topilmadi."); return; }
   hideAll();
   showScreen('screen-exam-result');
-  const feedbackHtml = record.openFeedback.map((f,i)=>`<div style="padding:8px 0;border-bottom:1px solid var(--edge);"><strong>Ochiq savol ${i+1}:</strong> ${f.score}/5<br><span class="desc">${escapeHtml(f.feedback)}</span></div>`).join('');
+  let openHtml;
+  if(!record.openGraded){
+    openHtml = `<div class="desc" style="text-align:center;padding:10px 0;">Ochiq savollar hali administrator tomonidan tekshirilmagan. Umumiy foiz faqat avtomatik baholangan qismlar (test + amaliy) asosida ko'rsatilmoqda.</div>`;
+  } else {
+    openHtml = (record.openScores||[]).map((s,i)=>`<div style="padding:8px 0;border-bottom:1px solid var(--edge);"><strong>Ochiq savol ${i+1}:</strong> ${s}/5${record.openNotes && record.openNotes[i] ? `<br><span class="desc">${escapeHtml(record.openNotes[i])}</span>` : ''}</div>`).join('');
+  }
   document.getElementById('examResultBody').innerHTML = `
     <div class="lead" style="text-align:center;">${escapeHtml(record.examTitle)}</div>
-    <div class="stamp" style="margin:20px auto;"><span class="pct">${record.overallPercentage}%</span><span class="lbl">Umumiy natija</span></div>
+    <div class="stamp" style="margin:20px auto;"><span class="pct">${record.overallPercentage}%</span><span class="lbl">${record.openGraded ? "Yakuniy natija" : "Oraliq natija"}</span></div>
     <div class="stat-grid">
-      <div class="stat-box"><div class="num">${record.openScore}/${record.openMax}</div><div class="lbl">Ochiq savollar</div></div>
+      <div class="stat-box"><div class="num">${record.openGraded ? `${record.openScore}/${record.openMax}` : "?/"+record.openMax}</div><div class="lbl">Ochiq savollar</div></div>
       <div class="stat-box"><div class="num">${record.mcqScore}/${record.mcqMax}</div><div class="lbl">Test</div></div>
       <div class="stat-box"><div class="num">${record.practicalScore}/${record.practicalMax}</div><div class="lbl">Amaliy</div></div>
     </div>
-    <div class="lead" style="font-size:1rem;margin:20px 0 10px;">AI fikr-mulohazasi</div>
-    ${feedbackHtml}
+    <div class="lead" style="font-size:1rem;margin:20px 0 10px;">Ochiq savollar bo'yicha izoh</div>
+    ${openHtml}
     <div style="text-align:center;margin-top:20px;"><button class="btn-primary" onclick="renderTestList()">Orqaga</button></div>
   `;
 }
@@ -1819,13 +1824,9 @@ async function handleExamDocUpload(evt){
       statusEl.innerHTML = `<div style="color:var(--red);">Hujjatdan matn topilmadi. Fayl skanerlangan rasm bo'lishi mumkin — bunday holatda matn avtomatik o'qilmaydi.</div>`;
       return;
     }
-    statusEl.innerHTML = `<div class="loading">AI savollarni ajratmoqda...</div>`;
-    const parsed = await generateExamQuestionsFromText(text);
-    mergeGeneratedQuestionsIntoDraft(parsed);
-    statusEl.innerHTML = `<div style="color:var(--teal);">${parsed.open.length} ta ochiq savol, ${parsed.mcq.length} ta test savoli, ${parsed.practical.length} ta amaliy operatsiya qo'shildi. Iltimos, to'g'ri javoblarni (test varianti, Dt/Kt) pastda tekshirib, to'ldiring.</div>`;
-    showToast("Savollar generatsiya qilindi ✓ — to'g'ri javoblarni tekshiring");
+    statusEl.innerHTML = `<div style="color:var(--gold,#C9A227);">Hujjat matni o'qildi, lekin AI orqali avtomatik ajratish hozircha faol emas. Iltimos, savollarni pastdagi bo'limlarga qo'lda kiriting. (Bu funksiya keyinroq qayta yoqiladi.)</div>`;
     evt.target.value = '';
-    renderExamEditorForm();
+    return;
   }catch(e){
     statusEl.innerHTML = `<div style="color:var(--red);">Xatolik: ${escapeHtml(e.message||'hujjatni qayta ishlashda muammo yuz berdi')}.</div>`;
   }
@@ -2027,8 +2028,8 @@ function renderExamEditorForm(){
       </div>
     </div>
     <div class="qeditor" style="margin-bottom:18px;">
-      <div style="font-weight:700;margin-bottom:6px;">Hujjatdan avtomatik savol generatsiya qilish (PDF yoki Word)</div>
-      <p class="desc" style="margin-bottom:12px;">Imtihon faylini yuklang — savol matnlari AI yordamida avtomatik ajratib olinadi va tegishli bo'limlarga joylashtiriladi. <strong>Muhim</strong>: hujjatda javob kaliti bo'lmagani uchun, to'g'ri variant/Dt/Kt qiymatlarini generatsiyadan keyin o'zingiz belgilashingiz kerak bo'ladi.</p>
+      <div style="font-weight:700;margin-bottom:6px;">Hujjatdan avtomatik savol generatsiya qilish (PDF yoki Word) — hozircha faol emas</div>
+      <p class="desc" style="margin-bottom:12px;">Bu funksiya AI xizmatiga bog'liq va hozircha o'chirilgan. Iltimos, savollarni quyidagi bo'limlarga <strong>qo'lda kiriting</strong>.</p>
       <input type="file" id="examDocInput" accept=".pdf,.docx,.txt" onchange="handleExamDocUpload(event)">
       <div id="examDocStatus" style="margin-top:10px;"></div>
     </div>
@@ -2139,20 +2140,86 @@ async function buildExamResultsHtml(examId){
   let html = `<div class="toolbar"><div class="lead" style="margin:0;">${escapeHtml(ex.title)} — Natijalar (${results.length})</div><button class="btn-ghost btn-small" onclick="switchExamsSubTab('list')">Orqaga</button></div>`;
   if(results.length===0){ html += `<div class="empty">Hali hech kim topshirmagan.</div>`; return html; }
   const sorted = [...results].sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp));
-  html += `<table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Ochiq</th><th>Test</th><th>Amaliy</th><th>Umumiy</th><th>Sana</th></tr></thead><tbody>`;
+  html += `<table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Ochiq</th><th>Test</th><th>Amaliy</th><th>Umumiy</th><th>Sana</th><th></th></tr></thead><tbody>`;
   sorted.forEach(r=>{
+    const slug = slugify(r.studentName);
+    const openCell = r.openMax===0 ? '—' : (r.openGraded ? `${r.openScore}/${r.openMax}` : `<span style="color:var(--gold,#C9A227);">Kutilmoqda</span>`);
+    const gradeBtn = r.openMax===0 ? '' : `<button class="btn-ghost btn-small" onclick="openExamGrading('${examId}','${slug}')">${r.openGraded?"Qayta ko'rish":'Baholash'}</button>`;
     html += `<tr>
       <td>${escapeHtml(r.studentName)}</td>
       <td>${escapeHtml(r.studentGroup||'—')}</td>
-      <td>${r.openScore}/${r.openMax}</td>
+      <td>${openCell}</td>
       <td>${r.mcqScore}/${r.mcqMax}</td>
       <td>${r.practicalScore}/${r.practicalMax}</td>
       <td class="pct-cell ${r.overallPercentage<60?'pct-low':'pct-ok'}">${r.overallPercentage}%</td>
       <td>${new Date(r.timestamp).toLocaleDateString('uz-UZ')}</td>
+      <td>${gradeBtn}</td>
     </tr>`;
   });
-  html += `</tbody></table>`;
+  html += `</tbody></table><div id="examGradingHolder"></div>`;
   return html;
+}
+async function openExamGrading(examId, slug){
+  const record = await getExamResult(examId, slug);
+  if(!record){ showToast("Natija topilmadi.", true); return; }
+  state.gradingRecord = record;
+  state.gradingExamId = examId;
+  state.gradingSlug = slug;
+  const ex = state.examConfig.exams.find(e=>e.id===examId);
+  const openSec = ex ? ex.sections.find(s=>s.type==='open') : null;
+  let html = `<div class="card" style="margin-top:16px;">
+    <div class="lead" style="margin-bottom:4px;">${escapeHtml(record.studentName)} — Ochiq savollarni baholash</div>
+    <p class="desc" style="margin-bottom:16px;">Har bir savolga 0 dan 5 gacha ball qo'ying, ixtiyoriy izoh yozishingiz mumkin.</p>`;
+  record.openAnswersText.forEach((ans,i)=>{
+    const qText = openSec && openSec.questions[i] ? openSec.questions[i].text : `Savol ${i+1}`;
+    const curScore = record.openScores[i];
+    html += `<div class="qeditor">
+      <label>Savol ${i+1}</label>
+      <div class="qtext" style="margin-bottom:8px;">${escapeHtml(qText)}</div>
+      <label>O'quvchi javobi</label>
+      <div class="desc" style="background:rgba(0,0,0,0.15);padding:10px;border-radius:8px;white-space:pre-wrap;margin-bottom:10px;">${escapeHtml(ans || '(javob berilmagan)')}</div>
+      <div class="flexrow">
+        <div style="flex:0 0 100px;"><label>Ball (0-5)</label><input type="number" min="0" max="5" id="gradeScore-${i}" value="${curScore!==null?curScore:''}"></div>
+        <div style="flex:1;"><label>Izoh (ixtiyoriy)</label><input type="text" id="gradeNote-${i}" value="${escapeAttr(record.openNotes[i]||'')}"></div>
+      </div>
+    </div>`;
+  });
+  html += `<button class="btn-primary" id="saveGradingBtn" onclick="saveExamGrading()">Baholarni saqlash</button></div>`;
+  document.getElementById('examGradingHolder').innerHTML = html;
+  document.getElementById('examGradingHolder').scrollIntoView({behavior:'smooth'});
+}
+async function saveExamGrading(){
+  const record = state.gradingRecord;
+  const n = record.openAnswersText.length;
+  const scores = [];
+  for(let i=0;i<n;i++){
+    const val = document.getElementById(`gradeScore-${i}`).value;
+    const num = parseInt(val,10);
+    if(val==='' || isNaN(num) || num<0 || num>5){ showToast(`Savol ${i+1} uchun 0-5 oralig'ida ball kiriting.`, true); return; }
+    scores.push(num);
+  }
+  const notes = [];
+  for(let i=0;i<n;i++){
+    notes.push(document.getElementById(`gradeNote-${i}`).value.trim());
+  }
+  const btn = document.getElementById('saveGradingBtn');
+  if(btn){ btn.disabled=true; btn.textContent='Saqlanmoqda...'; }
+  const openScore = scores.reduce((a,b)=>a+b,0);
+  const updated = {
+    ...record,
+    openScores: scores,
+    openNotes: notes,
+    openGraded: true,
+    openScore,
+    totalScore: record.mcqScore + record.practicalScore + openScore,
+    overallPercentage: record.totalMax>0 ? Math.round(((record.mcqScore+record.practicalScore+openScore)/record.totalMax)*100) : 0
+  };
+  const ok = await saveExamResult(state.gradingExamId, state.gradingSlug, updated);
+  if(btn){ btn.disabled=false; btn.textContent='Baholarni saqlash'; }
+  if(!ok){ showToast("Saqlashda xatolik yuz berdi.", true); return; }
+  showToast("Baholar saqlandi ✓");
+  document.getElementById('examGradingHolder').innerHTML = '';
+  viewExamResults(state.gradingExamId);
 }
 
 function renderAdminTests(){
