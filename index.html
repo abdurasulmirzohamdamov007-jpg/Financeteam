@@ -2177,7 +2177,7 @@ async function openExamGrading(examId, slug){
       <label>Savol ${i+1}</label>
       <div class="qtext" style="margin-bottom:8px;">${escapeHtml(qText)}</div>
       <label>O'quvchi javobi</label>
-      <div class="desc" style="background:rgba(0,0,0,0.15);padding:10px;border-radius:8px;white-space:pre-wrap;margin-bottom:10px;">${escapeHtml(ans || '(javob berilmagan)')}</div>
+      <div class="desc" style="background:rgba(0,0,0,0.15);padding:10px;border-radius:8px;white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;margin-bottom:10px;">${escapeHtml(ans || '(javob berilmagan)')}</div>
       <div class="flexrow">
         <div style="flex:0 0 100px;"><label>Ball (0-5)</label><input type="number" min="0" max="5" id="gradeScore-${i}" value="${curScore!==null?curScore:''}"></div>
         <div style="flex:1;"><label>Izoh (ixtiyoriy)</label><input type="text" id="gradeNote-${i}" value="${escapeAttr(record.openNotes[i]||'')}"></div>
