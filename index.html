@@ -264,7 +264,7 @@
         <div class="tagline">Ta'lim Markazi</div>
       </div>
     </div>
-    <span class="mode-badge" id="masthead-sub">O'quv Markazi</span>
+    <span class="mode-badge" id="masthead-sub">Talaba rejimi</span>
   </div>
 
   <!-- STUDENT: JOIN -->
@@ -283,12 +283,9 @@
       </div>
     </div>
     <div class="field">
-      <label>Guruh</label>
-      <input type="text" id="studentGroupInput" placeholder="Masalan: BUX-21">
-      <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
-        <input type="checkbox" id="groupUnknownCheckbox" onchange="toggleGroupUnknown()" style="width:auto;">
-        <label style="margin:0;text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink-soft);cursor:pointer;" onclick="document.getElementById('groupUnknownCheckbox').click()">Guruhimni hozircha ko'rsata olmayman</label>
-      </div>
+      <label>Kirish kodi</label>
+      <input type="text" id="studentAccessCodeInput" placeholder="O'qituvchingizdan olingan kod">
+      <p class="desc" style="margin:6px 0 0;font-size:0.8rem;">Guruhingiz yoki shaxsingiz uchun berilgan kodni kiriting.</p>
     </div>
     <button class="btn-primary" onclick="handleJoin()">Kirish</button>
     <div class="footer-link"><button class="toplink" onclick="showAdminLogin()">Boshqaruv paneli</button></div>
@@ -440,7 +437,7 @@ let state = {
   studentName: '',
   studentGroup: '',
   studentSlug: '',
-  config: { tests: [], blockedStudents: [], adminCode: DEFAULT_ADMIN_CODE, rahbarCode: DEFAULT_RAHBAR_CODE, permissions: { adminCanDeleteTests: false } },
+  config: { tests: [], blockedStudents: [], accessCodes: [], adminCode: DEFAULT_ADMIN_CODE, rahbarCode: DEFAULT_RAHBAR_CODE, permissions: { adminCanDeleteTests: false } },
   examConfig: { exams: [] },
   currentExamId: null,
   currentSectionIdx: 0,
@@ -592,11 +589,12 @@ async function loadConfig(){
       if(!cfg.rahbarCode) cfg.rahbarCode = DEFAULT_RAHBAR_CODE;
       if(!cfg.permissions) cfg.permissions = { adminCanDeleteTests: false };
       if(!cfg.blockedStudents) cfg.blockedStudents = [];
+      if(!cfg.accessCodes) cfg.accessCodes = [];
       if(!cfg.tests) cfg.tests = [];
       return cfg;
     }catch(e){ /* corrupt value — fall through to default */ }
   }
-  return { tests: [], blockedStudents: [], adminCode: DEFAULT_ADMIN_CODE, rahbarCode: DEFAULT_RAHBAR_CODE, permissions: { adminCanDeleteTests: false } };
+  return { tests: [], blockedStudents: [], accessCodes: [], adminCode: DEFAULT_ADMIN_CODE, rahbarCode: DEFAULT_RAHBAR_CODE, permissions: { adminCanDeleteTests: false } };
 }
 async function saveConfig(cfg){
   const ok = await storageSet('app-config', JSON.stringify(cfg));
@@ -844,7 +842,7 @@ async function goHome(){
 function showJoin(){
   hideAll();
   showScreen('screen-join');
-  document.getElementById('masthead-sub').textContent = "O'quv Markazi";
+  document.getElementById('masthead-sub').textContent = "Talaba rejimi";
 }
 function showAdminLogin(){
   hideAll();
@@ -853,32 +851,31 @@ function showAdminLogin(){
 }
 
 /* ============ STUDENT FLOW ============ */
-function toggleGroupUnknown(){
-  const checked = document.getElementById('groupUnknownCheckbox').checked;
-  const groupInput = document.getElementById('studentGroupInput');
-  groupInput.disabled = checked;
-  if(checked) groupInput.value = '';
-}
 async function handleJoin(){
   const first = document.getElementById('studentFirstNameInput').value.trim();
   const last = document.getElementById('studentLastNameInput').value.trim();
-  const groupUnknown = document.getElementById('groupUnknownCheckbox').checked;
-  const group = document.getElementById('studentGroupInput').value.trim();
+  const codeEntered = document.getElementById('studentAccessCodeInput').value.trim();
 
   if(first.length < 3){ await customAlert("Ismingizni to'liq kiriting (kamida 3 ta harf)."); return; }
   if(last.length < 3){ await customAlert("Familiyangizni to'liq kiriting (kamida 3 ta harf)."); return; }
-  if(!groupUnknown && group.length===0){ await customAlert("Guruhingizni kiriting, yoki 'Guruhimni hozircha ko'rsata olmayman' belgisini bosing."); return; }
+  if(!codeEntered){ await customAlert("Kirish kodini kiriting."); return; }
+
+  state.config = await loadConfig();
+  const codeObj = (state.config.accessCodes||[]).find(c => c.code===codeEntered);
+  if(!codeObj || !codeObj.active){
+    await customAlert("Kirish kodi noto'g'ri yoki endi faol emas. Iltimos, o'qituvchingiz bilan bog'laning.");
+    return;
+  }
 
   const fullName = `${first} ${last}`;
   const slug = slugify(fullName);
-  state.config = await loadConfig();
   if(state.config.blockedStudents && state.config.blockedStudents.includes(slug)){
     await customAlert("Kirish bloklangan. Iltimos, o'qituvchingiz bilan bog'laning.");
     return;
   }
   state.studentName = fullName;
   state.studentSlug = slug;
-  state.studentGroup = groupUnknown ? "Ko'rsatilmagan" : group;
+  state.studentGroup = codeObj.label;
   upsertRosterEntry(slug, fullName, state.studentGroup); // fire-and-forget: keeps the admin's block-list picker in sync
 
   // Priority 1: a direct single-test link (?test=ID) takes the student straight into that test
@@ -918,9 +915,7 @@ function logoutStudent(){
   state.studentName=''; state.studentSlug=''; state.studentGroup='';
   document.getElementById('studentFirstNameInput').value='';
   document.getElementById('studentLastNameInput').value='';
-  document.getElementById('studentGroupInput').value='';
-  document.getElementById('studentGroupInput').disabled = false;
-  document.getElementById('groupUnknownCheckbox').checked = false;
+  document.getElementById('studentAccessCodeInput').value='';
   showJoin();
 }
 async function showChannelPicker(channels){
@@ -958,7 +953,7 @@ async function renderTestList(){
   }
   hideAll();
   showScreen('screen-test-list');
-  document.getElementById('masthead-sub').textContent = "O'quv Markazi";
+  document.getElementById('masthead-sub').textContent = "Talaba rejimi";
   document.getElementById('studentGreeting').textContent = `Xush kelibsiz, ${state.studentName} · ${state.studentGroup}`;
   state.config = await loadConfig();
   state.examConfig = await loadExamConfig();
@@ -966,7 +961,7 @@ async function renderTestList(){
   const openTests = state.config.tests.filter(t=>t.active);
   const container = document.getElementById('testListContainer');
   if(openTests.length===0){
-    container.innerHTML = state.examConfig.exams.some(e=>e.active) ? '' : `<div class="empty">Hozircha faol testlar mavjud emas. Keyinroq qayta tekshiring.</div>`;
+    container.innerHTML = state.examConfig.exams.some(e=>e.active) ? '' : `<div class="empty">Hozircha ochiq test yo'q. O'qituvchingiz test qo'shishi bilan bu yerda avtomatik paydo bo'ladi.</div>`;
     return;
   }
   container.innerHTML = '<div class="loading">Yuklanmoqda...</div>';
@@ -976,8 +971,10 @@ async function renderTestList(){
     const existing = await getResult(t.id, state.studentSlug);
     let badge, action;
     if(existing){
+      window._studentTestResultsCache = window._studentTestResultsCache || {};
+      window._studentTestResultsCache[t.id] = existing;
       badge = `<span class="badge badge-done">Topshirilgan — ${existing.percentage}%</span>`;
-      action = '';
+      action = `<button class="btn-ghost btn-small" onclick="showResult(window._studentTestResultsCache['${t.id}'])">Natijani ko'rish</button>`;
     } else {
       badge = `<span class="badge badge-open">Ochiq</span>`;
       action = `<button class="btn-primary btn-small" onclick="startTest('${t.id}')">Boshlash</button>`;
@@ -1797,7 +1794,7 @@ async function renderAdminHome(){
       <div class="home-stat-box">${icon('trophy','lg')}<div class="num">${results.length}</div><div class="lbl">Jami urinishlar</div></div>
     </div>
     <div class="lead" style="font-size:1.05rem;margin-bottom:10px;">So'nggi faollik</div>
-    ${recent.length===0 ? '<div class="empty">Hali faollik yo\'q.</div>' : recent.map(r=>`
+    ${recent.length===0 ? '<div class="empty">Hali hech qanday faollik yo\'q — birinchi talaba test topshirganda shu yerda ko\'rinadi.</div>' : recent.map(r=>`
       <div class="home-activity-row">
         ${icon('check')}
         <span style="flex:1;">${escapeHtml(r.studentName)} — <span style="color:var(--ink-soft);">${escapeHtml(r.topic)}</span></span>
@@ -1931,7 +1928,7 @@ async function renderAdminExams(){
   }
   if(state.examsSubTab==='list'){
     if(state.examConfig.exams.length===0){
-      html += `<div class="empty">Hali imtihon qo'shilmagan. "+ Yangi imtihon" bo'limidan qo'shing.</div>`;
+      html += `<div class="empty">Hali imtihon yo'q — "+ Yangi imtihon" tugmasi bilan birinchisini yarating!</div>`;
     } else {
       for(const ex of state.examConfig.exams){
         const results = await fetchAllExamResults(ex.id);
@@ -2138,7 +2135,7 @@ async function buildExamResultsHtml(examId){
   if(!ex) return `<div class="empty">Imtihon topilmadi.</div>`;
   const results = await fetchAllExamResults(examId);
   let html = `<div class="toolbar"><div class="lead" style="margin:0;">${escapeHtml(ex.title)} — Natijalar (${results.length})</div><button class="btn-ghost btn-small" onclick="switchExamsSubTab('list')">Orqaga</button></div>`;
-  if(results.length===0){ html += `<div class="empty">Hali hech kim topshirmagan.</div>`; return html; }
+  if(results.length===0){ html += `<div class="empty">Hali hech kim topshirmagan — natijalar shu yerda avtomatik paydo bo'ladi.</div>`; return html; }
   const sorted = [...results].sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp));
   html += `<table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Ochiq</th><th>Test</th><th>Amaliy</th><th>Umumiy</th><th>Sana</th><th></th></tr></thead><tbody>`;
   sorted.forEach(r=>{
@@ -2235,7 +2232,7 @@ function renderAdminTests(){
       <button class="btn-ghost btn-small" onclick="backupTestsToExcel()">${icon('download')}Bazani Excel'ga zaxiralash</button>
     </div>`;
     if(state.config.tests.length===0){
-      html += `<div class="empty">Hali test qo'shilmagan. "+ Yangi test / Import" bo'limidan qo'shing.</div>`;
+      html += `<div class="empty">Hali test yo'q — "+ Yangi test / Import" bo'limidan birinchisini yarating!</div>`;
     } else {
       state.config.tests.forEach((t,i)=>{
         html += `<div class="row-item">
@@ -2975,7 +2972,7 @@ async function renderAdminAnalytics(){
   const results = await fetchAllResults();
   _analyticsResultsCache = results;
   if(results.length===0){
-    el.innerHTML = `<div class="empty">Tahlil qilish uchun hali natijalar mavjud emas.</div>`;
+    el.innerHTML = `<div class="empty">Hali tahlil qiladigan narsa yo'q — talabalar test topshirgach, bu yerda foydali grafiklar paydo bo'ladi.</div>`;
     return;
   }
   const byTopic = {};
@@ -3126,10 +3123,30 @@ async function renderAdminBlock(){
   const el = document.getElementById('adminTab-block');
   el.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
   const blocked = state.config.blockedStudents || [];
+  const codes = state.config.accessCodes || [];
   const roster = await fetchRoster();
   const rosterMap = {};
   roster.forEach(r=> rosterMap[r.slug] = r);
   el.innerHTML = `
+    <div class="lead" style="margin-bottom:6px;">Kirish kodlari</div>
+    <p class="desc">Har bir guruh yoki alohida shaxs uchun kirish kodi yarating. Talaba saytga kirishda shu kodni ham kiritishi shart bo'ladi. Kodni "O'chirish/Yoqish" orqali istalgan vaqt faolsizlantirishingiz mumkin — guruh tugagach shu yerdan yopib qo'ying.</p>
+    <div class="field" style="max-width:500px;">
+      <div class="flexrow">
+        <input type="text" id="newCodeLabel" placeholder="Nomi (masalan: BUX-21 yoki Jasur Aliyev)">
+        <input type="text" id="newCodeValue" placeholder="Kod (masalan: BUX21-2026)">
+      </div>
+      <button class="btn-primary btn-small" style="margin-top:8px;" onclick="addAccessCode()">${icon('plus')}Kod qo'shish</button>
+    </div>
+    <div id="accessCodesHolder" style="margin:14px 0 24px;">
+      ${codes.length===0 ? '<div class="empty">Hali kirish kodi yo\'q — yuqoridan birinchi kodingizni yarating.</div>' :
+        codes.map(c=>`
+          <div class="row-item">
+            <span class="row-title">${escapeHtml(c.label)}<br><span class="row-meta">${escapeHtml(c.code)}</span></span>
+            <span class="badge ${c.active?'badge-open':'badge-closed'}">${c.active?"Faol":"O'chirilgan"}</span>
+            <button class="btn-ghost btn-small" onclick="toggleAccessCode('${c.id}')">${c.active?"O'chirish":"Yoqish"}</button>
+            <button class="btn-danger btn-small" onclick="deleteAccessCode('${c.id}')">${icon('trash')}O'chirib tashlash</button>
+          </div>`).join('')}
+    </div>
     <div class="lead" style="margin-bottom:14px;">Kirishni bloklash</div>
     <p class="desc">Tizimga bir marta kirgan o'quvchilar ro'yxati avtomatik yangilanadi — shundan tanlang, yoki qo'lda kiriting.</p>
     <div class="field" style="max-width:400px;">
@@ -3147,7 +3164,7 @@ async function renderAdminBlock(){
       </div>
     </div>
     <div id="blockedListHolder">
-      ${blocked.length===0 ? '<div class="empty">Bloklangan o\'quvchi yo\'q.</div>' :
+      ${blocked.length===0 ? '<div class="empty">Bloklangan o\'quvchi yo\'q — hammasi joyida!</div>' :
         blocked.map(slug=>{
           const r = rosterMap[slug];
           const label = r ? `${r.name}${r.group?` (${r.group})`:''}` : slug;
@@ -3155,6 +3172,36 @@ async function renderAdminBlock(){
         }).join('')}
     </div>
   `;
+}
+async function addAccessCode(){
+  const label = document.getElementById('newCodeLabel').value.trim();
+  const code = document.getElementById('newCodeValue').value.trim();
+  if(!label || !code){ showToast("Nom va kodni to'ldiring.", true); return; }
+  if(!state.config.accessCodes) state.config.accessCodes = [];
+  if(state.config.accessCodes.some(c=>c.code===code)){ showToast("Bu kod allaqachon mavjud.", true); return; }
+  const backup = state.config.accessCodes.slice();
+  state.config.accessCodes.push({ id: 'code_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), label, code, active: true });
+  const ok = await saveConfig(state.config);
+  if(ok) showToast("Kirish kodi qo'shildi ✓");
+  else state.config.accessCodes = backup;
+  renderAdminBlock();
+}
+async function toggleAccessCode(id){
+  const c = state.config.accessCodes.find(x=>x.id===id);
+  c.active = !c.active;
+  const ok = await saveConfig(state.config);
+  if(ok) showToast(c.active ? "Kod yoqildi ✓" : "Kod o'chirildi ✓");
+  else c.active = !c.active;
+  renderAdminBlock();
+}
+async function deleteAccessCode(id){
+  if(!(await customConfirm("Ushbu kodni butunlay o'chirishni tasdiqlaysizmi?"))) return;
+  const backup = state.config.accessCodes.slice();
+  state.config.accessCodes = state.config.accessCodes.filter(x=>x.id!==id);
+  const ok = await saveConfig(state.config);
+  if(ok) showToast("Kod o'chirildi ✓");
+  else state.config.accessCodes = backup;
+  renderAdminBlock();
 }
 async function addBlock(){
   const selectVal = document.getElementById('blockStudentSelect').value;
