@@ -182,11 +182,11 @@
      included. A horizontal strip stays tidy regardless of window size. */
   .tabs{
     display:flex;gap:8px;margin:0 0 20px;flex-wrap:nowrap;
-    overflow-x:auto;scroll-snap-type:x proximity;
+    overflow-x:auto;overscroll-behavior-x:contain;touch-action:pan-x;
     -ms-overflow-style:none;scrollbar-width:none;
   }
   .tabs::-webkit-scrollbar{display:none;}
-  .tab{padding:10px 18px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid var(--edge);color:var(--ink-soft);font-size:0.85rem;font-weight:600;cursor:pointer;flex:0 0 auto;white-space:nowrap;scroll-snap-align:start;}
+  .tab{padding:10px 18px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid var(--edge);color:var(--ink-soft);font-size:0.85rem;font-weight:600;cursor:pointer;flex:0 0 auto;white-space:nowrap;}
   .tab.active{background:var(--teal);color:#06231E;border-color:var(--teal);}
   .tab.owner-tab.active{background:var(--white-ac);color:#0F2A26;border-color:var(--white-ac);}
   table{width:100%;border-collapse:collapse;font-size:0.87rem;display:block;overflow-x:auto;white-space:nowrap;}
@@ -1267,7 +1267,7 @@ async function renderAdminMaterials(){
     <div class="field" style="max-width:520px;">
       <label>Fayl yuklash (PDF, rasm; PPT/Word — PDF qilib yuklash tavsiya etiladi)</label>
       <div class="flexrow">
-        <input type="file" id="newMaterialFile" accept=".pdf,.ppt,.pptx,.doc,.docx,.png,.jpg,.jpeg,.webp,.gif,.mp4,.webm">
+        <input type="file" id="newMaterialFile" accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.mp4,.webm">
         <button class="btn-primary btn-small" id="uploadMaterialBtn" onclick="addMaterialFile()">${icon('upload')}Yuklash</button>
       </div>
       <p class="desc" style="margin:6px 0 0;font-size:0.8rem;">Yuklashdan oldin yuqorida material nomini kiriting. Hajmi 50 MB gacha.</p>
@@ -1300,6 +1300,7 @@ async function addMaterialFile(){
   if(!title){ showToast("Material nomini kiriting.", true); return; }
   if(!file){ showToast("Fayl tanlang.", true); return; }
   if(file.size > 50*1024*1024){ showToast("Fayl hajmi 50 MB dan oshmasligi kerak.", true); return; }
+  if(/\.(pptx?|docx?|xlsx?)$/i.test(file.name)){ showToast("PPT/Word/Excel yuklab olishdan himoyalanmaydi. Uni PDF qilib saqlab (Fayl → Saqlash → PDF), PDF ni yuklang.", true); return; }
   const chosenCat = document.getElementById('newMaterialCategory').value;
   if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spinner"></span>Yuklanmoqda...`; }
   try{
@@ -1314,7 +1315,6 @@ async function addMaterialFile(){
     if(ok){
       showToast("Material qo'shildi ✓");
       titleInput.value=''; fileInput.value='';
-      if(/\.(pptx?|docx?)$/i.test(file.name)) showToast("Eslatma: PPT/Word saytda cheklangan ko'rinadi. Qalam va izoh uchun PDF qilib yuklang.", false);
     } else {
       await deleteMaterialFile(uploaded.path);
       showToast("Xatolik: saqlanmadi.", true);
@@ -1364,10 +1364,14 @@ async function deleteMaterial(id){
 }
 
 /* ---- Student: Materiallar (alohida bo'lim) ---- */
+function seenMatKey(){ return 'ft-mat-seen:' + (state.studentSlug || slugify(state.studentName||'') || 'x'); }
+function getSeenMaterials(){ try{ return new Set(JSON.parse(localStorage.getItem(seenMatKey())||'[]')); }catch(e){ return new Set(); } }
+function markMaterialSeen(id){ try{ const s=getSeenMaterials(); if(s.has(id)) return; s.add(id); localStorage.setItem(seenMatKey(), JSON.stringify([...s])); }catch(e){} }
 async function updateMaterialsBadge(){
   try{
     const cfg = await loadMaterialsConfig();
-    const n = (cfg.materials||[]).length;
+    const seen = getSeenMaterials();
+    const n = (cfg.materials||[]).filter(x=>!seen.has(x.id)).length;
     const b = document.getElementById('materialsCountBadge');
     if(b){ b.textContent = n; b.style.display = n>0 ? 'inline-flex' : 'none'; }
     window._materialsCache = cfg.materials||[];
@@ -1432,6 +1436,7 @@ function viewerKeyBlock(e){
 async function openMaterial(id){
   const m = (window._materialsCache||[]).find(x=>x.id===id);
   if(!m) return;
+  if(!state.role) markMaterialSeen(id);
   state.viewerReturn = state.role ? 'admin' : 'student';
   hideAll();
   showScreen('screen-viewer');
@@ -1458,8 +1463,7 @@ async function openMaterial(id){
       return;
     }
     if(/\.(pptx?|docx?|xlsx?)$/.test(f)){
-      body.innerHTML = `<p class="desc">Bu format uchun qalam/izoh imkoniyati yo'q (PDF qilib yuklangan materiallarda bor).</p>
-        <div style="position:relative;width:100%;padding-top:70%;"><iframe src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(m.url)}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe></div>`;
+      body.innerHTML = `<div class="empty">Bu material PPT/Word formatida. Himoya (yuklab olish va nusxalashni cheklash) faqat PDF formatida ishlaydi, shuning uchun bu format ko'rsatilmaydi.<br>O'qituvchingizdan PDF variantini yuklashni so'rang.</div>`;
       return;
     }
     await loadViewerAnnotations();
@@ -1478,7 +1482,7 @@ function closeViewer(){
   if(state.viewer && state.viewer.observer) state.viewer.observer.disconnect();
   state.viewer = null;
   if(state.role){ document.getElementById('screen-viewer').classList.add('hidden'); openAdminDashboard().then(()=>switchAdminTab('materials')); }
-  else showStudentMaterials();
+  else { showStudentMaterials(); updateMaterialsBadge(); }
 }
 function annKey(){ return `note:${state.studentSlug}:${state.viewer.m.id}`; }
 async function loadViewerAnnotations(){
@@ -3228,24 +3232,25 @@ async function openAdminDashboard(){
 }
 /* Panel tugmalarini sichqoncha bilan ushlab surish */
 (function initTabDrag(){
-  let down=false, startX=0, startScroll=0, moved=false, el=null;
-  document.addEventListener('mousedown', e=>{
+  let down=false, startX=0, startScroll=0, moved=false, el=null, target=0, raf=0;
+  const apply=()=>{ raf=0; if(el) el.scrollLeft=target; };
+  document.addEventListener('pointerdown', e=>{
+    if(e.pointerType==='touch') return; // telefonda brauzerning o'z surishi ishlaydi
     el = e.target.closest && e.target.closest('.tabs');
     if(!el || e.button!==0) return;
-    down=true; moved=false; startX=e.pageX; startScroll=el.scrollLeft;
+    down=true; moved=false; startX=e.clientX; startScroll=el.scrollLeft;
   });
-  document.addEventListener('mousemove', e=>{
+  document.addEventListener('pointermove', e=>{
     if(!down || !el) return;
-    const dx = e.pageX-startX;
-    if(Math.abs(dx)>4){ moved=true; el.classList.add('dragging'); }
-    if(moved) el.scrollLeft = startScroll - dx;
+    const dx = e.clientX-startX;
+    if(!moved && Math.abs(dx)>5){ moved=true; el.classList.add('dragging'); }
+    if(moved){ target = startScroll - dx; if(!raf) raf=requestAnimationFrame(apply); e.preventDefault(); }
   });
   const end = ()=>{ if(el) el.classList.remove('dragging'); down=false; };
-  document.addEventListener('mouseup', end);
-  document.addEventListener('mouseleave', end);
-  // sudrashdan keyin tasodifan tugma bosilib ketmasin
-  document.addEventListener('click', e=>{ if(moved && e.target.closest && e.target.closest('.tabs')){ e.stopPropagation(); e.preventDefault(); moved=false; } }, true);
-  // g'ildirak bilan ham yon tomonga surish
+  document.addEventListener('pointerup', end);
+  document.addEventListener('pointercancel', end);
+  window.addEventListener('blur', end);
+  document.addEventListener('click', e=>{ if(moved && e.target.closest && e.target.closest('.tabs')){ e.stopPropagation(); e.preventDefault(); } moved=false; }, true);
   document.addEventListener('wheel', e=>{
     const t = e.target.closest && e.target.closest('.tabs');
     if(t && Math.abs(e.deltaY)>Math.abs(e.deltaX) && t.scrollWidth>t.clientWidth){ t.scrollLeft += e.deltaY; e.preventDefault(); }
