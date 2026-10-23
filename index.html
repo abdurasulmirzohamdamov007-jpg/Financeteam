@@ -50,11 +50,28 @@
   :root[data-theme="light"] .row-item,:root[data-theme="light"] .qeditor,:root[data-theme="light"] .stat-box,:root[data-theme="light"] .live-lb-row,:root[data-theme="light"] .code-display{background:#F4F8F6;}
   :root[data-theme="light"] .row-item:hover{background:#EAF2EF;}
   :root[data-theme="light"] .btn-ghost,:root[data-theme="light"] .tab,:root[data-theme="light"] .opt{background:#fff;border-color:rgba(15,42,38,0.22);}
-  :root[data-theme="light"] .tab.active{color:#fff;}
+  :root[data-theme="light"] .tab.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+  :root[data-theme="light"] .tab.owner-tab.active{background:#12302B;border-color:#12302B;color:#fff;}
   :root[data-theme="light"] .btn-primary{color:#fff;}
   :root[data-theme="light"] .badge-closed,:root[data-theme="light"] .chat-msg-admin{background:#E6EEEB;}
   :root[data-theme="light"] .opt.correct{background:rgba(14,138,118,0.14);}
   :root[data-theme="light"] .opt.wrong{background:rgba(201,58,46,0.12);}
+  .count-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:9px;background:var(--red);color:#fff;font-size:0.68rem;font-weight:700;line-height:1;vertical-align:middle;}
+  .tabs{cursor:grab;} .tabs.dragging{cursor:grabbing;user-select:none;} .tabs.dragging .tab{pointer-events:none;}
+  .home-stat-box.clickable{cursor:pointer;transition:transform .15s, box-shadow .15s, border-color .15s;}
+  .home-stat-box.clickable:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);border-color:var(--teal);}
+  .home-stat-box.clickable:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+  .chat-group-h{font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin:12px 2px 6px;display:flex;align-items:center;justify-content:space-between;}
+  .viewer-tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px;position:sticky;top:0;z-index:5;padding:6px;border-radius:10px;background:var(--card);border:1px solid var(--edge);}
+  .viewer-tools button{padding:6px 10px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--ink);cursor:pointer;font-size:0.85rem;}
+  .viewer-tools button.on{background:var(--teal);color:#06231E;border-color:var(--teal);}
+  .viewer-tools .sw{width:22px;height:22px;border-radius:50%;padding:0;border:2px solid transparent;}
+  .viewer-tools .sw.on{border-color:var(--ink);}
+  .viewer-body{max-height:78vh;overflow:auto;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;background:rgba(0,0,0,0.12);border-radius:10px;padding:8px;}
+  .vpage{position:relative;margin:0 auto 10px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.25);max-width:100%;}
+  .vpage canvas{display:block;width:100%;height:100%;max-height:none;position:absolute;left:0;top:0;}
+  .mat-cat{display:inline-block;font-size:0.72rem;padding:2px 8px;border-radius:8px;background:var(--edge);color:var(--ink-soft);}
+  @media print{ body.viewer-open .app{display:none !important;} body.viewer-open::before{content:"Bu material chop etilmaydi.";display:block;padding:40px;font-size:20px;} }
   .theme-toggle{background:transparent;border:1px solid var(--edge);color:var(--ink);border-radius:10px;padding:6px 10px;cursor:pointer;font-size:0.95rem;line-height:1;}
   *{box-sizing:border-box;}
   body{
@@ -407,14 +424,15 @@
       </div>
       <div class="flexrow" style="width:auto;">
         <button class="btn-ghost btn-small" onclick="renderStudentProfile()"><svg class="icon" viewBox="0 0 24 24"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v6a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/></svg>Mening natijalarim</button>
-        <button class="btn-ghost btn-small" onclick="showLeaderboard()">Reyting</button>
-        <button class="btn-ghost btn-small" onclick="showStudentChat()">Savol-javob</button>
+        <button class="btn-ghost btn-small" onclick="showLeaderboard('group')">Reyting</button>
+        <button class="btn-ghost btn-small" onclick="showStudentMaterials()">Materiallar<span class="count-badge" id="materialsCountBadge" style="background:var(--teal);color:#06231E;display:none;"></span></button>
+        <button class="btn-ghost btn-small" onclick="showStudentChat()">Savol-javob<span class="count-badge hidden" id="studentChatBadge"></span></button>
         <button class="btn-ghost btn-small" onclick="logoutStudent()">Chiqish</button>
       </div>
     </div>
     <div id="notificationsBanner"></div>
     <div id="examsListContainer"></div>
-    <div id="materialsListContainer"></div>
+
     <div id="testListContainer"></div>
   </div>
 
@@ -434,6 +452,25 @@
       <button class="btn-ghost btn-small" onclick="renderTestList()">Orqaga</button>
     </div>
     <div id="leaderboardBody"></div>
+  </div>
+
+  <!-- STUDENT: MATERIALS -->
+  <div id="screen-materials" class="card hidden">
+    <div class="toolbar">
+      <div class="lead" style="margin:0;">O'quv materiallari</div>
+      <button class="btn-ghost btn-small" onclick="renderTestList()">Orqaga</button>
+    </div>
+    <div id="materialsBody"></div>
+  </div>
+
+  <!-- STUDENT: MATERIAL VIEWER (yuklab olish yo'q; qalam/izoh bor) -->
+  <div id="screen-viewer" class="card hidden" style="padding:16px 14px;">
+    <div class="toolbar" style="margin-bottom:8px;">
+      <div class="lead" style="margin:0;font-size:1.05rem;" id="viewerTitle"></div>
+      <button class="btn-ghost btn-small" onclick="closeViewer()">Yopish</button>
+    </div>
+    <div id="viewerTools" class="viewer-tools hidden"></div>
+    <div id="viewerBody" class="viewer-body"></div>
   </div>
 
   <!-- STUDENT: CHAT -->
@@ -715,6 +752,25 @@ async function storageGet(key){
   const r = await storageGetStrict(key);
   return r.value;
 }
+// RLS yoqilgandan keyin: admin yozishda rad etilsa, Supabase hisobi so'raladi va yozish bir marta qaytariladi.
+// RLS yoqilmagan bo'lsa bu hech qachon ishga tushmaydi — hech narsa so'ralmaydi.
+function isAuthDenied(e){
+  if(!e) return false;
+  const m = String(e.message||'')+' '+String(e.details||'');
+  return e.code==='42501' || e.status===401 || e.status===403 || /row-level security|RLS|permission denied|JWT/i.test(m);
+}
+async function retryAfterAdminAuth(e){
+  if(!state.role || !isAuthDenied(e)) return false;
+  if(state._authDeclinedAt && Date.now()-state._authDeclinedAt < 30000) return false;
+  // bir vaqtda bir nechta yozish rad etilsa, hammasi bitta oynani kutadi
+  if(!state._authPromise){
+    state._authPromise = ensureAdminAuth().then(ok=>{ if(!ok) state._authDeclinedAt = Date.now(); return ok; }, ()=>false).finally(()=>{ state._authPromise = null; });
+  } else {
+    return state._authPromise;
+  }
+  // "Keyinroq" bosilgandan keyin 30 soniya qayta so'ralmaydi
+  return state._authPromise;
+}
 async function storageSet(key, value){
   for(let attempt=0; attempt<=2; attempt++){
     try{
@@ -722,6 +778,10 @@ async function storageSet(key, value){
       if(error) throw error;
       return true;
     }catch(e){
+      if(isAuthDenied(e)){
+        if(await retryAfterAdminAuth(e)){ const r = await supabaseClient.from('kv_store').upsert({ key, value }); return !r.error; }
+        return false;
+      }
       if(attempt===2) return false;
       await new Promise(res=>setTimeout(res, 350*(attempt+1)));
     }
@@ -731,10 +791,18 @@ async function storageSet(key, value){
 async function storageDelete(key){
   for(let attempt=0; attempt<=2; attempt++){
     try{
-      const { error } = await withTimeout(supabaseClient.from('kv_store').delete().eq('key', key), 8000);
+      const { data, error } = await withTimeout(supabaseClient.from('kv_store').delete().eq('key', key).select('key'), 8000);
       if(error) throw error;
+      // RLS o'chirishni jimgina rad etadi (xato bermaydi, 0 ta qator): admin sessiyasiz bo'lsa, hisob so'raymiz
+      if(state.role && (!data || data.length===0) && !(await getAdminSession())){
+        if(await retryAfterAdminAuth({code:'42501'})){ const r = await supabaseClient.from('kv_store').delete().eq('key', key); return !r.error; }
+      }
       return true;
     }catch(e){
+      if(isAuthDenied(e)){
+        if(await retryAfterAdminAuth(e)){ const r = await supabaseClient.from('kv_store').delete().eq('key', key); return !r.error; }
+        return false;
+      }
       if(attempt===2) return false;
       await new Promise(res=>setTimeout(res, 350*(attempt+1)));
     }
@@ -787,7 +855,7 @@ const LOG_TYPE_LABELS = {
   account_create:'Login yaratildi', account_block:'Bloklandi', account_unblock:'Blokdan chiqarildi',
   account_delete:"Login o'chirildi", account_reset:'Parol yangilandi', account_encrypt:'Parollar shifrlandi',
   course_finish:'Kurs yakunlandi', block_add:"Qo'lda bloklandi", block_remove:'Blok olib tashlandi',
-  test_toggle:'Test holati', exam_toggle:'Imtihon holati', backup_export:'Zaxira yuklandi', backup_restore:'Zaxira tiklandi', export:'Hisobot yuklandi', settings:'Sozlamalar'
+  test_toggle:'Test holati', exam_toggle:'Imtihon holati', backup_export:'Zaxira yuklandi', backup_restore:'Zaxira tiklandi', group_delete:"Guruh o'chirildi", chat_delete:"Suhbat o'chirildi", export:'Hisobot yuklandi', settings:'Sozlamalar'
 };
 function logActivity(type, text, actor){
   try{
@@ -1150,26 +1218,59 @@ function extractYoutubeEmbed(url){
   return m ? `https://www.youtube.com/embed/${m[1]}` : null;
 }
 
-/* ---- Admin: Materials tab ---- */
+/* ---- Material toifalari (kelajakda kurs/dars bilan bog'lanishi uchun courseId/lessonId maydonlari tayyor) ---- */
+const MATERIAL_CATEGORIES = [
+  {id:'video', label:'Videolar'}, {id:'book', label:'Kitoblar'}, {id:'slides', label:'Taqdimotlar'},
+  {id:'task', label:'Vazifalar'}, {id:'other', label:'Boshqa'}
+];
+function materialCategoryLabel(id){ const c = MATERIAL_CATEGORIES.find(x=>x.id===id); return c ? c.label : 'Boshqa'; }
+function guessMaterialCategory(m){
+  if(m.category) return m.category;
+  if(m.kind==='youtube') return 'video';
+  const mt = (m.mimeType||'')+' '+(m.fileName||'').toLowerCase();
+  if(/video|\.mp4|\.webm/.test(mt)) return 'video';
+  if(/ppt|presentation/.test(mt)) return 'slides';
+  if(/pdf/.test(mt)) return 'book';
+  return 'other';
+}
+function categoryOptionsHtml(selected){
+  return MATERIAL_CATEGORIES.map(c=>`<option value="${c.id}" ${c.id===selected?'selected':''}>${c.label}</option>`).join('');
+}
 async function renderAdminMaterials(){
   const el = document.getElementById('adminTab-materials');
   el.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
   state.materialsConfig = await loadMaterialsConfig();
   const list = state.materialsConfig.materials || [];
+  window._materialsCache = list;
+  const groupsHtml = MATERIAL_CATEGORIES.map(c=>{
+    const items = list.filter(m=>guessMaterialCategory(m)===c.id);
+    if(!items.length) return '';
+    return `<div class="chat-group-h"><span>${c.label} · ${items.length}</span></div>` + items.map(m=>`
+      <div class="row-item">
+        <span class="row-title">${icon(materialKindIcon(m))} ${escapeHtml(m.title)}<br><span class="row-meta">${m.kind==='youtube' ? 'YouTube video' : escapeHtml(m.fileName||'Fayl')}</span></span>
+        <select onchange="changeMaterialCategory('${m.id}',this.value)" style="width:auto;" title="Toifa">${categoryOptionsHtml(guessMaterialCategory(m))}</select>
+        <button class="btn-ghost btn-small" onclick="openMaterial('${m.id}')">${icon('play')}Ko'rish</button>
+        <button class="btn-danger btn-small" onclick="deleteMaterial('${m.id}')">${icon('trash')}O'chirish</button>
+      </div>`).join('');
+  }).join('');
   el.innerHTML = `
     <div class="lead" style="margin-bottom:6px;">O'quv materiallari</div>
-    <p class="desc">Talabalar uchun hujjat, taqdimot (PPT), rasm yuklang yoki YouTube video havolasini qo'shing. Video fayllar to'g'ridan-to'g'ri yuklanmaydi (joy tejash uchun) — faqat YouTube havolasi qo'shiladi.</p>
+    <p class="desc">Materiallar talabalarga <strong>faqat saytda ko'rish</strong> uchun beriladi: yuklab olish tugmasi yo'q, matnni nusxalab bo'lmaydi, har sahifada talaba ismi suv belgisi bo'lib turadi. PDF va rasmlarda talaba qalam, marker va izoh bilan yozishi mumkin. <strong>PPT/Word fayllarni PDF qilib yuklang</strong> — shunda hamma imkoniyat ishlaydi. Video uchun YouTube havolasidan foydalaning.</p>
     <div class="field" style="max-width:520px;">
       <label>Material nomi</label>
       <input type="text" id="newMaterialTitle" placeholder="Masalan: 3-mavzu — Aktiv va passiv">
     </div>
     <div class="field" style="max-width:520px;">
-      <label>Fayl yuklash (PDF, PPT, rasm va h.k.)</label>
+      <label>Toifa</label>
+      <select id="newMaterialCategory"><option value="">Avtomatik (fayl turiga qarab)</option>${categoryOptionsHtml('')}</select>
+    </div>
+    <div class="field" style="max-width:520px;">
+      <label>Fayl yuklash (PDF, rasm; PPT/Word — PDF qilib yuklash tavsiya etiladi)</label>
       <div class="flexrow">
-        <input type="file" id="newMaterialFile" accept=".pdf,.ppt,.pptx,.doc,.docx,.png,.jpg,.jpeg,.webp,.gif">
+        <input type="file" id="newMaterialFile" accept=".pdf,.ppt,.pptx,.doc,.docx,.png,.jpg,.jpeg,.webp,.gif,.mp4,.webm">
         <button class="btn-primary btn-small" id="uploadMaterialBtn" onclick="addMaterialFile()">${icon('upload')}Yuklash</button>
       </div>
-      <p class="desc" style="margin:6px 0 0;font-size:0.8rem;">Yuklashdan oldin yuqorida material nomini kiriting.</p>
+      <p class="desc" style="margin:6px 0 0;font-size:0.8rem;">Yuklashdan oldin yuqorida material nomini kiriting. Hajmi 50 MB gacha.</p>
     </div>
     <div class="field" style="max-width:520px;">
       <label>Yoki YouTube video havolasi</label>
@@ -1179,15 +1280,16 @@ async function renderAdminMaterials(){
       </div>
     </div>
     <div id="materialsHolder" style="margin-top:16px;">
-      ${list.length===0 ? '<div class="empty">Hali material yo\'q — yuqoridan birinchi materialingizni qo\'shing.</div>' :
-        list.map(m=>`
-          <div class="row-item">
-            <span class="row-title">${icon(materialKindIcon(m))} ${escapeHtml(m.title)}<br><span class="row-meta">${m.kind==='youtube' ? 'YouTube video' : escapeHtml(m.fileName||'Fayl')}</span></span>
-            <a href="${escapeAttr(m.url)}" target="_blank" rel="noopener"><button class="btn-ghost btn-small" type="button">${icon('link')}Ochish</button></a>
-            <button class="btn-danger btn-small" onclick="deleteMaterial('${m.id}')">${icon('trash')}O'chirish</button>
-          </div>`).join('')}
+      ${list.length===0 ? '<div class="empty">Hali material yo\'q — yuqoridan birinchi materialingizni qo\'shing.</div>' : groupsHtml}
     </div>
   `;
+}
+async function changeMaterialCategory(id, cat){
+  const m = state.materialsConfig.materials.find(x=>x.id===id); if(!m) return;
+  const prev = m.category; m.category = cat;
+  const ok = await saveMaterialsConfig(state.materialsConfig);
+  if(!ok) m.category = prev; else showToast("Toifa o'zgartirildi ✓");
+  renderAdminMaterials();
 }
 async function addMaterialFile(){
   const titleInput = document.getElementById('newMaterialTitle');
@@ -1198,24 +1300,21 @@ async function addMaterialFile(){
   if(!title){ showToast("Material nomini kiriting.", true); return; }
   if(!file){ showToast("Fayl tanlang.", true); return; }
   if(file.size > 50*1024*1024){ showToast("Fayl hajmi 50 MB dan oshmasligi kerak.", true); return; }
-  const origHtml = btn ? btn.innerHTML : '';
+  const chosenCat = document.getElementById('newMaterialCategory').value;
   if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spinner"></span>Yuklanmoqda...`; }
   try{
     const uploaded = await uploadMaterialFile(file);
     if(!uploaded){ showToast("Xatolik: fayl yuklanmadi. Internetni tekshirib qayta urinib ko'ring.", true); return; }
     if(!state.materialsConfig) state.materialsConfig = await loadMaterialsConfig();
     if(!state.materialsConfig.materials) state.materialsConfig.materials = [];
-    state.materialsConfig.materials.unshift({
-      id: 'mat_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
-      title, kind: 'file',
-      url: uploaded.url, path: uploaded.path,
-      fileName: file.name, mimeType: file.type,
-      addedAt: Date.now()
-    });
+    const m = { id: 'mat_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), title, kind: 'file', url: uploaded.url, path: uploaded.path, fileName: file.name, mimeType: file.type, addedAt: Date.now(), courseId:null, lessonId:null };
+    m.category = chosenCat || guessMaterialCategory(m);
+    state.materialsConfig.materials.unshift(m);
     const ok = await saveMaterialsConfig(state.materialsConfig);
     if(ok){
       showToast("Material qo'shildi ✓");
       titleInput.value=''; fileInput.value='';
+      if(/\.(pptx?|docx?)$/i.test(file.name)) showToast("Eslatma: PPT/Word saytda cheklangan ko'rinadi. Qalam va izoh uchun PDF qilib yuklang.", false);
     } else {
       await deleteMaterialFile(uploaded.path);
       showToast("Xatolik: saqlanmadi.", true);
@@ -1236,20 +1335,15 @@ async function addMaterialYoutube(){
   if(!state.materialsConfig) state.materialsConfig = await loadMaterialsConfig();
   if(!state.materialsConfig.materials) state.materialsConfig.materials = [];
   const backup = state.materialsConfig.materials.slice();
+  const chosenCat = document.getElementById('newMaterialCategory').value;
   state.materialsConfig.materials.unshift({
     id: 'mat_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
-    title, kind: 'youtube',
-    url: rawUrl, embedUrl: embed,
-    addedAt: Date.now()
+    title, kind: 'youtube', url: rawUrl, embedUrl: embed, category: chosenCat || 'video',
+    addedAt: Date.now(), courseId:null, lessonId:null
   });
   const ok = await saveMaterialsConfig(state.materialsConfig);
-  if(ok){
-    showToast("Video qo'shildi ✓");
-    titleInput.value=''; urlInput.value='';
-  } else {
-    state.materialsConfig.materials = backup;
-    showToast("Xatolik: saqlanmadi.", true);
-  }
+  if(ok){ showToast("Video qo'shildi ✓"); titleInput.value=''; urlInput.value=''; }
+  else { state.materialsConfig.materials = backup; showToast("Xatolik: saqlanmadi.", true); }
   renderAdminMaterials();
 }
 async function deleteMaterial(id){
@@ -1269,32 +1363,280 @@ async function deleteMaterial(id){
   renderAdminMaterials();
 }
 
-/* ---- Student: Materials list (inside screen-test-list) ---- */
-async function renderStudentMaterialsList(){
-  const container = document.getElementById('materialsListContainer');
-  if(!container) return;
+/* ---- Student: Materiallar (alohida bo'lim) ---- */
+async function updateMaterialsBadge(){
+  try{
+    const cfg = await loadMaterialsConfig();
+    const n = (cfg.materials||[]).length;
+    const b = document.getElementById('materialsCountBadge');
+    if(b){ b.textContent = n; b.style.display = n>0 ? 'inline-flex' : 'none'; }
+    window._materialsCache = cfg.materials||[];
+  }catch(e){}
+}
+async function showStudentMaterials(cat){
+  hideAll();
+  showScreen('screen-materials');
+  const body = document.getElementById('materialsBody');
+  body.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
   const cfg = await loadMaterialsConfig();
   const list = cfg.materials || [];
-  if(list.length===0){ container.innerHTML=''; return; }
-  let html = `<div class="lead" style="font-size:1.1rem;margin-bottom:10px;">O'quv materiallari</div>`;
-  for(const m of list){
-    html += `<div class="row-item">
-      <span class="row-title">${icon(materialKindIcon(m))} ${escapeHtml(m.title)}<br><span class="row-meta">${m.kind==='youtube' ? 'Video' : escapeHtml(m.fileName||'Fayl')}</span></span>
-      <button class="btn-primary btn-small" onclick="openMaterial('${m.id}')">${m.kind==='youtube'?icon('play'):icon('download')}${m.kind==='youtube'?"Ko'rish":"Ochish"}</button>
-    </div>`;
-  }
-  container.innerHTML = html;
   window._materialsCache = list;
+  if(list.length===0){ body.innerHTML = `<div class="empty">Hozircha material yo'q. O'qituvchingiz qo'shishi bilan shu yerda paydo bo'ladi.</div>`; return; }
+  const active = cat || state.matCat || 'all';
+  state.matCat = active;
+  const counts = {}; list.forEach(m=>{ const c=guessMaterialCategory(m); counts[c]=(counts[c]||0)+1; });
+  const chips = [{id:'all',label:'Hammasi'}, ...MATERIAL_CATEGORIES.filter(c=>counts[c.id])];
+  let html = `<div class="tabs" style="margin-bottom:14px;">${chips.map(c=>`<button class="tab ${active===c.id?'active':''}" onclick="showStudentMaterials('${c.id}')">${c.label}${c.id==='all'?'':' ('+counts[c.id]+')'}</button>`).join('')}</div>`;
+  MATERIAL_CATEGORIES.forEach(c=>{
+    if(active!=='all' && active!==c.id) return;
+    const items = list.filter(m=>guessMaterialCategory(m)===c.id);
+    if(!items.length) return;
+    html += `<div class="chat-group-h"><span>${c.label}</span></div>` + items.map(m=>`
+      <div class="row-item">
+        <span class="row-title">${icon(materialKindIcon(m))} ${escapeHtml(m.title)}<br><span class="row-meta">${m.kind==='youtube' ? 'Video' : escapeHtml(materialTypeLabel(m))}</span></span>
+        <button class="btn-primary btn-small" onclick="openMaterial('${m.id}')">${m.kind==='youtube'?icon('play'):icon('book')}${m.kind==='youtube'?"Ko'rish":"O'qish"}</button>
+      </div>`).join('');
+  });
+  body.innerHTML = html;
 }
-function openMaterial(id){
+function materialTypeLabel(m){
+  const f = (m.fileName||'').toLowerCase();
+  if(/\.pdf$/.test(f)) return 'PDF hujjat';
+  if(/\.(png|jpe?g|webp|gif)$/.test(f)) return 'Rasm';
+  if(/\.(mp4|webm)$/.test(f)) return 'Video fayl';
+  if(/\.pptx?$/.test(f)) return 'Taqdimot';
+  if(/\.docx?$/.test(f)) return 'Hujjat';
+  return 'Fayl';
+}
+
+/* ---- Material o'quvchisi: faqat saytda ko'rish, yuklab olish va nusxalash yo'q ---- */
+function ensurePdfJs(){
+  if(typeof pdfjsLib==='undefined') throw new Error("PDF o'qish kutubxonasi yuklanmadi. Internetni tekshiring.");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+function viewerWatermark(){ return (state.studentName || (state.role==='rahbar'?'Rahbar':'Admin')) + ' · ' + new Date().toLocaleDateString('uz-UZ'); }
+function drawWatermark(ctx, w, h){
+  ctx.save();
+  ctx.globalAlpha = 0.07; ctx.fillStyle = "#000"; ctx.font = `${Math.round(w/30)}px sans-serif`;
+  ctx.rotate(-Math.PI/7);
+  const txt = viewerWatermark();
+  for(let y=-h; y<h*1.5; y+=h/4) for(let x=-w; x<w*1.5; x+=w/1.6) ctx.fillText(txt, x, y);
+  ctx.restore();
+}
+function viewerKeyBlock(e){
+  if(!state.viewer) return;
+  const k = (e.key||'').toLowerCase();
+  if((e.ctrlKey||e.metaKey) && ['s','p','c','u','a'].includes(k)){ e.preventDefault(); e.stopPropagation(); }
+  if(k==='printscreen'){ try{ navigator.clipboard.writeText(''); }catch(_){} }
+}
+async function openMaterial(id){
   const m = (window._materialsCache||[]).find(x=>x.id===id);
   if(!m) return;
-  if(m.kind==='youtube'){
-    showModal('', [{label:'Yopish', primary:true, onClick:()=>{ closeModal(); }}]);
-    document.getElementById('modalMessage').innerHTML = `<div style="position:relative;width:100%;padding-top:56.25%;"><iframe src="${escapeAttr(m.embedUrl)}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe></div>`;
-  } else {
-    window.open(m.url, '_blank', 'noopener');
+  state.viewerReturn = state.role ? 'admin' : 'student';
+  hideAll();
+  showScreen('screen-viewer');
+  document.body.classList.add('viewer-open');
+  document.getElementById('viewerTitle').textContent = m.title;
+  const body = document.getElementById('viewerBody'), tools = document.getElementById('viewerTools');
+  tools.classList.add('hidden'); tools.innerHTML='';
+  body.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  state.viewer = { m, tool:'view', color:'#e5392b', pages:{}, ann:{pages:{}}, history:[], saveTimer:null };
+  document.addEventListener('keydown', viewerKeyBlock, true);
+  const guard = document.getElementById('screen-viewer');
+  guard.oncontextmenu = e=>{ e.preventDefault(); return false; };
+  guard.ondragstart = e=>{ e.preventDefault(); return false; };
+  guard.oncopy = e=>{ e.preventDefault(); return false; };
+  guard.oncut = e=>{ e.preventDefault(); return false; };
+  try{
+    if(m.kind==='youtube'){
+      body.innerHTML = `<div style="position:relative;width:100%;padding-top:56.25%;"><iframe src="${escapeAttr(m.embedUrl)}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
+      return;
+    }
+    const f = (m.fileName||m.url||'').toLowerCase();
+    if(/\.(mp4|webm)$/.test(f)){
+      body.innerHTML = `<video src="${escapeAttr(m.url)}" controls controlsList="nodownload noplaybackrate" disablePictureInPicture playsinline oncontextmenu="return false" style="width:100%;max-height:74vh;background:#000;border-radius:8px;"></video>`;
+      return;
+    }
+    if(/\.(pptx?|docx?|xlsx?)$/.test(f)){
+      body.innerHTML = `<p class="desc">Bu format uchun qalam/izoh imkoniyati yo'q (PDF qilib yuklangan materiallarda bor).</p>
+        <div style="position:relative;width:100%;padding-top:70%;"><iframe src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(m.url)}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe></div>`;
+      return;
+    }
+    await loadViewerAnnotations();
+    buildViewerTools();
+    if(/\.pdf$/.test(f) || (m.mimeType||'').includes('pdf')) await renderPdfPages(m);
+    else await renderImagePage(m);
+  }catch(e){
+    body.innerHTML = `<div class="empty" style="color:var(--red);">Materialni ochib bo'lmadi: ${escapeHtml(e.message||'xatolik')}</div>`;
   }
+}
+function closeViewer(){
+  if(state.viewer && state.viewer.saveTimer){ clearTimeout(state.viewer.saveTimer); saveViewerAnnotations(); }
+  document.removeEventListener('keydown', viewerKeyBlock, true);
+  document.body.classList.remove('viewer-open');
+  const body = document.getElementById('viewerBody'); if(body) body.innerHTML = '';
+  if(state.viewer && state.viewer.observer) state.viewer.observer.disconnect();
+  state.viewer = null;
+  if(state.role){ document.getElementById('screen-viewer').classList.add('hidden'); openAdminDashboard().then(()=>switchAdminTab('materials')); }
+  else showStudentMaterials();
+}
+function annKey(){ return `note:${state.studentSlug}:${state.viewer.m.id}`; }
+async function loadViewerAnnotations(){
+  if(state.role || !state.studentSlug) return; // admin ko'rishida yozuv saqlanmaydi
+  let raw = await storageGet(annKey());
+  if(!raw){ try{ raw = localStorage.getItem(annKey()); }catch(e){} }
+  if(raw){ try{ state.viewer.ann = JSON.parse(raw); if(!state.viewer.ann.pages) state.viewer.ann.pages = {}; }catch(e){} }
+}
+function saveViewerAnnotationsSoon(){
+  const v = state.viewer; if(!v || state.role) return;
+  clearTimeout(v.saveTimer);
+  v.saveTimer = setTimeout(saveViewerAnnotations, 1500);
+}
+async function saveViewerAnnotations(){
+  const v = state.viewer; if(!v || state.role || !state.studentSlug) return;
+  v.saveTimer = null;
+  const data = JSON.stringify(v.ann);
+  try{ localStorage.setItem(annKey(), data); }catch(e){}
+  await storageSet(annKey(), data);
+}
+function buildViewerTools(){
+  const t = document.getElementById('viewerTools'); t.classList.remove('hidden');
+  const colors = ['#e5392b','#1e6fe0','#1a9d57','#111111'];
+  t.innerHTML = `
+    <button data-tool="view" class="on" onclick="setViewerTool('view')">✋ Ko'rish</button>
+    <button data-tool="pen" onclick="setViewerTool('pen')">✏️ Qalam</button>
+    <button data-tool="hl" onclick="setViewerTool('hl')">🖍 Marker</button>
+    <button data-tool="note" onclick="setViewerTool('note')">📝 Izoh</button>
+    <button data-tool="erase" onclick="setViewerTool('erase')">⌫ O'chirg'ich</button>
+    <span style="display:flex;gap:6px;margin:0 4px;">${colors.map((c,i)=>`<button class="sw ${i===0?'on':''}" data-color="${c}" style="background:${c};" onclick="setViewerColor('${c}')" aria-label="rang"></button>`).join('')}</span>
+    <button onclick="viewerUndo()">↶ Ortga</button>
+    <button onclick="viewerClear()">🗑 Tozalash</button>`;
+}
+function setViewerTool(tool){
+  state.viewer.tool = tool;
+  document.querySelectorAll('#viewerTools [data-tool]').forEach(b=>b.classList.toggle('on', b.dataset.tool===tool));
+  document.querySelectorAll('.vpage .ann').forEach(c=>{ c.style.pointerEvents = tool==='view' ? 'none' : 'auto'; c.style.touchAction = tool==='view' ? 'auto' : 'none'; c.style.cursor = tool==='erase' ? 'cell' : (tool==='note' ? 'text' : 'crosshair'); });
+}
+function setViewerColor(c){
+  state.viewer.color = c;
+  document.querySelectorAll('#viewerTools .sw').forEach(b=>b.classList.toggle('on', b.dataset.color===c));
+}
+function pageAnn(n){ const a = state.viewer.ann.pages; if(!a[n]) a[n] = {strokes:[], notes:[]}; return a[n]; }
+function redrawAnn(n){
+  const pg = state.viewer.pages[n]; if(!pg) return;
+  const c = pg.ann, ctx = c.getContext('2d'), W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  const d = pageAnn(n);
+  d.strokes.forEach(st=>{
+    ctx.save(); ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.strokeStyle = st.c; ctx.globalAlpha = st.t==='hl' ? 0.35 : 1; ctx.lineWidth = st.w * W;
+    ctx.beginPath(); st.p.forEach((pt,i)=>{ const x=pt[0]*W, y=pt[1]*H; i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); if(st.p.length===1) ctx.lineTo(st.p[0][0]*W+0.1, st.p[0][1]*H); ctx.stroke(); ctx.restore();
+  });
+  d.notes.forEach(nt=>{
+    const fs = Math.max(12, Math.round(W/38)), pad = fs*0.5, maxW = W*0.26;
+    ctx.save(); ctx.font = `${fs}px sans-serif`;
+    const words = String(nt.text).split(/\s+/), lines = []; let cur='';
+    words.forEach(w=>{ const t = cur?cur+' '+w:w; if(ctx.measureText(t).width>maxW-2*pad && cur){ lines.push(cur); cur=w; } else cur=t; }); if(cur) lines.push(cur);
+    const bw = Math.min(maxW, Math.max(...lines.map(l=>ctx.measureText(l).width))+2*pad), bh = lines.length*fs*1.25+2*pad;
+    const x = Math.min(nt.x*W, W-bw-2), y = Math.min(nt.y*H, H-bh-2);
+    ctx.fillStyle = '#fff3a6'; ctx.strokeStyle = '#d4b800'; ctx.lineWidth = 1.5; ctx.fillRect(x,y,bw,bh); ctx.strokeRect(x,y,bw,bh);
+    ctx.fillStyle = '#222'; lines.forEach((l,i)=> ctx.fillText(l, x+pad, y+pad+fs*(i+0.95)*1.25));
+    ctx.restore();
+  });
+}
+function attachAnnHandlers(n){
+  const pg = state.viewer.pages[n], c = pg.ann;
+  let drawing = null;
+  const pt = e=>{ const r = c.getBoundingClientRect(); return [ (e.clientX-r.left)/r.width, (e.clientY-r.top)/r.height ]; };
+  c.addEventListener('pointerdown', async e=>{
+    const v = state.viewer, tool = v.tool; if(tool==='view') return;
+    e.preventDefault(); const p = pt(e), d = pageAnn(n);
+    if(tool==='note'){
+      const text = await customPromptText("Izoh matni:", "");
+      if(text){ d.notes.push({x:p[0], y:p[1], text:text.slice(0,300)}); v.history.push({n,k:'note'}); redrawAnn(n); saveViewerAnnotationsSoon(); }
+      return;
+    }
+    if(tool==='erase'){ drawing = {erase:true}; eraseAt(n,p); return; }
+    drawing = { t:tool, c:v.color, w: tool==='hl' ? 0.016 : 0.0028, p:[p] };
+    d.strokes.push(drawing); v.history.push({n,k:'stroke'});
+    c.setPointerCapture(e.pointerId); redrawAnn(n);
+  });
+  c.addEventListener('pointermove', e=>{
+    if(!drawing) return; const p = pt(e);
+    if(drawing.erase){ eraseAt(n,p); return; }
+    drawing.p.push(p); redrawAnn(n);
+  });
+  const end = ()=>{ if(drawing){ drawing = null; saveViewerAnnotationsSoon(); } };
+  c.addEventListener('pointerup', end); c.addEventListener('pointercancel', end);
+}
+function eraseAt(n,p){
+  const d = pageAnn(n), pg = state.viewer.pages[n], ar = pg.ann.height/pg.ann.width;
+  const near = (x,y)=> Math.hypot(x-p[0], (y-p[1])*ar) < 0.02;
+  const bs = d.strokes.length, bn = d.notes.length;
+  d.strokes = d.strokes.filter(st=> !st.p.some(q=>near(q[0],q[1])));
+  d.notes = d.notes.filter(nt=> !(near(nt.x,nt.y) || near(nt.x+0.05,nt.y+0.02)));
+  if(d.strokes.length!==bs || d.notes.length!==bn){ redrawAnn(n); saveViewerAnnotationsSoon(); }
+}
+function viewerUndo(){
+  const v = state.viewer; const h = v.history.pop(); if(!h){ showToast("Qaytariladigan amal yo'q."); return; }
+  const d = pageAnn(h.n); if(h.k==='stroke') d.strokes.pop(); else d.notes.pop();
+  redrawAnn(h.n); saveViewerAnnotationsSoon();
+}
+async function viewerClear(){
+  if(!(await customConfirm("Bu materialdagi barcha yozuv va izohlaringiz o'chiriladi. Davom etasizmi?"))) return;
+  const v = state.viewer; v.ann = {pages:{}}; v.history = [];
+  Object.keys(v.pages).forEach(n=>redrawAnn(+n)); saveViewerAnnotationsSoon();
+}
+function makePageShell(n, ratio){
+  const body = document.getElementById('viewerBody');
+  const w = Math.min(body.clientWidth-16 || 700, 900);
+  const div = document.createElement('div'); div.className='vpage'; div.dataset.n=n; div.style.width=w+'px'; div.style.height=Math.round(w*ratio)+'px';
+  const base = document.createElement('canvas'), ann = document.createElement('canvas'); ann.className='ann'; ann.style.pointerEvents='none';
+  div.appendChild(base); div.appendChild(ann); body.appendChild(div);
+  state.viewer.pages[n] = { div, base, ann, rendered:false };
+  return div;
+}
+function sizeCanvases(n, cssW, cssH){
+  const pg = state.viewer.pages[n], r = Math.min(window.devicePixelRatio||1, 2);
+  [pg.base, pg.ann].forEach(c=>{ c.width = Math.round(cssW*r); c.height = Math.round(cssH*r); });
+}
+async function renderPdfPages(m){
+  ensurePdfJs();
+  const res = await fetch(m.url); if(!res.ok) throw new Error("Fayl yuklanmadi ("+res.status+")");
+  const buf = await res.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+  const body = document.getElementById('viewerBody'); body.innerHTML='';
+  const first = await pdf.getPage(1), v1 = first.getViewport({scale:1}), ratio = v1.height/v1.width;
+  state.viewer.pdf = pdf;
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{ if(en.isIntersecting){ const n = +en.target.dataset.n; renderPdfPage(n); } });
+  }, {root: body, rootMargin:'800px 0px'});
+  state.viewer.observer = obs;
+  for(let n=1;n<=pdf.numPages;n++){ const d = makePageShell(n, ratio); obs.observe(d); }
+}
+async function renderPdfPage(n){
+  const v = state.viewer; if(!v) return; const pg = v.pages[n]; if(!pg || pg.rendered || pg.rendering) return; pg.rendering = true;
+  try{
+    const page = await v.pdf.getPage(n), vp1 = page.getViewport({scale:1});
+    const cssW = pg.div.clientWidth, cssH = Math.round(cssW*vp1.height/vp1.width); pg.div.style.height = cssH+'px';
+    sizeCanvases(n, cssW, cssH);
+    const scale = pg.base.width / vp1.width, vp = page.getViewport({scale});
+    await page.render({canvasContext: pg.base.getContext('2d'), viewport: vp}).promise;
+    drawWatermark(pg.base.getContext('2d'), pg.base.width, pg.base.height);
+    pg.rendered = true; attachAnnHandlers(n); redrawAnn(n); setViewerTool(v.tool);
+  }catch(e){ console.error('renderPdfPage', e); }
+  pg.rendering = false;
+}
+async function renderImagePage(m){
+  const res = await fetch(m.url); if(!res.ok) throw new Error("Fayl yuklanmadi ("+res.status+")");
+  const blob = await res.blob(); const bmp = await createImageBitmap(blob);
+  const body = document.getElementById('viewerBody'); body.innerHTML='';
+  makePageShell(1, bmp.height/bmp.width);
+  const pg = state.viewer.pages[1], cssW = pg.div.clientWidth, cssH = Math.round(cssW*bmp.height/bmp.width);
+  sizeCanvases(1, cssW, cssH);
+  const ctx = pg.base.getContext('2d'); ctx.drawImage(bmp, 0, 0, pg.base.width, pg.base.height);
+  drawWatermark(ctx, pg.base.width, pg.base.height);
+  pg.rendered = true; attachAnnHandlers(1); redrawAnn(1); setViewerTool(state.viewer.tool);
 }
 
 /* ============ STUDENT ROSTER (for the block-list picker) ============ */
@@ -1410,7 +1752,14 @@ window.addEventListener('DOMContentLoaded', async ()=>{
 
 /* ============ NAV HELPERS ============ */
 function hideAll(){
-  ['screen-join','screen-test-list','screen-student-profile','screen-leaderboard','screen-chat','screen-test-take','screen-test-result','screen-admin-login','screen-admin-dashboard','screen-live-student','screen-live-host','screen-exam-intro','screen-exam-take','screen-exam-result']
+  if(state.viewer){
+    if(state.viewer.saveTimer){ clearTimeout(state.viewer.saveTimer); saveViewerAnnotations(); }
+    document.removeEventListener('keydown', viewerKeyBlock, true);
+    document.body.classList.remove('viewer-open');
+    if(state.viewer.observer) state.viewer.observer.disconnect();
+    state.viewer = null;
+  }
+  ['screen-join','screen-test-list','screen-student-profile','screen-leaderboard','screen-chat','screen-materials','screen-viewer','screen-test-take','screen-test-result','screen-admin-login','screen-admin-dashboard','screen-live-student','screen-live-host','screen-exam-intro','screen-exam-take','screen-exam-result']
     .forEach(id=>document.getElementById(id).classList.add('hidden'));
   clearInterval(state.livePollTimer);
   clearInterval(state.examTimer);
@@ -1623,9 +1972,10 @@ async function renderTestList(){
   document.getElementById('studentGreeting').textContent = `Xush kelibsiz, ${state.studentName} · ${state.studentGroup}`;
   state.config = await loadConfig();
   state.examConfig = await loadExamConfig();
+  refreshStudentChatBadge(false);
   await renderStudentNotifications();
   await renderStudentExamsList();
-  await renderStudentMaterialsList();
+  updateMaterialsBadge();
   const openTests = state.config.tests.filter(t=>t.active && isAssignedToMe(t.assignTo));
   const container = document.getElementById('testListContainer');
   if(openTests.length===0){
@@ -1769,7 +2119,45 @@ async function showStudentChat(){
   thread.studentGroup = state.studentGroup;
   window._chatThread = thread;
   renderChatMessages();
+  markStudentChatRead();
 }
+async function markStudentChatRead(){
+  if(!state.studentSlug) return;
+  const th = await loadChatThread(state.studentSlug);
+  if(th._loadFailed || !th.messages.length || chatUnreadCount(th,'student')===0) { setBadge('studentChatBadge', 0); return; }
+  th.studentReadAt = Date.now();
+  th.studentName = state.studentName; th.studentGroup = state.studentGroup;
+  await storageSet(`chat:${state.studentSlug}`, JSON.stringify(th));
+  setBadge('studentChatBadge', 0); updateDocTitle(0); state._lastStudentUnread = 0;
+}
+async function refreshStudentChatBadge(announce){
+  if(!state.studentSlug || state.role) return;
+  try{
+    const th = await loadChatThread(state.studentSlug);
+    if(th._loadFailed) return;
+    const chatOpen = !document.getElementById('screen-chat').classList.contains('hidden');
+    if(chatOpen){
+      const cur = window._chatThread;
+      if(!cur || th.messages.length!==cur.messages.length){
+        const typing = document.getElementById('chatInput') && document.getElementById('chatInput').value;
+        th.studentName = state.studentName; th.studentGroup = state.studentGroup;
+        window._chatThread = th;
+        if(!typing) renderChatMessages();
+      }
+      markStudentChatRead();
+      return;
+    }
+    const n = chatUnreadCount(th,'student');
+    setBadge('studentChatBadge', n); updateDocTitle(n);
+    if(announce && n>(state._lastStudentUnread||0)) showToast("Administratordan yangi xabar keldi");
+    state._lastStudentUnread = n;
+  }catch(e){}
+}
+setInterval(()=>{
+  if(document.hidden) return;
+  if(state.role) refreshAdminChatBadge(true);
+  else if(state.studentSlug) refreshStudentChatBadge(true);
+}, 15000);
 function renderChatMessages(){
   const thread = window._chatThread;
   const body = document.getElementById('chatBody');
@@ -1802,39 +2190,52 @@ async function sendChatMessage(){
   thread.messages.push({from:'student', text, ts: Date.now()});
   if(thread.messages.length>300) thread.messages = thread.messages.slice(-300);
   thread.lastMessageAt = Date.now();
+  thread.studentReadAt = Date.now();
+  thread.archived = false; // yangi xabar arxivdagi suhbatni qayta faollashtiradi
   window._chatThread = thread;
   renderChatMessages();
   const ok = await storageSet(`chat:${state.studentSlug}`, JSON.stringify(thread));
   if(!ok) showToast("Xabar yuborilmadi, qayta urinib ko'ring.", true);
 }
-async function showLeaderboard(){
+async function showLeaderboard(scope){
+  if(scope) state.lbScope = scope;
+  const sc = state.lbScope || 'group';
   hideAll();
   showScreen('screen-leaderboard');
   const body = document.getElementById('leaderboardBody');
   body.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
-  const results = await fetchAllResults();
-  const groupResults = results.filter(r=>r.studentGroup===state.studentGroup);
-  if(groupResults.length===0){
-    body.innerHTML = `<div class="empty">Guruhingizda hali hech kim test topshirmagan.</div>`;
+  if(!state._lbResults || scope==='refresh' || !state._lbAt || Date.now()-state._lbAt>60000){ state._lbResults = await fetchAllResults(); state._lbAt = Date.now(); }
+  const results = state._lbResults;
+  const pool = sc==='group' ? results.filter(r=>r.studentGroup===state.studentGroup) : results;
+  const tabs = `<div class="tabs" style="margin-bottom:14px;">
+    <button class="tab ${sc==='group'?'active':''}" onclick="showLeaderboard('group')">Mening guruhim</button>
+    <button class="tab ${sc==='center'?'active':''}" onclick="showLeaderboard('center')">Butun markaz</button></div>`;
+  if(pool.length===0){
+    body.innerHTML = tabs + `<div class="empty">${sc==='group'?"Guruhingizda hali hech kim test topshirmagan.":"Markazda hali natija yo'q."}</div>`;
     return;
   }
   const byStudent = {};
-  groupResults.forEach(r=>{
-    if(!byStudent[r.studentName]) byStudent[r.studentName] = [];
-    byStudent[r.studentName].push(r.percentage);
-  });
-  const rows = Object.entries(byStudent).map(([name, pcts])=>({
-    name, avg: Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length), count: pcts.length
-  })).sort((a,b)=> b.avg-a.avg);
-  body.innerHTML = `
-    <p class="desc" style="margin-bottom:14px;">"${escapeHtml(state.studentGroup)}" guruhi — o'rtacha natija bo'yicha reyting.</p>
+  pool.forEach(r=>{ const k=r.studentName; (byStudent[k]=byStudent[k]||{pcts:[],group:r.studentGroup}).pcts.push(r.percentage); });
+  const all = Object.entries(byStudent).map(([name,v])=>({ name, group:v.group, avg: Math.round(v.pcts.reduce((a,b)=>a+b,0)/v.pcts.length), count: v.pcts.length })).sort((a,b)=> b.avg-a.avg || b.count-a.count);
+  const meIdx = all.findIndex(r=>r.name===state.studentName);
+  // Markaz bo'yicha reytingda boshqa guruh talabalarining ismi qisqartiriladi (Ism F.) — maxfiylik uchun
+  const shown = (r)=> (sc==='center' && r.name!==state.studentName && r.group!==state.studentGroup) ? (()=>{ const p=r.name.split(' '); return p.length>1 ? p[0]+' '+p[p.length-1][0]+'.' : r.name; })() : r.name;
+  let list = all.map((r,i)=>({...r,rank:i+1}));
+  if(sc==='center' && list.length>20){
+    const top = list.slice(0,20);
+    if(meIdx>=20) top.push({...list[meIdx]});
+    list = top;
+  }
+  body.innerHTML = tabs + `
+    <p class="desc" style="margin-bottom:14px;">${sc==='group' ? `"${escapeHtml(state.studentGroup)}" guruhi` : `Butun markaz (${all.length} ta talaba)`} — o'rtacha natija bo'yicha reyting.${meIdx>=0 ? ` Sizning o'rningiz: <strong style="color:var(--teal);">${meIdx+1}</strong> / ${all.length}.`:''}</p>
     <table>
-      <thead><tr><th>O'rin</th><th>O'quvchi</th><th>Topshirgan testlar</th><th>O'rtacha</th></tr></thead>
+      <thead><tr><th>O'rin</th><th>O'quvchi</th>${sc==='center'?'<th>Guruh</th>':''}<th>Topshirgan testlar</th><th>O'rtacha</th></tr></thead>
       <tbody>
-        ${rows.map((r,i)=>`
+        ${list.map(r=>`
           <tr style="${r.name===state.studentName?'font-weight:700;color:var(--teal);':''}">
-            <td><span class="rank-pill rank-${i<3?i+1:'n'}">${i+1}</span></td>
-            <td>${escapeHtml(r.name)}${r.name===state.studentName?' (siz)':''}</td>
+            <td><span class="rank-pill rank-${r.rank<=3?r.rank:'n'}">${r.rank}</span></td>
+            <td>${escapeHtml(shown(r))}${r.name===state.studentName?' (siz)':''}</td>
+            ${sc==='center'?`<td>${escapeHtml(r.group||'—')}</td>`:''}
             <td>${r.count}</td>
             <td class="pct-cell ${r.avg<60?'pct-low':'pct-ok'}">${r.avg}%</td>
           </tr>`).join('')}
@@ -1888,11 +2289,12 @@ async function renderStudentProfile(){
     html += `<div class="row-item" style="margin-bottom:18px;"><span class="row-title">Xatolar ustida ishlash<br><span class="row-meta">Oldin noto'g'ri javob bergan ${practicePool.length} ta savolni qayta mashq qiling (natijaga ta'sir qilmaydi)</span></span>
       <button class="btn-primary btn-small" onclick="startPractice()">Boshlash</button></div>`;
   }
+  let testHtml = '', examHtml = '';
   allRows.forEach((row,i)=>{
     if(row.kind==='test'){
       const r = row.record;
       const certBtn = r.percentage>=80 ? `<button class="btn-owner btn-small" onclick="downloadCertificateFromProfile(${i})">${icon('download')}Sertifikat</button>` : '';
-      html += `<div class="row-item">
+      testHtml += `<div class="row-item">
         <span class="row-title">${escapeHtml(row.test.topic)}<br><span class="row-meta">Test · ${new Date(r.timestamp).toLocaleDateString('uz-UZ')}</span></span>
         <span class="pct-cell ${r.percentage<60?'pct-low':'pct-ok'}">${r.percentage}%</span>
         <button class="btn-ghost btn-small" onclick="showResult(window._profileRowsCache[${i}].record)">Natijani ko'rish</button>
@@ -1905,13 +2307,15 @@ async function renderStudentProfile(){
         ? `<span class="badge badge-closed">Baholanmoqda</span>`
         : (visibleNow ? `<span class="pct-cell ${r.overallPercentage<60?'pct-low':'pct-ok'}">${r.overallPercentage}%</span>` : `<span class="badge badge-closed">Natija yopiq</span>`);
       const action = (r.openGraded && visibleNow) ? `<button class="btn-ghost btn-small" onclick="showExamResultToStudent('${row.exam.id}')">Natijani ko'rish</button>` : '';
-      html += `<div class="row-item">
+      examHtml += `<div class="row-item">
         <span class="row-title">${escapeHtml(row.exam.title)}<br><span class="row-meta">Imtihon · ${new Date(r.timestamp).toLocaleDateString('uz-UZ')}</span></span>
         ${statusBadge}
         ${action}
       </div>`;
     }
   });
+  const sec = (title, n, inner)=> `<div class="lead" style="font-size:1.05rem;margin:18px 0 10px;display:flex;align-items:center;gap:8px;">${title}<span class="count-badge" style="background:var(--teal);color:#06231E;">${n}</span></div>${inner || `<div class="empty">Hali yo'q.</div>`}`;
+  html += sec('Testlar', testRows.length, testHtml) + sec('Imtihonlar', examRows.length, examHtml);
   window._profileRowsCache = allRows;
   body.innerHTML = html;
 }
@@ -2695,6 +3099,69 @@ function ensureAdminAuth(){
       <div id="sbErr" style="color:var(--red);font-size:0.85rem;margin-top:6px;min-height:1em;"></div>`;
   });
 }
+/* ---- Parollar ombori (vault) ----
+   Talaba parollari bazada xesh ko'rinishida turadi (ularni qaytarib bo'lmaydi). Admin parolni keyin ham ko'ra olishi uchun
+   asl parol RSA ochiq kalit bilan shifrlab saqlanadi. Maxfiy kalit esa rahbar (va ixtiyoriy ravishda admin) kodi bilan
+   qulflanadi — kodni bilmagan odam (jumladan, bazani o'qiy oladigan talaba) parolni ocha olmaydi. */
+const B64 = { enc: buf=> btoa(String.fromCharCode(...new Uint8Array(buf))), dec: str=> Uint8Array.from(atob(str), c=>c.charCodeAt(0)) };
+async function vaultWrapKey(code, saltB64){
+  const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(code), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2', salt:B64.dec(saltB64), iterations:250000, hash:'SHA-256'}, km, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']);
+}
+async function vaultWrap(privJwk, code){
+  const salt = B64.enc(crypto.getRandomValues(new Uint8Array(16))), iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await vaultWrapKey(code, salt);
+  const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, new TextEncoder().encode(JSON.stringify(privJwk)));
+  return { salt, iv: B64.enc(iv), data: B64.enc(ct) };
+}
+async function vaultUnwrap(w, code){
+  try{
+    const key = await vaultWrapKey(code, w.salt);
+    const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv:B64.dec(w.iv)}, key, B64.dec(w.data));
+    return JSON.parse(new TextDecoder().decode(pt));
+  }catch(e){ return null; }
+}
+async function vaultOnLogin(role, code){
+  state.vaultPrivJwk = null; state.vaultPrivKey = null; state.vaultPw = {};
+  if(!cryptoAvailable()) return;
+  const cfg = state.config;
+  try{
+    if(!cfg.vault){
+      if(role!=='rahbar') return; // omborni faqat rahbar yaratadi
+      const kp = await crypto.subtle.generateKey({name:'RSA-OAEP', modulusLength:2048, publicExponent:new Uint8Array([1,0,1]), hash:'SHA-256'}, true, ['encrypt','decrypt']);
+      const pub = await crypto.subtle.exportKey('jwk', kp.publicKey), priv = await crypto.subtle.exportKey('jwk', kp.privateKey);
+      cfg.vault = { pub, wrapRahbar: await vaultWrap(priv, code) };
+      if(!(await saveConfig(cfg))){ delete cfg.vault; return; }
+      state.vaultPrivJwk = priv;
+    } else {
+      const w = role==='rahbar' ? cfg.vault.wrapRahbar : cfg.vault.wrapAdmin;
+      if(!w) return;
+      const jwk = await vaultUnwrap(w, code);
+      if(!jwk){ showToast("Parollar ombori ochilmadi (kod o'zgartirilgan bo'lishi mumkin).", true); return; }
+      state.vaultPrivJwk = jwk;
+    }
+    state.vaultPrivKey = await crypto.subtle.importKey('jwk', state.vaultPrivJwk, {name:'RSA-OAEP', hash:'SHA-256'}, false, ['decrypt']);
+  }catch(e){ console.error('vaultOnLogin', e); }
+}
+async function vaultEncrypt(plain){
+  const v = state.config && state.config.vault; if(!v || !cryptoAvailable()) return null;
+  try{
+    const pub = await crypto.subtle.importKey('jwk', v.pub, {name:'RSA-OAEP', hash:'SHA-256'}, false, ['encrypt']);
+    return B64.enc(await crypto.subtle.encrypt({name:'RSA-OAEP'}, pub, new TextEncoder().encode(plain)));
+  }catch(e){ return null; }
+}
+async function vaultDecryptAll(accounts){
+  state.vaultPw = state.vaultPw || {};
+  if(!state.vaultPrivKey) return;
+  await Promise.all(accounts.filter(a=>a.pwEnc && state.vaultPw[a.id]===undefined).map(async a=>{
+    try{ state.vaultPw[a.id] = new TextDecoder().decode(await crypto.subtle.decrypt({name:'RSA-OAEP'}, state.vaultPrivKey, B64.dec(a.pwEnc))); }catch(e){ state.vaultPw[a.id] = null; }
+  }));
+}
+function knownPassword(a){
+  const f = state.freshCreds && state.freshCreds[a.id]; if(f) return f.password;
+  if(a.password!==undefined && !a.secret) return a.password;
+  return (state.vaultPw && state.vaultPw[a.id]) || null;
+}
 async function handleAdminLogin(){
   const code = document.getElementById('adminCodeInput').value;
   const errEl = document.getElementById('adminLoginError');
@@ -2716,10 +3183,10 @@ async function handleAdminLogin(){
   state.role = role;
   state.usingDefaultCode = (code === DEFAULT_ADMIN_CODE || code === DEFAULT_RAHBAR_CODE);
   document.getElementById('adminCodeInput').value='';
-  await ensureAdminAuth();
   logActivity('admin_login', role==='rahbar' ? "Rahbar kirdi" : "Admin kirdi");
   await openAdminDashboard();
   await migrateLegacyAdminCodes();
+  await vaultOnLogin(role, code);
   if(state.usingDefaultCode){
     await customAlert("DIQQAT: siz standart (dasturda ochiq yozilgan) kod bilan kirdingiz. Xavfsizlik uchun Rahbar bo'limida admin va rahbar kodlarini darhol almashtiring.");
   }
@@ -2755,9 +3222,36 @@ async function openAdminDashboard(){
   const tabs = isOwner ? [...BASE_ADMIN_TABS, {id:'owner', label:'Rahbar nazorati', owner:true, ic:'shield'}] : BASE_ADMIN_TABS;
   const defaultTab = 'home';
   const tabsBar = document.getElementById('adminTabsBar');
-  tabsBar.innerHTML = tabs.map(t => `<button class="tab ${t.owner?'owner-tab':''} ${t.id===defaultTab?'active':''}" data-tab="${t.id}" onclick="switchAdminTab('${t.id}')">${icon(t.ic)}${t.label}</button>`).join('');
+  tabsBar.innerHTML = tabs.map(t => `<button class="tab ${t.owner?'owner-tab':''} ${t.id===defaultTab?'active':''}" data-tab="${t.id}" onclick="switchAdminTab('${t.id}')">${icon(t.ic)}${t.label}${t.id==='chats'?'<span class="count-badge hidden" id="chatsTabBadge"></span>':''}</button>`).join('');
   switchAdminTab(defaultTab);
+  refreshAdminChatBadge(false);
 }
+/* Panel tugmalarini sichqoncha bilan ushlab surish */
+(function initTabDrag(){
+  let down=false, startX=0, startScroll=0, moved=false, el=null;
+  document.addEventListener('mousedown', e=>{
+    el = e.target.closest && e.target.closest('.tabs');
+    if(!el || e.button!==0) return;
+    down=true; moved=false; startX=e.pageX; startScroll=el.scrollLeft;
+  });
+  document.addEventListener('mousemove', e=>{
+    if(!down || !el) return;
+    const dx = e.pageX-startX;
+    if(Math.abs(dx)>4){ moved=true; el.classList.add('dragging'); }
+    if(moved) el.scrollLeft = startScroll - dx;
+  });
+  const end = ()=>{ if(el) el.classList.remove('dragging'); down=false; };
+  document.addEventListener('mouseup', end);
+  document.addEventListener('mouseleave', end);
+  // sudrashdan keyin tasodifan tugma bosilib ketmasin
+  document.addEventListener('click', e=>{ if(moved && e.target.closest && e.target.closest('.tabs')){ e.stopPropagation(); e.preventDefault(); moved=false; } }, true);
+  // g'ildirak bilan ham yon tomonga surish
+  document.addEventListener('wheel', e=>{
+    const t = e.target.closest && e.target.closest('.tabs');
+    if(t && Math.abs(e.deltaY)>Math.abs(e.deltaX) && t.scrollWidth>t.clientWidth){ t.scrollLeft += e.deltaY; e.preventDefault(); }
+  }, {passive:false});
+})();
+function statKey(e,tab){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); switchAdminTab(tab); } }
 function switchAdminTab(tab){
   if(tab==='owner' && state.role!=='rahbar') return; // guard: never allow non-owner to open owner panel
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
@@ -2835,10 +3329,10 @@ async function renderAdminHome(){
     <div class="lead" style="margin-bottom:4px;">Xush kelibsiz${state.role==='rahbar' ? ', Rahbar' : ''}!</div>
     <p class="desc">FINANCE TEAM test platformasining umumiy holati.</p>
     <div class="home-stat-grid">
-      <div class="home-stat-box">${icon('book','lg')}<div class="num">${state.config.tests.length}</div><div class="lbl">Jami testlar</div></div>
-      <div class="home-stat-box">${icon('play','lg')}<div class="num">${activeTests}</div><div class="lbl">Faol testlar</div></div>
-      <div class="home-stat-box">${icon('users','lg')}<div class="num">${roster.length}</div><div class="lbl">Ro'yxatdagi o'quvchilar</div></div>
-      <div class="home-stat-box">${icon('trophy','lg')}<div class="num">${results.length}</div><div class="lbl">Jami urinishlar</div></div>
+      <div class="home-stat-box clickable" tabindex="0" role="button" onclick="switchAdminTab('tests')" onkeydown=\"statKey(event,'tests')\">${icon('book','lg')}<div class="num">${state.config.tests.length}</div><div class="lbl">Jami testlar</div></div>
+      <div class="home-stat-box clickable" tabindex="0" role="button" onclick="switchAdminTab('tests')" onkeydown=\"statKey(event,'tests')\">${icon('play','lg')}<div class="num">${activeTests}</div><div class="lbl">Faol testlar</div></div>
+      <div class="home-stat-box clickable" tabindex="0" role="button" onclick="switchAdminTab('groups')" onkeydown=\"statKey(event,'groups')\">${icon('users','lg')}<div class="num">${roster.length}</div><div class="lbl">Ro'yxatdagi o'quvchilar</div></div>
+      <div class="home-stat-box clickable" tabindex="0" role="button" onclick="switchAdminTab('results')" onkeydown=\"statKey(event,'results')\">${icon('trophy','lg')}<div class="num">${results.length}</div><div class="lbl">Jami urinishlar</div></div>
     </div>
     <div class="lead" style="font-size:1.05rem;margin-bottom:10px;">So'nggi faollik</div>
     ${recent.length===0 ? '<div class="empty">Hali hech qanday faollik yo\'q — birinchi talaba test topshirganda shu yerda ko\'rinadi.</div>' : recent.map(r=>`
@@ -4074,35 +4568,95 @@ async function renderAdminResults(){
   _allResultsCache = results;
   const topics = [...new Set(state.config.tests.map(t=>t.topic))];
   const groups = [...new Set(results.map(r=>r.studentGroup).filter(Boolean))].sort();
-  let html = `<div class="toolbar">
-    <div class="lead" style="margin:0;">Natijalar (${results.length})</div>
-    <div class="flexrow" style="max-width:600px;">
-      <input type="text" id="resultSearch" placeholder="Ism bo'yicha qidirish..." oninput="filterAdminResults()">
-      <select id="resultGroupFilter" onchange="filterAdminResults()">
-        <option value="">Barcha guruhlar</option>
-        ${groups.map(g=>`<option value="${escapeAttr(g)}">${escapeHtml(g)}</option>`).join('')}
-      </select>
-      <select id="resultTopicFilter" onchange="filterAdminResults()">
-        <option value="">Barcha mavzular</option>
-        ${topics.map(t=>`<option value="${escapeAttr(t)}">${escapeHtml(t)}</option>`).join('')}
-      </select>
-      <button class="btn-ghost btn-small" onclick="exportResultsToExcel()">${icon('download')}Excel'ga eksport</button>
-    </div>
+  const view = state.resultsView || 'attempts';
+  const vtab = (id,label)=>`<button class="tab ${view===id?'active':''}" onclick="setResultsView('${id}')">${label}</button>`;
+  el.innerHTML = `<div class="toolbar">
+    <div class="lead" style="margin:0;">Natijalar (<span id="resultsCount">${results.length}</span>)</div>
+    <button class="btn-ghost btn-small" onclick="exportResultsToExcel()">${icon('download')}Excel'ga eksport</button>
   </div>
-  <table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Mavzu</th><th>Natija</th><th>Ball</th><th>Sana</th><th></th></tr></thead>
-  <tbody id="resultsTableBody"></tbody></table>`;
-  el.innerHTML = html;
-  drawResultsTable(results);
+  <div class="tabs" style="margin:12px 0;">
+    ${vtab('attempts',"Barcha urinishlar")}${vtab('students',"Talabalar bo'yicha (umumiy)")}${vtab('groups',"Guruhlar bo'yicha")}${vtab('topics',"Mavzular bo'yicha")}
+  </div>
+  <div class="flexrow" style="flex-wrap:wrap;margin-bottom:12px;">
+    <input type="text" id="resultSearch" placeholder="Ism bo'yicha qidirish..." oninput="filterAdminResults()" style="flex:1 1 180px;">
+    <select id="resultGroupFilter" onchange="filterAdminResults()" style="flex:1 1 150px;">
+      <option value="">Barcha guruhlar</option>
+      ${groups.map(g=>`<option value="${escapeAttr(g)}">${escapeHtml(g)}</option>`).join('')}
+    </select>
+    <select id="resultTopicFilter" onchange="filterAdminResults()" style="flex:1 1 150px;">
+      <option value="">Barcha mavzular</option>
+      ${topics.map(t=>`<option value="${escapeAttr(t)}">${escapeHtml(t)}</option>`).join('')}
+    </select>
+    <select id="resultBandFilter" onchange="filterAdminResults()" style="flex:1 1 140px;">
+      <option value="">Barcha natijalar</option><option value="low">60% dan past</option><option value="mid">60–79%</option><option value="high">80% va yuqori</option>
+    </select>
+    <input type="date" id="resultFrom" onchange="filterAdminResults()" title="Boshlanish sanasi" style="flex:0 1 150px;">
+    <input type="date" id="resultTo" onchange="filterAdminResults()" title="Tugash sanasi" style="flex:0 1 150px;">
+    <button class="btn-ghost btn-small" onclick="resetResultFilters()">Tozalash</button>
+  </div>
+  <div id="resultsViewHolder"></div>`;
+  filterAdminResults();
+}
+function setResultsView(v){ state.resultsView = v; renderAdminResults(); }
+function resetResultFilters(){
+  ['resultSearch','resultGroupFilter','resultTopicFilter','resultBandFilter','resultFrom','resultTo'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+  filterAdminResults();
 }
 function filterAdminResults(){
-  const q = document.getElementById('resultSearch').value.toLowerCase();
-  const topic = document.getElementById('resultTopicFilter').value;
-  const group = document.getElementById('resultGroupFilter').value;
-  let filtered = _allResultsCache;
-  if(q) filtered = filtered.filter(r=>r.studentName.toLowerCase().includes(q));
+  const g = id=> { const e=document.getElementById(id); return e ? e.value : ''; };
+  const q = g('resultSearch').toLowerCase(), topic = g('resultTopicFilter'), group = g('resultGroupFilter'), band = g('resultBandFilter');
+  const from = g('resultFrom') ? new Date(g('resultFrom')+'T00:00:00').getTime() : null;
+  const to = g('resultTo') ? new Date(g('resultTo')+'T23:59:59').getTime() : null;
+  let filtered = _allResultsCache || [];
+  if(q) filtered = filtered.filter(r=>(r.studentName||'').toLowerCase().includes(q));
   if(topic) filtered = filtered.filter(r=>r.topic===topic);
   if(group) filtered = filtered.filter(r=>r.studentGroup===group);
-  drawResultsTable(filtered);
+  if(band==='low') filtered = filtered.filter(r=>r.percentage<60);
+  if(band==='mid') filtered = filtered.filter(r=>r.percentage>=60 && r.percentage<80);
+  if(band==='high') filtered = filtered.filter(r=>r.percentage>=80);
+  if(from!==null) filtered = filtered.filter(r=>new Date(r.timestamp).getTime()>=from);
+  if(to!==null) filtered = filtered.filter(r=>new Date(r.timestamp).getTime()<=to);
+  _filteredResultsCache = filtered;
+  const c = document.getElementById('resultsCount'); if(c) c.textContent = filtered.length;
+  drawResultsView(filtered);
+}
+function summarizeBy(results, keyFn){
+  const m = {};
+  results.forEach(r=>{ const k = keyFn(r)||'—'; (m[k]=m[k]||[]).push(r); });
+  return Object.entries(m).map(([k,arr])=>{
+    const pcts = arr.map(r=>r.percentage);
+    return { key:k, count:arr.length, avg:Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length), best:Math.max(...pcts), pass:Math.round(100*pcts.filter(p=>p>=60).length/pcts.length), students:new Set(arr.map(r=>r.studentName)).size, group:(arr[0].studentGroup||'—') };
+  });
+}
+function pctBar(v){ return `<div style="display:flex;align-items:center;gap:8px;min-width:120px;"><div style="flex:1;height:8px;border-radius:5px;background:var(--edge);overflow:hidden;"><div style="width:${v}%;height:100%;background:${v<60?'var(--red)':'var(--teal)'};"></div></div><span class="pct-cell ${v<60?'pct-low':'pct-ok'}" style="min-width:38px;">${v}%</span></div>`; }
+function drawResultsView(results){
+  const holder = document.getElementById('resultsViewHolder');
+  if(!holder) return;
+  const view = state.resultsView || 'attempts';
+  if(view==='attempts'){
+    holder.innerHTML = `<table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Mavzu</th><th>Natija</th><th>Ball</th><th>Sana</th><th></th></tr></thead><tbody id="resultsTableBody"></tbody></table>`;
+    drawResultsTable(results); return;
+  }
+  if(results.length===0){ holder.innerHTML = `<div class="empty">Natija topilmadi.</div>`; return; }
+  let rows, head, link;
+  if(view==='students'){
+    rows = summarizeBy(results, r=>r.studentName).sort((a,b)=>b.avg-a.avg);
+    head = `<th>#</th><th>O'quvchi</th><th>Guruh</th><th>Urinishlar</th><th>O'rtacha</th><th>Eng yaxshi</th>`;
+    holder.innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.key)}</td><td>${escapeHtml(r.group)}</td><td>${r.count}</td><td>${pctBar(r.avg)}</td><td>${r.best}%</td></tr>`).join('')}</tbody></table>`;
+  } else if(view==='groups'){
+    rows = summarizeBy(results, r=>r.studentGroup).sort((a,b)=>b.avg-a.avg);
+    holder.innerHTML = `<p class="desc">Guruh qatorini bossangiz, shu guruhning barcha urinishlari ochiladi.</p><table><thead><tr><th>#</th><th>Guruh</th><th>Talabalar</th><th>Urinishlar</th><th>O'rtacha</th><th>O'tish (≥60%)</th></tr></thead><tbody>${rows.map((r,i)=>`<tr style="cursor:pointer;" onclick="drillResults('group','${escapeAttr(r.key)}')"><td>${i+1}</td><td>${escapeHtml(r.key)}</td><td>${r.students}</td><td>${r.count}</td><td>${pctBar(r.avg)}</td><td>${r.pass}%</td></tr>`).join('')}</tbody></table>`;
+  } else {
+    rows = summarizeBy(results, r=>r.topic).sort((a,b)=>a.avg-b.avg);
+    holder.innerHTML = `<p class="desc">Eng qiyin mavzular yuqorida. Mavzu qatorini bossangiz, uning urinishlari ochiladi.</p><table><thead><tr><th>#</th><th>Mavzu</th><th>Talabalar</th><th>Urinishlar</th><th>O'rtacha</th><th>O'tish (≥60%)</th></tr></thead><tbody>${rows.map((r,i)=>`<tr style="cursor:pointer;" onclick="drillResults('topic','${escapeAttr(r.key)}')"><td>${i+1}</td><td>${escapeHtml(r.key)}</td><td>${r.students}</td><td>${r.count}</td><td>${pctBar(r.avg)}</td><td>${r.pass}%</td></tr>`).join('')}</tbody></table>`;
+  }
+}
+function drillResults(kind, value){
+  state.resultsView = 'attempts';
+  renderAdminResults().then(()=>{
+    const el = document.getElementById(kind==='group'?'resultGroupFilter':'resultTopicFilter');
+    if(el){ el.value = value; filterAdminResults(); }
+  });
 }
 function exportResultsToExcel(){
   const results = _filteredResultsCache || _allResultsCache || [];
@@ -4162,198 +4716,176 @@ function computeQuestionErrorStats(results){
     .sort((a,b)=>b.errorRate-a.errorRate)
     .slice(0,15);
 }
+const _anCharts = {};
+function anColors(){
+  const cs = getComputedStyle(document.documentElement), g = n=>cs.getPropertyValue(n).trim();
+  return { teal:g('--teal')||'#2FC7AE', red:g('--red')||'#E5584B', ink:g('--ink')||'#EAF3F0', soft:g('--ink-soft')||'#93B8B0', edge:g('--edge')||'rgba(255,255,255,0.1)', amber:'#E0A82E', blue:'#4C8DF6' };
+}
+function anDestroy(){ Object.keys(_anCharts).forEach(k=>{ try{ _anCharts[k].destroy(); }catch(e){} delete _anCharts[k]; }); }
+function anMake(id, cfg){
+  const el = document.getElementById(id); if(!el || typeof Chart==='undefined') return;
+  if(_anCharts[id]) _anCharts[id].destroy();
+  _anCharts[id] = new Chart(el.getContext('2d'), cfg);
+}
+function anSet(key, val){ state.an[key] = (state.an[key]===val ? '' : val); state.an.bin = null; drawAnalytics(); }
+function anPeriod(days){ state.an.days = days; state.an.bin = null; drawAnalytics(); }
+function anReset(){ state.an = {group:'', topic:'', days:0, bin:null, student:''}; drawAnalytics(); }
+function weekStart(ts){ const d = new Date(ts); d.setHours(0,0,0,0); const day = (d.getDay()+6)%7; d.setDate(d.getDate()-day); return d.getTime(); }
+function avgOf(arr){ return arr.length ? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : 0; }
+function sparkSvg(vals, color){
+  if(vals.length<2) return '';
+  const W=90,H=26, mx=100, pts = vals.map((v,i)=> `${(i/(vals.length-1)*(W-4)+2).toFixed(1)},${(H-3-(v/mx)*(H-6)).toFixed(1)}`).join(' ');
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block;margin-top:6px;"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+}
 async function renderAdminAnalytics(){
   const el = document.getElementById('adminTab-analytics');
   el.innerHTML = `<div class="loading">Tahlil tayyorlanmoqda...</div>`;
   const [results, roster] = await Promise.all([fetchAllResults(), fetchRoster()]);
   _analyticsResultsCache = results;
+  state._anRoster = roster;
+  if(!state.an) state.an = {group:'', topic:'', days:0, bin:null, student:''};
   const groupNames = collectAllGroupNames(roster, results);
-  const hisobotHtml = `
-    <div class="lead" style="margin-bottom:6px;">Hisobot</div>
-    <p class="desc">Tanlangan guruh va davr uchun natijalar hisobotini yuklab oling.</p>
+  state._anGroupNames = groupNames;
+  el.innerHTML = `<div id="anDash"></div>
+    <details style="margin-top:26px;"><summary class="lead" style="font-size:1.05rem;cursor:pointer;">Hisobotni yuklab olish (PDF / Excel)</summary>
+    <p class="desc" style="margin-top:10px;">Tanlangan guruh va davr uchun natijalar hisoboti.</p>
     <div class="flexrow" style="max-width:640px;margin-bottom:16px;">
-      <div class="field" style="margin-bottom:0;">
-        <label>Guruh</label>
-        <select id="reportGroupFilter">
-          <option value="">Barcha guruhlar</option>
-          ${groupNames.map(g=>`<option value="${escapeAttr(g)}">${escapeHtml(g)}</option>`).join('')}
-        </select>
-      </div>
-      <div class="field" style="margin-bottom:0;">
-        <label>Dan</label>
-        <input type="date" id="reportDateFrom">
-      </div>
-      <div class="field" style="margin-bottom:0;">
-        <label>Gacha</label>
-        <input type="date" id="reportDateTo">
-      </div>
+      <div class="field" style="margin-bottom:0;"><label>Guruh</label>
+        <select id="reportGroupFilter"><option value="">Barcha guruhlar</option>${groupNames.map(g=>`<option value="${escapeAttr(g)}">${escapeHtml(g)}</option>`).join('')}</select></div>
+      <div class="field" style="margin-bottom:0;"><label>Dan</label><input type="date" id="reportDateFrom"></div>
+      <div class="field" style="margin-bottom:0;"><label>Gacha</label><input type="date" id="reportDateTo"></div>
     </div>
-    <div class="flexrow" style="max-width:360px;margin-bottom:30px;">
+    <div class="flexrow" style="max-width:360px;">
       <button class="btn-primary btn-small" onclick="generateReportPDF()">${icon('download')}PDF hisobot</button>
       <button class="btn-ghost btn-small" onclick="generateReportExcel()">${icon('download')}Excel hisobot</button>
-    </div>
-  `;
-  if(results.length===0){
-    el.innerHTML = hisobotHtml + `<div class="empty">Hali tahlil qiladigan narsa yo'q — talabalar test topshirgach, bu yerda foydali grafiklar paydo bo'ladi.</div>`;
-    return;
-  }
-  const byTopic = {};
-  results.forEach(r=>{
-    if(!byTopic[r.topic]) byTopic[r.topic] = [];
-    byTopic[r.topic].push(r.percentage);
-  });
-  const topics = Object.keys(byTopic);
-  const averages = topics.map(t=> Math.round(byTopic[t].reduce((a,b)=>a+b,0)/byTopic[t].length));
-
-  const byGroup = {};
-  results.forEach(r=>{
-    const g = r.studentGroup || "Ko'rsatilmagan";
-    if(!byGroup[g]) byGroup[g] = [];
-    byGroup[g].push(r.percentage);
-  });
-  const groups = Object.keys(byGroup);
-  const groupAverages = groups.map(g=> Math.round(byGroup[g].reduce((a,b)=>a+b,0)/byGroup[g].length));
-
-  const byStudent = {};
-  results.forEach(r=>{
-    if(!byStudent[r.studentName]) byStudent[r.studentName] = [];
-    byStudent[r.studentName].push(r);
-  });
-  let studentRows = Object.entries(byStudent).map(([name, recs])=>{
-    const avg = Math.round(recs.reduce((a,b)=>a+b.percentage,0)/recs.length);
-    const weakest = [...recs].sort((a,b)=>a.percentage-b.percentage)[0];
-    return {name, avg, count: recs.length, weakest};
-  }).sort((a,b)=>a.avg-b.avg);
-  const studentNames = Object.keys(byStudent).sort();
-  const questionStats = computeQuestionErrorStats(results);
-
-  el.innerHTML = hisobotHtml + `
-    <div class="lead" style="margin-bottom:14px;">Mavzular bo'yicha o'rtacha natija</div>
-    <canvas id="topicChart"></canvas>
-
-    <div class="lead" style="margin:30px 0 14px;">Guruhlar bo'yicha solishtirma</div>
-    <canvas id="groupChart"></canvas>
-
-    <div class="lead" style="margin:30px 0 14px;">O'quvchilar bo'yicha umumiy samaradorlik</div>
-    <table>
-      <thead><tr><th>O'quvchi</th><th>Topshirgan testlari</th><th>O'rtacha</th><th>Zaif mavzu</th></tr></thead>
-      <tbody>
-        ${studentRows.map(s=>`
-          <tr>
-            <td>${escapeHtml(s.name)}</td>
-            <td>${s.count}</td>
-            <td class="pct-cell ${s.avg<60?'pct-low':'pct-ok'}">${s.avg}%</td>
-            <td>${escapeHtml(s.weakest.topic)} (${s.weakest.percentage}%)</td>
-          </tr>`).join('')}
-      </tbody>
-    </table>
-
-    <div class="lead" style="margin:30px 0 14px;">O'quvchi progressi (vaqt bo'yicha)</div>
-    <div class="field" style="max-width:320px;">
-      <label>O'quvchini tanlang</label>
-      <select id="progressStudentSelect" onchange="renderProgressChart()">
-        ${studentNames.map(n=>`<option value="${escapeAttr(n)}">${escapeHtml(n)}</option>`).join('')}
-      </select>
-    </div>
-    <canvas id="progressChart"></canvas>
-
-    <div class="lead" style="margin:30px 0 14px;">Xato tahlili — eng ko'p adashiladigan savollar</div>
-    ${questionStats.length===0 ? `<p class="desc">Hali yetarlicha ma'lumot yo'q (kamida 3 marta topshirilgan savollar hisoblanadi).</p>` : `
-    <table>
-      <thead><tr><th>Mavzu</th><th>Savol</th><th>Xato foizi</th><th>Urinishlar</th></tr></thead>
-      <tbody>
-        ${questionStats.map(q=>`
-          <tr>
-            <td>${escapeHtml(q.topic||'')}</td>
-            <td>${escapeHtml(q.question)}</td>
-            <td class="pct-cell ${q.errorRate>=50?'pct-low':'pct-ok'}">${q.errorRate}%</td>
-            <td>${q.total}</td>
-          </tr>`).join('')}
-      </tbody>
-    </table>`}
-  `;
-  const ctx = document.getElementById('topicChart').getContext('2d');
-  if(_chartInstance) _chartInstance.destroy();
-  _chartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: topics,
-      datasets: [{
-        label: "O'rtacha % ",
-        data: averages,
-        backgroundColor: averages.map(a=> a<60 ? '#E5584B' : '#2FC7AE'),
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive:true,
-      plugins:{ legend:{display:false} },
-      scales:{
-        y:{ beginAtZero:true, max:100, ticks:{color:'#93B8B0'}, grid:{color:'rgba(255,255,255,0.06)'} },
-        x:{ ticks:{color:'#93B8B0'}, grid:{display:false} }
-      }
-    }
-  });
-
-  const gctx = document.getElementById('groupChart').getContext('2d');
-  if(_groupChartInstance) _groupChartInstance.destroy();
-  _groupChartInstance = new Chart(gctx, {
-    type: 'bar',
-    data: {
-      labels: groups,
-      datasets: [{
-        label: "Guruh o'rtacha %",
-        data: groupAverages,
-        backgroundColor: groupAverages.map(a=> a<60 ? '#E5584B' : '#F4F7F6'),
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive:true,
-      plugins:{ legend:{display:false} },
-      scales:{
-        y:{ beginAtZero:true, max:100, ticks:{color:'#93B8B0'}, grid:{color:'rgba(255,255,255,0.06)'} },
-        x:{ ticks:{color:'#93B8B0'}, grid:{display:false} }
-      }
-    }
-  });
-
-  renderProgressChart();
+    </div></details>`;
+  drawAnalytics();
 }
-function renderProgressChart(){
-  const select = document.getElementById('progressStudentSelect');
-  if(!select) return;
-  const name = select.value;
-  const recs = (_analyticsResultsCache||[]).filter(r=>r.studentName===name)
-    .sort((a,b)=> new Date(a.timestamp)-new Date(b.timestamp));
-  const labels = recs.map(r=> `${r.topic} (${new Date(r.timestamp).toLocaleDateString('uz-UZ')})`);
-  const data = recs.map(r=> r.percentage);
-  const ctx = document.getElementById('progressChart').getContext('2d');
-  if(_progressChartInstance) _progressChartInstance.destroy();
-  _progressChartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: `${name} — foiz (%)`,
-        data,
-        borderColor: '#2FC7AE',
-        backgroundColor: 'rgba(47,199,174,0.15)',
-        tension: 0.3,
-        fill: true,
-        pointBackgroundColor: data.map(d=> d<60 ? '#E5584B' : '#2FC7AE'),
-        pointRadius: 5
-      }]
-    },
-    options: {
-      responsive:true,
-      plugins:{ legend:{display:false} },
-      scales:{
-        y:{ beginAtZero:true, max:100, ticks:{color:'#93B8B0'}, grid:{color:'rgba(255,255,255,0.06)'} },
-        x:{ ticks:{color:'#93B8B0', maxRotation:45, minRotation:45}, grid:{display:false} }
-      }
-    }
-  });
+function anFiltered(extra){
+  const f = state.an, now = Date.now();
+  let list = _analyticsResultsCache || [];
+  if(f.group) list = list.filter(r=>(r.studentGroup||"Ko'rsatilmagan")===f.group);
+  if(f.topic) list = list.filter(r=>r.topic===f.topic);
+  if(f.days) list = list.filter(r=> now-new Date(r.timestamp).getTime() <= f.days*86400000);
+  return list;
+}
+function drawAnalytics(){
+  const dash = document.getElementById('anDash'); if(!dash) return;
+  anDestroy();
+  const f = state.an, C = anColors();
+  const all = _analyticsResultsCache || [];
+  const list = anFiltered();
+  const topics = [...new Set(all.map(r=>r.topic))].sort();
+  const chip = (label, active, fn)=> `<button class="tab ${active?'active':''}" onclick="${fn}">${label}</button>`;
+  let html = `<div class="lead" style="margin-bottom:4px;">Tahlil paneli</div>
+    <p class="desc">Grafik, ustun yoki qatorni bossangiz, tahlil shu bo'yicha filtrlanadi. Qayta bossangiz filtr olib tashlanadi.</p>
+    <div class="tabs" style="margin-bottom:10px;">${chip('Hammasi',!f.days,'anPeriod(0)')}${chip('7 kun',f.days===7,'anPeriod(7)')}${chip('30 kun',f.days===30,'anPeriod(30)')}${chip('90 kun',f.days===90,'anPeriod(90)')}</div>
+    <div class="flexrow" style="flex-wrap:wrap;margin-bottom:16px;">
+      <select onchange="state.an.group=this.value;state.an.bin=null;drawAnalytics()" style="flex:1 1 180px;"><option value="">Barcha guruhlar</option>${state._anGroupNames.map(g=>`<option value="${escapeAttr(g)}" ${f.group===g?'selected':''}>${escapeHtml(g)}</option>`).join('')}</select>
+      <select onchange="state.an.topic=this.value;state.an.bin=null;drawAnalytics()" style="flex:1 1 180px;"><option value="">Barcha mavzular</option>${topics.map(t=>`<option value="${escapeAttr(t)}" ${f.topic===t?'selected':''}>${escapeHtml(t)}</option>`).join('')}</select>
+      <button class="btn-ghost btn-small" onclick="anReset()">Filtrlarni tozalash</button>
+    </div>`;
+  if(all.length===0){
+    dash.innerHTML = html + `<div class="empty">Hali tahlil qiladigan narsa yo'q — talabalar test topshirgach, bu yerda grafiklar paydo bo'ladi.</div>`; return;
+  }
+  if(list.length===0){
+    dash.innerHTML = html + `<div class="empty">Tanlangan filtr bo'yicha natija yo'q. Filtrlarni tozalab ko'ring.</div>`; return;
+  }
+  // ---- KPI ----
+  const pcts = list.map(r=>r.percentage);
+  const avg = avgOf(pcts), pass = Math.round(100*pcts.filter(p=>p>=60).length/pcts.length), cert = Math.round(100*pcts.filter(p=>p>=80).length/pcts.length);
+  const students = new Set(list.map(r=>r.studentName)).size;
+  let delta = null;
+  if(f.days){
+    const now = Date.now(), prev = (_analyticsResultsCache||[]).filter(r=>{ const age=now-new Date(r.timestamp).getTime(); return age>f.days*86400000 && age<=2*f.days*86400000 && (!f.group||(r.studentGroup||"Ko'rsatilmagan")===f.group) && (!f.topic||r.topic===f.topic); });
+    if(prev.length) delta = avg - avgOf(prev.map(r=>r.percentage));
+  }
+  const weeks = {}; list.forEach(r=>{ const w = weekStart(new Date(r.timestamp).getTime()); (weeks[w]=weeks[w]||[]).push(r.percentage); });
+  const weekKeys = Object.keys(weeks).map(Number).sort((a,b)=>a-b);
+  const weekAvg = weekKeys.map(k=>avgOf(weeks[k]));
+  const kpi = (label, val, sub, spark)=> `<div class="home-stat-box"><div class="lbl" style="margin:0 0 4px;">${label}</div><div class="num">${val}</div><div class="row-meta">${sub||''}</div>${spark||''}</div>`;
+  html += `<div class="home-stat-grid" style="margin-bottom:20px;">
+    ${kpi('Urinishlar', list.length, `${students} ta talaba`)}
+    ${kpi("O'rtacha natija", avg+'%', delta===null ? '' : `<span style="color:${delta>=0?C.teal:C.red};font-weight:700;">${delta>=0?'▲':'▼'} ${Math.abs(delta)}%</span> oldingi ${f.days} kunga nisbatan`, sparkSvg(weekAvg, C.teal))}
+    ${kpi("O'tish darajasi", pass+'%', '60% va undan yuqori')}
+    ${kpi('Sertifikat darajasi', cert+'%', '80% va undan yuqori')}
+  </div>`;
+  // ---- charts grid ----
+  const box = (title, inner, hint)=> `<div style="border:1px solid var(--edge);border-radius:14px;padding:16px;background:var(--card);min-width:0;"><div style="font-weight:700;margin-bottom:${hint?2:10}px;">${title}</div>${hint?`<div class="row-meta" style="margin-bottom:10px;">${hint}</div>`:''}${inner}</div>`;
+  html += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:14px;">
+    ${box("Natijalar dinamikasi (haftalar bo'yicha)", `<canvas id="anTrend" style="max-height:260px;"></canvas>`, "Chiziq — o'rtacha %, ustunlar — urinishlar soni")}
+    ${box("Natijalar taqsimoti", `<canvas id="anDist" style="max-height:260px;"></canvas>`, "Ustunni bossangiz, shu oraliqdagi urinishlar ro'yxati ochiladi")}
+    ${box("Mavzular (eng qiyini yuqorida)", `<canvas id="anTopics"></canvas>`, "Mavzuni bossangiz, tahlil shu mavzuga filtrlanadi")}
+    ${box("Guruhlar solishtirmasi", `<canvas id="anGroups"></canvas>`, "Guruhni bossangiz, tahlil shu guruhga filtrlanadi")}
+  </div><div id="anDetail"></div>`;
+  // ---- heatmap ----
+  const dayNames = ['Du','Se','Chor','Pay','Ju','Sha','Yak'], slots = [["Tun","0–6",0,6],["Ertalab","6–12",6,12],["Kunduz","12–18",12,18],["Kechqurun","18–24",18,24]];
+  const grid = dayNames.map(()=>slots.map(()=>0)); let gmax = 1;
+  list.forEach(r=>{ const d = new Date(r.timestamp), di = (d.getDay()+6)%7, h = d.getHours(), si = slots.findIndex(sl=>h>=sl[2]&&h<sl[3]); grid[di][si]++; gmax = Math.max(gmax, grid[di][si]); });
+  const heat = `<table style="display:table;width:100%;text-align:center;border-collapse:separate;border-spacing:4px;"><thead><tr><th></th>${dayNames.map(d=>`<th style="text-align:center;">${d}</th>`).join('')}</tr></thead><tbody>
+    ${slots.map((sl,si)=>`<tr><th style="text-align:left;white-space:nowrap;font-size:0.75rem;">${sl[0]}<br><span class="row-meta">${sl[1]}</span></th>${dayNames.map((_,di)=>{ const v=grid[di][si], a=v? 0.15+0.75*v/gmax : 0.05; return `<td title="${v} ta urinish" style="border-radius:6px;padding:10px 4px;background:color-mix(in srgb, ${C.teal} ${Math.round(a*100)}%, transparent);font-weight:600;">${v||''}</td>`; }).join('')}</tr>`).join('')}</tbody></table>`;
+  // ---- students: risk / top ----
+  const byStudent = {}; list.forEach(r=>{ (byStudent[r.studentName]=byStudent[r.studentName]||[]).push(r); });
+  const srows = Object.entries(byStudent).map(([name,recs])=>{ const sorted=[...recs].sort((x,y)=>new Date(x.timestamp)-new Date(y.timestamp)); return { name, group:recs[0].studentGroup||'—', avg:avgOf(recs.map(r=>r.percentage)), count:recs.length, last:new Date(sorted[sorted.length-1].timestamp).getTime(), trend: sorted.length>=2 ? sorted[sorted.length-1].percentage-sorted[0].percentage : 0 }; });
+  const risk = srows.filter(s=>s.avg<60).sort((a,b)=>a.avg-b.avg).slice(0,8);
+  const top = [...srows].sort((a,b)=>b.avg-a.avg || b.count-a.count).slice(0,5);
+  const stuRow = (s, extra)=> `<div class="row-item" style="cursor:pointer;" onclick="anPickStudent('${escapeAttr(s.name)}')"><span class="row-title">${escapeHtml(s.name)}<br><span class="row-meta">${escapeHtml(s.group)} · ${s.count} ta urinish${extra||''}</span></span><span style="min-width:150px;">${pctBar(s.avg)}</span></div>`;
+  // ---- hardest questions ----
+  const qs = computeQuestionErrorStats(list).slice(0,8);
+  html += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:14px 0;">
+    ${box("E'tibor talab qiladigan talabalar", risk.length ? risk.map(s=>stuRow(s, s.trend<0?` · <span style="color:${C.red}">▼ ${Math.abs(s.trend)}%</span>`:'')).join('') : `<div class="empty">O'rtachasi 60% dan past talaba yo'q 🎉</div>`, "O'rtacha natijasi 60% dan past — talabani bossangiz, batafsil ochiladi")}
+    ${box("Eng yaxshi natijalar", top.map((s,i)=>stuRow({...s,name:s.name}, ` · ${['🥇','🥈','🥉','4','5'][i]}`)).join(''))}
+    ${box("Faollik xaritasi", heat, "Qaysi kun va vaqtda ko'proq test topshirilgan")}
+    ${box("Eng ko'p adashiladigan savollar", qs.length ? qs.map(q=>`<div style="margin-bottom:10px;"><div style="font-size:0.85rem;">${escapeHtml(q.question)}</div><div class="row-meta">${escapeHtml(q.topic||'')} · ${q.total} urinish</div>${pctBar(q.errorRate)}</div>`).join('') : `<p class="desc">Hali yetarli ma'lumot yo'q (kamida 3 marta topshirilgan savollar hisoblanadi).</p>`, "Xato foizi qanchalik baland bo'lsa, savol shunchalik qiyin")}
+  </div><div id="anStudent"></div>`;
+  dash.innerHTML = html;
+  const axis = { ticks:{color:C.soft}, grid:{color:C.edge} };
+  // trend
+  anMake('anTrend', { data:{ labels: weekKeys.map(k=>new Date(k).toLocaleDateString('uz-UZ',{day:'2-digit',month:'2-digit'})),
+    datasets:[ {type:'bar', label:'Urinishlar', data: weekKeys.map(k=>weeks[k].length), backgroundColor:C.edge, yAxisID:'y2', borderRadius:4},
+               {type:'line', label:"O'rtacha %", data:weekAvg, borderColor:C.teal, backgroundColor:C.teal, tension:0.3, pointRadius:4, yAxisID:'y'} ] },
+    options:{ responsive:true, interaction:{mode:'index',intersect:false}, plugins:{legend:{labels:{color:C.soft}}}, scales:{ y:{...axis, min:0, max:100}, y2:{position:'right', ticks:{color:C.soft, precision:0}, grid:{display:false}, beginAtZero:true}, x:{ticks:{color:C.soft}, grid:{display:false}} } } });
+  // distribution
+  const bins = [0,0,0,0,0]; pcts.forEach(p=>{ bins[Math.min(4, Math.floor(p/20))]++; });
+  const binLabels = ['0–19%','20–39%','40–59%','60–79%','80–100%'];
+  anMake('anDist', { type:'bar', data:{ labels:binLabels, datasets:[{ data:bins, backgroundColor: bins.map((_,i)=> state.an.bin===i ? C.amber : (i<3?C.red:C.teal)), borderRadius:6 }] },
+    options:{ responsive:true, plugins:{legend:{display:false}}, onClick:(e,els)=>{ if(els.length){ const i=els[0].index; setTimeout(()=>{ state.an.bin = state.an.bin===i?null:i; drawAnalytics(); },0); } }, scales:{ y:{...axis, beginAtZero:true, ticks:{color:C.soft, precision:0}}, x:{ticks:{color:C.soft}, grid:{display:false}} } } });
+  // topics (horizontal)
+  const tmap = {}; list.forEach(r=>{ (tmap[r.topic]=tmap[r.topic]||[]).push(r.percentage); });
+  const tRows = Object.entries(tmap).map(([t,a])=>({t, avg:avgOf(a), n:a.length})).sort((a,b)=>a.avg-b.avg);
+  const tcv = document.getElementById('anTopics'); if(tcv) tcv.parentElement.style.minHeight = (60+tRows.length*30)+'px';
+  anMake('anTopics', { type:'bar', data:{ labels:tRows.map(r=>r.t), datasets:[{ data:tRows.map(r=>r.avg), backgroundColor:tRows.map(r=> f.topic===r.t ? C.amber : (r.avg<60?C.red:C.teal)), borderRadius:5 }] },
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>` ${c.parsed.x}% (${tRows[c.dataIndex].n} urinish)`}}}, onClick:(e,els)=>{ if(els.length){ const v=tRows[els[0].index].t; setTimeout(()=>anSet('topic', v),0); } }, scales:{ x:{...axis, min:0, max:100}, y:{ticks:{color:C.soft}, grid:{display:false}} } } });
+  // groups
+  const gmap = {}; list.forEach(r=>{ const g=r.studentGroup||"Ko'rsatilmagan"; (gmap[g]=gmap[g]||[]).push(r.percentage); });
+  const gRows = Object.entries(gmap).map(([g,a])=>({g, avg:avgOf(a), n:a.length})).sort((a,b)=>b.avg-a.avg);
+  const gcv = document.getElementById('anGroups'); if(gcv) gcv.parentElement.style.minHeight = (60+gRows.length*34)+'px';
+  anMake('anGroups', { type:'bar', data:{ labels:gRows.map(r=>r.g), datasets:[{ data:gRows.map(r=>r.avg), backgroundColor:gRows.map(r=> f.group===r.g ? C.amber : (r.avg<60?C.red:C.blue)), borderRadius:5 }] },
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>` ${c.parsed.x}% (${gRows[c.dataIndex].n} urinish)`}}}, onClick:(e,els)=>{ if(els.length){ const v=gRows[els[0].index].g; setTimeout(()=>anSet('group', v),0); } }, scales:{ x:{...axis, min:0, max:100}, y:{ticks:{color:C.soft}, grid:{display:false}} } } });
+  // bin detail
+  if(state.an.bin!==null && state.an.bin!==undefined){
+    const i = state.an.bin, lo = i*20, hi = i===4?100:lo+19;
+    const rows = list.filter(r=>r.percentage>=lo && r.percentage<=hi).sort((a,b)=>b.percentage-a.percentage);
+    document.getElementById('anDetail').innerHTML = `<div style="border:1px solid var(--edge);border-radius:14px;padding:16px;margin-bottom:14px;"><div style="font-weight:700;margin-bottom:8px;">${binLabels[i]} oralig'idagi urinishlar (${rows.length})</div>
+      <table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Mavzu</th><th>Natija</th><th>Sana</th></tr></thead><tbody>${rows.slice(0,50).map(r=>`<tr><td>${escapeHtml(r.studentName)}</td><td>${escapeHtml(r.studentGroup||'—')}</td><td>${escapeHtml(r.topic)}</td><td class="pct-cell ${r.percentage<60?'pct-low':'pct-ok'}">${r.percentage}%</td><td>${new Date(r.timestamp).toLocaleDateString('uz-UZ')}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  if(state.an.student) anShowStudent(state.an.student);
+}
+function anPickStudent(name){ state.an.student = state.an.student===name ? '' : name; if(state.an.student) anShowStudent(name); else { const e=document.getElementById('anStudent'); if(e) e.innerHTML=''; if(_anCharts.anStu){ _anCharts.anStu.destroy(); delete _anCharts.anStu; } } }
+function anShowStudent(name){
+  const holder = document.getElementById('anStudent'); if(!holder) return;
+  const C = anColors();
+  const recs = (_analyticsResultsCache||[]).filter(r=>r.studentName===name).sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
+  if(!recs.length){ holder.innerHTML=''; return; }
+  const tmap = {}; recs.forEach(r=>{ (tmap[r.topic]=tmap[r.topic]||[]).push(r.percentage); });
+  const weak = Object.entries(tmap).map(([t,a])=>({t,avg:avgOf(a)})).sort((a,b)=>a.avg-b.avg).slice(0,3);
+  holder.innerHTML = `<div style="border:1px solid var(--teal);border-radius:14px;padding:16px;margin-bottom:14px;">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;"><div style="font-weight:700;">${escapeHtml(name)} — shaxsiy progress</div><button class="btn-ghost btn-small" onclick="anPickStudent('${escapeAttr(name)}')">Yopish</button></div>
+    <div class="row-meta" style="margin-bottom:8px;">${recs.length} ta urinish · o'rtacha ${avgOf(recs.map(r=>r.percentage))}% · eng zaif mavzular: ${weak.map(w=>`${escapeHtml(w.t)} (${w.avg}%)`).join(', ')}</div>
+    <canvas id="anStu" style="max-height:240px;"></canvas></div>`;
+  anMake('anStu', { type:'line', data:{ labels:recs.map(r=>`${r.topic} · ${new Date(r.timestamp).toLocaleDateString('uz-UZ')}`), datasets:[{ data:recs.map(r=>r.percentage), borderColor:C.teal, backgroundColor:C.teal+'33', fill:true, tension:0.3, pointRadius:5, pointBackgroundColor:recs.map(r=>r.percentage<60?C.red:C.teal) }] },
+    options:{ responsive:true, plugins:{legend:{display:false}}, scales:{ y:{ticks:{color:C.soft}, grid:{color:C.edge}, min:0, max:100}, x:{ticks:{color:C.soft, maxRotation:40, minRotation:40}, grid:{display:false}} } } });
+  holder.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 /* --- Hisobot (group/period report — PDF & Excel) --- */
@@ -4596,12 +5128,19 @@ async function renderAdminGroups(){
         <button class="btn-primary btn-small" onclick="createGroup()">${icon('plus')}Guruh yaratish</button>
       </div>
     </div>
+    <div class="tabs" style="margin-top:14px;">
+      <button class="tab ${(state.groupsView||'active')==='active'?'active':''}" onclick="state.groupsView='active';renderAdminGroups()">Faol guruhlar</button>
+      <button class="tab ${state.groupsView==='archive'?'active':''}" onclick="state.groupsView='archive';renderAdminGroups()">Arxiv</button>
+    </div>
     <div id="groupsHolder" style="margin-top:14px;">`;
 
   if(names.length===0){
     html += `<div class="empty">Hali guruh yo'q — kirish kodi qo'shilganda yoki yuqoridan yaratilganda shu yerda ko'rinadi.</div>`;
   } else {
-    names.forEach(name=>{
+    const viewArchive = state.groupsView==='archive';
+    const visibleNames = names.filter(n=>{ const ge = state.config.groups.find(g=>g.name===n); return viewArchive ? !!(ge && ge.archived) : !(ge && ge.archived); });
+    if(visibleNames.length===0) html += `<div class="empty">${viewArchive?"Arxivda guruh yo'q.":"Faol guruh yo'q."}</div>`;
+    visibleNames.forEach(name=>{
       const groupEntry = state.config.groups.find(g=>g.name===name);
       const isRegistered = !!groupEntry;
       const isArchived = groupEntry && groupEntry.archived;
@@ -4620,8 +5159,10 @@ async function renderAdminGroups(){
         ${isRegistered
           ? `<button class="btn-ghost btn-small" onclick="renameGroupPrompt('${groupEntry.id}')">${icon('edit')}Nomini o'zgartirish</button>
              <button class="btn-ghost btn-small" onclick="toggleArchiveGroup('${groupEntry.id}')">${isArchived? "Arxivdan chiqarish":"Arxivlash"}</button>
-             <button class="btn-danger btn-small" onclick="deleteGroupEntry('${groupEntry.id}')">${icon('trash')}Ro'yxatdan olib tashlash</button>`
-          : `<button class="btn-ghost btn-small" onclick="registerExistingGroup('${escapeAttr(name)}')">${icon('check')}Ro'yxatga olish</button>`}
+             <button class="btn-danger btn-small" onclick="deleteGroupEntry('${groupEntry.id}')">${icon('trash')}Ro'yxatdan chiqarish</button>`
+          : `<button class="btn-ghost btn-small" onclick="registerExistingGroup('${escapeAttr(name)}')">${icon('check')}Ro'yxatga olish</button>
+             <button class="btn-ghost btn-small" onclick="archiveGroupByName('${escapeAttr(name)}')">Arxivlash</button>`}
+        <button class="btn-danger btn-small" onclick="deleteGroupFully('${escapeAttr(name)}')">${icon('trash')}Guruhni o'chirish</button>
         <button class="btn-ghost btn-small" onclick="downloadGroupReport('${escapeAttr(name)}')">${icon('download')}Excel hisobot</button>
         ${(state.config.studentAccounts||[]).some(a=>a.group===name && a.blocked)
           ? `<button class="btn-owner btn-small" onclick="finishCourseForGroup('${escapeAttr(name)}')">Kursni yakunlash (bloklarni olib tashlash)</button>`
@@ -4707,6 +5248,40 @@ async function toggleArchiveGroup(id){
   else g.archived = backup;
   renderAdminGroups();
 }
+async function archiveGroupByName(name){
+  if(!state.config.groups) state.config.groups = [];
+  let g = state.config.groups.find(x=>x.name===name);
+  if(!g){ g = { id:'group_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), name, archived:false, createdAt: Date.now() }; state.config.groups.push(g); }
+  await toggleArchiveGroup(g.id);
+}
+// Guruhni va unga tegishli hamma narsani tozalash (kodlar, loginlar, ro'yxat, suhbatlar, ixtiyoriy natijalar)
+async function deleteGroupFully(name){
+  if(!(await customConfirm(`"${name}" guruhini butunlay o'chirasizmi? Guruh, uning kirish kodlari, talaba loginlari, ro'yxatdagi o'quvchilar va suhbatlari o'chadi. Avval "Excel hisobot" tugmasi bilan natijalarni yuklab olishni tavsiya qilamiz.`))) return;
+  const alsoResults = await customConfirm(`Shu guruh talabalarining TEST VA IMTIHON NATIJALARI ham o'chirilsinmi?\n\nOK — natijalar ham o'chadi (qaytarib bo'lmaydi).\nBekor qilish — natijalar saqlanadi.`);
+  const backup = JSON.parse(JSON.stringify({ g:state.config.groups||[], c:state.config.accessCodes||[], a:state.config.studentAccounts||[], t:state.config.tests||[] }));
+  state.config.groups = (state.config.groups||[]).filter(g=>g.name!==name);
+  state.config.accessCodes = (state.config.accessCodes||[]).filter(c=>c.label!==name);
+  state.config.studentAccounts = (state.config.studentAccounts||[]).filter(a=>a.group!==name);
+  const dropGroup = (item)=>{ if(item.assignTo && item.assignTo.groups) item.assignTo.groups = item.assignTo.groups.filter(g=>g!==name); };
+  (state.config.tests||[]).forEach(dropGroup);
+  const ok = await saveConfig(state.config);
+  if(!ok){ state.config.groups=backup.g; state.config.accessCodes=backup.c; state.config.studentAccounts=backup.a; state.config.tests=backup.t; renderAdminGroups(); return; }
+  const ec = await loadExamConfig();
+  if(!ec._loadFailed){ let changed=false; (ec.exams||[]).forEach(e=>{ if(e.assignTo && e.assignTo.groups && e.assignTo.groups.includes(name)){ dropGroup(e); changed=true; } }); if(changed) await saveExamConfig(ec); }
+  showToast("Guruh sozlamalari o'chirildi, ma'lumotlar tozalanmoqda...");
+  const delKeys = [];
+  (await storageGetRows('roster:')).forEach(r=>{ try{ if(JSON.parse(r.value).group===name) delKeys.push(r.key); }catch(e){} });
+  (await storageGetRows('chat:')).forEach(r=>{ try{ if(JSON.parse(r.value).studentGroup===name) delKeys.push(r.key); }catch(e){} });
+  if(alsoResults){
+    for(const pre of ['result:','exam-result:']){
+      (await storageGetRows(pre)).forEach(r=>{ try{ if(JSON.parse(r.value).studentGroup===name) delKeys.push(r.key); }catch(e){} });
+    }
+  }
+  for(let i=0;i<delKeys.length;i+=8) await Promise.all(delKeys.slice(i,i+8).map(k=>storageDelete(k)));
+  logActivity('group_delete', `Guruh o'chirildi: ${name} (${delKeys.length} ta yozuv${alsoResults?', natijalar bilan':''})`);
+  showToast(`"${name}" guruhi o'chirildi ✓`);
+  renderAdminGroups();
+}
 async function deleteGroupEntry(id){
   if(!(await customConfirm("Guruhni boshqariladigan ro'yxatdan olib tashlaysizmi? Kirish kodlari va o'quvchilar o'zgarmaydi — faqat guruh \"rasmiy\" ro'yxatdan chiqariladi."))) return;
   const backup = state.config.groups.slice();
@@ -4754,35 +5329,103 @@ async function finishCourseForGroup(groupName){
 }
 
 /* --- Savol-javob (Chat) tab --- */
+/* ---- Chat: o'qilmagan xabarlar, guruhlash, arxiv ---- */
+function chatUnreadCount(thread, who){
+  const readAt = (who==='student' ? thread.studentReadAt : thread.adminReadAt) || 0;
+  const other = who==='student' ? 'admin' : 'student';
+  return (thread.messages||[]).filter(m=> m.from===other && m.ts>readAt).length;
+}
+function timeAgo(ts){
+  if(!ts) return '';
+  const d = Date.now()-ts, m = Math.floor(d/60000);
+  if(m<1) return 'hozir';
+  if(m<60) return `${m} daq. oldin`;
+  const h = Math.floor(m/60);
+  if(h<24) return `${h} soat oldin`;
+  const dt = new Date(ts);
+  return dt.toLocaleDateString('uz-UZ')+' '+dt.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'});
+}
+function setBadge(id, n){
+  const el = document.getElementById(id); if(!el) return;
+  el.textContent = n>99 ? '99+' : String(n);
+  el.classList.toggle('hidden', !(n>0));
+}
+function updateDocTitle(n){
+  const base = 'FINANCE TEAM';
+  document.title = n>0 ? `(${n}) ${base}` : base;
+}
+async function fetchAllChatThreads(){
+  const rows = await storageGetRows('chat:');
+  const threads = [];
+  rows.forEach(r=>{ try{ const t = JSON.parse(r.value); t._slug = r.key.slice('chat:'.length); if(!Array.isArray(t.messages)) t.messages=[]; threads.push(t); }catch(e){} });
+  return threads;
+}
+async function refreshAdminChatBadge(announce){
+  if(!state.role) return;
+  try{
+    const threads = (await fetchAllChatThreads()).filter(t=>!t.archived);
+    const unreadThreads = threads.filter(t=>chatUnreadCount(t,'admin')>0);
+    const total = unreadThreads.reduce((a,t)=>a+chatUnreadCount(t,'admin'),0);
+    setBadge('chatsTabBadge', total);
+    updateDocTitle(total);
+    if(announce && total>(state._lastAdminUnread||0)){
+      const newest = unreadThreads.sort((a,b)=>(b.lastMessageAt||0)-(a.lastMessageAt||0))[0];
+      showToast(`Yangi xabar: ${newest.studentName||newest._slug}${newest.studentGroup?' ('+newest.studentGroup+')':''}`);
+      const chatsVisible = !document.getElementById('adminTab-chats').classList.contains('hidden');
+      const typing = document.getElementById('adminChatInput') && document.getElementById('adminChatInput').value;
+      if(chatsVisible && !typing) renderAdminChats();
+    }
+    state._lastAdminUnread = total;
+  }catch(e){}
+}
 async function renderAdminChats(){
   const el = document.getElementById('adminTab-chats');
-  el.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
-  const keys = await storageListKeys('chat:');
-  const threads = [];
-  const raws = await Promise.all(keys.map(k=> storageGet(k)));
-  raws.forEach((raw,i)=>{ if(raw){ try{ const t = JSON.parse(raw); t._slug = keys[i].slice('chat:'.length); threads.push(t); }catch(e){} } });
-  threads.sort((a,b)=>(b.lastMessageAt||0)-(a.lastMessageAt||0));
-  state._chatThreadsCache = threads;
-  let html = `<div class="lead" style="margin-bottom:6px;">Talabalar savollari</div><p class="desc">Talabalar yuborgan xabarlarga shu yerdan javob bering.</p>`;
+  if(!state._chatsRenderedOnce) el.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  const all = await fetchAllChatThreads();
+  all.sort((a,b)=>(b.lastMessageAt||0)-(a.lastMessageAt||0));
+  state._chatThreadsCache = all;
+  state._chatsRenderedOnce = true;
+  const view = state.adminChatView || 'active';
+  const activeList = all.filter(t=>!t.archived), archList = all.filter(t=>t.archived);
+  const threads = view==='archive' ? archList : activeList;
+  const totalUnread = activeList.reduce((a,t)=>a+chatUnreadCount(t,'admin'),0);
+  setBadge('chatsTabBadge', totalUnread); updateDocTitle(totalUnread); state._lastAdminUnread = totalUnread;
+  let html = `<div class="lead" style="margin-bottom:6px;">Talabalar savollari</div>
+    <p class="desc">Xabarlar guruhlar bo'yicha ajratilgan. Yangi xabarlar soni qizil raqamda ko'rinadi.</p>
+    <div class="tabs" style="margin-bottom:14px;">
+      <button class="tab ${view==='active'?'active':''}" onclick="state.adminChatView='active';renderAdminChats()">Faol (${activeList.length})</button>
+      <button class="tab ${view==='archive'?'active':''}" onclick="state.adminChatView='archive';renderAdminChats()">Arxiv (${archList.length})</button>
+    </div>`;
   if(threads.length===0){
-    html += `<div class="empty">Hali xabar yo'q.</div>`;
-    el.innerHTML = html;
+    el.innerHTML = html + `<div class="empty">${view==='archive'?"Arxivda suhbat yo'q.":"Hali xabar yo'q."}</div>`;
     return;
   }
+  const groups = {};
+  threads.forEach(t=>{ const g = t.studentGroup || 'Guruhsiz'; (groups[g] = groups[g]||[]).push(t); });
+  const groupNames = Object.keys(groups).sort((a,b)=>{
+    const ua = groups[a].reduce((x,t)=>x+chatUnreadCount(t,'admin'),0), ub = groups[b].reduce((x,t)=>x+chatUnreadCount(t,'admin'),0);
+    return (ub>0)-(ua>0) || a.localeCompare(b);
+  });
   html += `<div class="flexrow" style="align-items:flex-start;flex-wrap:wrap;">
-    <div style="flex:0 0 260px;max-height:460px;overflow-y:auto;">
-      ${threads.map(t=>{
-        const last = t.messages[t.messages.length-1];
-        const unread = last && last.from==='student' && (!t.adminReadAt || t.adminReadAt < t.lastMessageAt);
-        return `<div class="row-item" style="cursor:pointer;${state.adminChatOpenSlug===t._slug?'border-color:var(--teal);':''}" onclick="openAdminChatThread('${t._slug}')">
-          <span class="row-title">${escapeHtml(t.studentName||t._slug)} ${unread?'<span class="badge badge-open" style="margin-left:6px;">Yangi</span>':''}<br><span class="row-meta">${escapeHtml(t.studentGroup||'')}</span></span>
-        </div>`;
+    <div style="flex:0 0 280px;max-height:520px;overflow-y:auto;">
+      ${groupNames.map(g=>{
+        const gu = groups[g].reduce((x,t)=>x+chatUnreadCount(t,'admin'),0);
+        return `<div class="chat-group-h"><span>${escapeHtml(g)} · ${groups[g].length}</span>${gu?`<span class="count-badge" style="margin:0;">${gu}</span>`:''}</div>` +
+        groups[g].map(t=>{
+          const last = t.messages[t.messages.length-1];
+          const u = chatUnreadCount(t,'admin');
+          return `<div class="row-item" style="cursor:pointer;display:block;${state.adminChatOpenSlug===t._slug?'border-color:var(--teal);':''}" onclick="openAdminChatThread('${escapeAttr(t._slug)}')">
+            <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>${escapeHtml(t.studentName||t._slug)}</strong>${u?`<span class="count-badge" style="margin:0;">${u}</span>`:''}</div>
+            <div class="row-meta" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${last?(last.from==='admin'?'Siz: ':'')+escapeHtml(last.text):''}</div>
+            <div class="row-meta">${timeAgo(t.lastMessageAt)}</div>
+          </div>`;
+        }).join('');
       }).join('')}
     </div>
-    <div style="flex:1;min-width:260px;" id="adminChatThreadBox"></div>
+    <div style="flex:1;min-width:260px;" id="adminChatThreadBox"><div class="empty">Suhbatni tanlang.</div></div>
   </div>`;
   el.innerHTML = html;
-  if(state.adminChatOpenSlug) renderAdminChatThread();
+  if(state.adminChatOpenSlug && threads.find(t=>t._slug===state.adminChatOpenSlug)) renderAdminChatThread();
 }
 function openAdminChatThread(slug){
   state.adminChatOpenSlug = slug;
@@ -4793,7 +5436,13 @@ async function renderAdminChatThread(){
   const box = document.getElementById('adminChatThreadBox');
   if(!t || !box) return;
   box.innerHTML = `
-    <div class="lead" style="font-size:1rem;margin-bottom:10px;">${escapeHtml(t.studentName||t._slug)} <span class="row-meta">${escapeHtml(t.studentGroup||'')}</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+      <div class="lead" style="font-size:1rem;margin:0;">${escapeHtml(t.studentName||t._slug)} <span class="row-meta">${escapeHtml(t.studentGroup||'')}</span></div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-ghost btn-small" onclick="toggleChatArchive('${escapeAttr(t._slug)}')">${t.archived?"Arxivdan chiqarish":"Arxivlash"}</button>
+        <button class="btn-danger btn-small" onclick="deleteChatThread('${escapeAttr(t._slug)}')">${icon('trash')}O'chirish</button>
+      </div>
+    </div>
     <div id="adminChatMessages" class="chat-box">
       ${t.messages.map(m=>`<div class="chat-msg chat-msg-${m.from}"><div class="chat-msg-text">${escapeHtml(m.text)}</div><div class="chat-msg-ts">${new Date(m.ts).toLocaleString('uz-UZ')}</div></div>`).join('')}
     </div>
@@ -4805,14 +5454,29 @@ async function renderAdminChatThread(){
   if(msgsEl) msgsEl.scrollTop = msgsEl.scrollHeight;
   const input = document.getElementById('adminChatInput');
   if(input) input.onkeydown = (e)=>{ if(e.key==='Enter') sendAdminChatReply(); };
-  if(!t.adminReadAt || t.adminReadAt < t.lastMessageAt){
+  if(chatUnreadCount(t,'admin')>0){
     // Re-read before writing the "read" mark so a student message sent in the meantime isn't lost.
     const latest = await loadChatThread(t._slug);
     if(latest._loadFailed) return;
     latest.adminReadAt = Date.now();
     await storageSet(`chat:${t._slug}`, JSON.stringify(latest));
     t.adminReadAt = latest.adminReadAt;
+    refreshAdminChatBadge(false);
   }
+}
+async function toggleChatArchive(slug){
+  const latest = await loadChatThread(slug);
+  if(latest._loadFailed){ showToast("Aloqa yo'q.", true); return; }
+  latest.archived = !latest.archived;
+  const ok = await storageSet(`chat:${slug}`, JSON.stringify(latest));
+  if(ok){ showToast(latest.archived ? "Suhbat arxivlandi ✓" : "Suhbat arxivdan chiqarildi ✓"); state.adminChatOpenSlug = null; }
+  renderAdminChats();
+}
+async function deleteChatThread(slug){
+  if(!(await customConfirm("Bu suhbatni butunlay o'chirishni tasdiqlaysizmi? Qaytarib bo'lmaydi."))) return;
+  const ok = await storageDelete(`chat:${slug}`);
+  if(ok){ showToast("Suhbat o'chirildi ✓"); logActivity('chat_delete', `Suhbat o'chirildi: ${slug}`); state.adminChatOpenSlug = null; }
+  renderAdminChats();
 }
 async function sendAdminChatReply(){
   const input = document.getElementById('adminChatInput');
@@ -4828,6 +5492,7 @@ async function sendAdminChatReply(){
   if(latest.messages.length>300) latest.messages = latest.messages.slice(-300);
   latest.lastMessageAt = Date.now();
   latest.adminReadAt = Date.now();
+  latest.archived = false;
   const idx = state._chatThreadsCache.indexOf(cached);
   state._chatThreadsCache[idx] = latest;
   renderAdminChatThread();
@@ -4854,11 +5519,14 @@ async function renderAdminAccounts(){
   const groupOptions = (state.config.groups||[]).map(g=>g.name).concat(groupNames).filter((v,i,a)=>a.indexOf(v)===i);
   const fresh = state.freshCreds || {};
   const freshList = Object.values(fresh);
+  await vaultDecryptAll(accounts);
   const legacyCount = accounts.filter(a=>a.password!==undefined && !a.secret).length;
+  const vaultOn = !!state.config.vault;
 
   let html = `
     <div class="lead" style="margin-bottom:6px;">Talaba loginlari</div>
     <p class="desc">Har bir talabaga markaz tomonidan shaxsiy login va parol beriladi. Parollar shifrlangan holda saqlanadi — yangi yaratilgan parol faqat shu sahifa ochiq turganida ko'rinadi, shuning uchun darhol Excel'ga yuklab oling. Bloklangan hisob boshqa qurilmadan ham kira olmaydi; faqat administrator blokdan chiqarsa yoki "Guruhlar" bo'limida kursni yakunlasa, kirish tiklanadi.</p>
+    ${!vaultOn ? `<div class="notify-banner" style="margin-bottom:16px;"><div class="notify-banner-title">${icon('shield')}Parollarni saqlash o'chiq</div><p class="desc" style="margin:0;">Hozir yangi parollar faqat yaratilgan paytda ko'rinadi. Parollarni platformada saqlab, keyin ham ko'rish uchun <b>Rahbar</b> bir marta o'z kodi bilan kirishi kerak (parollar ombori avtomatik yoqiladi).${state.role==='rahbar'?' Siz rahbar sifatida kirgansiz — sahifani qayta yuklab, qayta kiring.':''}</p></div>` : ''}
     ${legacyCount>0 ? `<div class="notify-banner" style="margin-bottom:16px;">
       <div class="notify-banner-title">${icon('shield')}Xavfsizlik</div>
       <p class="desc" style="margin:0 0 10px;">${legacyCount} ta loginning paroli hali ochiq matn ko'rinishida saqlanmoqda. Shifrlash tugmasi avval hozirgi parollar ro'yxatini Excel'ga yuklab oladi, keyin ularni shifrlaydi.</p>
@@ -4897,10 +5565,10 @@ async function renderAdminAccounts(){
     html += `<div class="empty">Hali login yaratilmagan — yuqoridan birinchi talabangizni qo'shing.</div>`;
   } else {
     accounts.slice().sort((a,b)=>(a.group||'').localeCompare(b.group||'') || a.fullName.localeCompare(b.fullName)).forEach(a=>{
-      const known = fresh[a.id] ? fresh[a.id].password : (a.password!==undefined && !a.secret ? a.password : null);
+      const known = knownPassword(a);
       html += `<div class="row-item">
         <span class="row-title">${escapeHtml(a.fullName)} ${a.blocked?'<span class="badge badge-closed" style="margin-left:6px;">Bloklangan</span>':''}
-          <br><span class="row-meta">Login: <b>${escapeHtml(a.login)}</b> · Parol: ${known ? `<b>${escapeHtml(known)}</b>` : '<i>shifrlangan</i>'} · Guruh: ${escapeHtml(a.group||'—')}</span></span>
+          <br><span class="row-meta">Login: <b>${escapeHtml(a.login)}</b> · Parol: ${known ? `<b>${escapeHtml(known)}</b>` : (a.pwEnc ? "<i>saqlangan — ko'rish uchun rahbar ruxsat berishi kerak</i>" : '<i>shifrlangan (ko\'rib bo\'lmaydi — «Parolni yangilash» bosing)</i>')} · Guruh: ${escapeHtml(a.group||'—')}</span></span>
         ${known ? `<button class="btn-ghost btn-small" onclick="copyAccountCreds('${a.id}')">${icon('link')}Nusxalash</button>` : ''}
         <button class="btn-ghost btn-small" onclick="resetAccountPassword('${a.id}')">Parolni yangilash</button>
         <button class="btn-${a.blocked?'ghost':'danger'} btn-small" onclick="toggleAccountBlock('${a.id}')">${a.blocked?"Blokdan chiqarish":"Bloklash"}</button>
@@ -4921,6 +5589,7 @@ async function buildAccount(fullName, group, existingLogins){
     secret: await makeSecret(password),
     fullName, group, blocked:false, createdAt: Date.now()
   };
+  const enc = await vaultEncrypt(password); if(enc) account.pwEnc = enc;
   if(!state.freshCreds) state.freshCreds = {};
   state.freshCreds[account.id] = { fullName, login: account.login, password, group };
   return account;
@@ -4993,13 +5662,15 @@ async function resetAccountPassword(id){
   const password = genPassword();
   a.secret = await makeSecret(password);
   delete a.password;
+  const prevEnc = a.pwEnc; delete a.pwEnc; const enc = await vaultEncrypt(password); if(enc) a.pwEnc = enc;
+  if(state.vaultPw) delete state.vaultPw[a.id];
   const ok = await saveConfig(state.config);
   if(ok){
     if(!state.freshCreds) state.freshCreds = {};
     state.freshCreds[a.id] = { fullName:a.fullName, login:a.login, password, group:a.group };
     showToast("Yangi parol yaratildi ✓");
     logActivity('account_reset', `Parol yangilandi: ${a.fullName} (${a.login})`);
-  } else { a.secret = prev.secret; if(prev.password!==undefined) a.password = prev.password; }
+  } else { a.secret = prev.secret; if(prev.password!==undefined) a.password = prev.password; if(prevEnc) a.pwEnc = prevEnc; }
   renderAdminAccounts();
 }
 async function migrateAccountPasswords(){
@@ -5020,9 +5691,8 @@ async function migrateAccountPasswords(){
 function copyAccountCreds(id){
   const a = state.config.studentAccounts.find(x=>x.id===id);
   if(!a) return;
-  const f = state.freshCreds && state.freshCreds[id];
-  const pw = f ? f.password : a.password;
-  if(pw===undefined) return;
+  const pw = knownPassword(a);
+  if(!pw) return;
   const text = `Login: ${a.login}\nParol: ${pw}`;
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(()=> showToast("Login va parol nusxalandi ✓")).catch(()=> showToast(text));
@@ -5035,7 +5705,7 @@ function downloadAccountsExcel(freshOnly){
   const rows = [['F.I.Sh','Guruh','Login','Parol','Holat']];
   state.config.studentAccounts.forEach(a=>{
     if(freshOnly && !fresh[a.id]) return;
-    const pw = fresh[a.id] ? fresh[a.id].password : (a.password!==undefined && !a.secret ? a.password : "(shifrlangan)");
+    const pw = knownPassword(a) || "(shifrlangan)";
     rows.push([a.fullName, a.group||'', a.login, pw, a.blocked?'Bloklangan':'Faol']);
   });
   const ws = XLSX.utils.aoa_to_sheet(rows);
@@ -5118,6 +5788,11 @@ async function renderOwnerPanel(){
       </div>
     </div>
 
+    <div class="lead" style="font-size:1.1rem;margin:26px 0 10px;">Parollar ombori</div>
+    <p class="desc">Talaba parollari shifrlangan holda saqlanadi va faqat kod bilan ochiladi. ${state.config.vault ? 'Ombor <b>yoqilgan</b>.' : "Ombor hali yoqilmagan — rahbar sifatida qayta kirsangiz avtomatik yoqiladi."} Eslatma: kodlar qancha uzun va murakkab bo'lsa, ombor shuncha xavfsiz.</p>
+    ${state.config.vault ? `<div class="row-item"><span class="row-title">Admin saqlangan parollarni ko'ra oladimi?</span>
+      ${state.config.vault.wrapAdmin ? `<span class="badge badge-open">Ha</span><button class="btn-ghost btn-small" onclick="disableAdminVaultAccess()">Bekor qilish</button>` : `<span class="badge badge-closed">Yo'q</span><button class="btn-owner btn-small" onclick="enableAdminVaultAccess()">Ruxsat berish</button>`}</div>` : ''}
+
     <div class="lead" style="font-size:1.1rem;margin:26px 0 10px;">Sertifikat sozlamalari</div>
     <p class="desc">Sertifikatda ko'rinadigan markaz nomi va imzo egasi.</p>
     <div class="field" style="max-width:520px;">
@@ -5163,9 +5838,12 @@ async function saveAdminCode(){
   const prevSecret = state.config.adminSecret, prevPlain = state.config.adminCode;
   state.config.adminSecret = await makeSecret(val);
   delete state.config.adminCode;
+  const prevWrapAdmin = state.config.vault && state.config.vault.wrapAdmin;
+  if(prevWrapAdmin && state.vaultPrivJwk) state.config.vault.wrapAdmin = await vaultWrap(state.vaultPrivJwk, val);
+  else if(prevWrapAdmin) delete state.config.vault.wrapAdmin; // kalit sessiyada yo'q — eski qulf yangi kodga mos kelmaydi
   const ok = await saveConfig(state.config);
   if(ok){ showToast("Admin kodi yangilandi ✓"); input.value=''; logActivity('code_change', "Admin kodi almashtirildi"); }
-  else { state.config.adminSecret = prevSecret; if(prevPlain) state.config.adminCode = prevPlain; }
+  else { state.config.adminSecret = prevSecret; if(prevPlain) state.config.adminCode = prevPlain; if(prevWrapAdmin) state.config.vault.wrapAdmin = prevWrapAdmin; }
 }
 async function saveRahbarCode(){
   const input = document.getElementById('ownerRahbarCodeInput');
@@ -5175,15 +5853,61 @@ async function saveRahbarCode(){
   const prevSecret = state.config.rahbarSecret, prevPlain = state.config.rahbarCode;
   state.config.rahbarSecret = await makeSecret(val);
   delete state.config.rahbarCode;
+  const prevWrapRahbar = state.config.vault && state.config.vault.wrapRahbar;
+  if(prevWrapRahbar){
+    if(!state.vaultPrivJwk){ state.config.rahbarSecret = prevSecret; if(prevPlain) state.config.rahbarCode = prevPlain; showToast("Parollar ombori ochilmagan — rahbar kodini hozir almashtirib bo'lmaydi. Chiqib, qayta kiring.", true); return; }
+    state.config.vault.wrapRahbar = await vaultWrap(state.vaultPrivJwk, val);
+  }
   const ok = await saveConfig(state.config);
   if(ok){ showToast("Rahbar kodi yangilandi ✓"); input.value=''; logActivity('code_change', "Rahbar kodi almashtirildi"); }
-  else { state.config.rahbarSecret = prevSecret; if(prevPlain) state.config.rahbarCode = prevPlain; }
+  else { state.config.rahbarSecret = prevSecret; if(prevPlain) state.config.rahbarCode = prevPlain; if(prevWrapRahbar) state.config.vault.wrapRahbar = prevWrapRahbar; }
+}
+// Rahbar: adminga parollarni ko'rish huquqini berish (admin kodini bir marta kiritadi)
+async function enableAdminVaultAccess(){
+  if(state.role!=='rahbar' || !state.vaultPrivJwk){ showToast("Avval rahbar kodi bilan qayta kiring.", true); return; }
+  const code = await customPromptText("Adminning joriy kirish kodini kiriting (u tekshiriladi va parollar ombori shu kod bilan ochiladigan bo'ladi):", "");
+  if(!code) return;
+  let ok = false; try{ ok = state.config.adminSecret ? await verifySecret(code, state.config.adminSecret) : (code===state.config.adminCode); }catch(e){}
+  if(!ok){ showToast("Admin kodi noto'g'ri.", true); return; }
+  const prev = state.config.vault.wrapAdmin;
+  state.config.vault.wrapAdmin = await vaultWrap(state.vaultPrivJwk, code);
+  if(await saveConfig(state.config)){ showToast("Admin endi saqlangan parollarni ko'ra oladi ✓"); logActivity('settings', "Adminga parollarni ko'rish ruxsati berildi"); }
+  else state.config.vault.wrapAdmin = prev;
+  renderOwnerPanel();
+}
+async function disableAdminVaultAccess(){
+  if(!(await askRahbarCode("Adminning parollarni ko'rish ruxsatini bekor qilish uchun rahbar kodini kiriting."))) return;
+  const prev = state.config.vault.wrapAdmin; delete state.config.vault.wrapAdmin;
+  if(await saveConfig(state.config)){ showToast("Admin ruxsati bekor qilindi ✓"); logActivity('settings', "Adminning parollarni ko'rish ruxsati bekor qilindi"); }
+  else state.config.vault.wrapAdmin = prev;
+  renderOwnerPanel();
+}
+function askRahbarCode(message){
+  return new Promise(resolve=>{
+    showModal('', [
+      {label:'Bekor qilish', onClick:()=>{ closeModal(); resolve(false); }},
+      {label:'Tasdiqlash', primary:true, onClick: async ()=>{
+        const val = document.getElementById('rahbarConfirmInput').value;
+        const errEl = document.getElementById('rahbarConfirmErr'); errEl.textContent='';
+        if(!val){ errEl.textContent = "Kodni kiriting."; return; }
+        const cfg = state.config; let ok = false;
+        try{ ok = cfg.rahbarSecret ? await verifySecret(val, cfg.rahbarSecret) : (val === cfg.rahbarCode); }catch(e){}
+        if(!ok){ errEl.textContent = "Rahbar kodi noto'g'ri."; logActivity('admin_login_failed', "Rahbar kodini tasdiqlashda xato"); return; }
+        closeModal(); resolve(true);
+      }}
+    ]);
+    document.getElementById('modalMessage').innerHTML = `<div style="margin-bottom:10px;">${escapeHtml(message)}</div>
+      <input type="password" id="rahbarConfirmInput" placeholder="Rahbar kirish kodi" autocomplete="off">
+      <div id="rahbarConfirmErr" style="color:var(--red);font-size:0.85rem;margin-top:6px;min-height:1em;"></div>`;
+    setTimeout(()=>{ const i=document.getElementById('rahbarConfirmInput'); if(i) i.focus(); },50);
+  });
 }
 async function togglePermission(){
+  if(!(await askRahbarCode("Admin huquqini o'zgartirish uchun rahbar kirish kodini qayta kiriting."))) return;
   const newVal = !state.config.permissions.adminCanDeleteTests;
   state.config.permissions.adminCanDeleteTests = newVal;
   const ok = await saveConfig(state.config);
-  if(ok) showToast(newVal ? "Ruxsat berildi ✓" : "Ruxsat bekor qilindi ✓");
+  if(ok){ showToast(newVal ? "Ruxsat berildi ✓" : "Ruxsat bekor qilindi ✓"); logActivity('settings', newVal ? "Admin testlarni o'chirishga ruxsat oldi" : "Adminning o'chirish ruxsati bekor qilindi"); }
   else state.config.permissions.adminCanDeleteTests = !newVal;
   renderOwnerPanel();
 }
