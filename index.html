@@ -554,6 +554,7 @@
 
   <div id="screen-live-student" class="card hidden">
     <div id="liveStudentBody"></div>
+    <div id="liveConnInfo" class="row-meta" style="text-align:center;margin-top:12px;font-size:0.7rem;opacity:0.7;"></div>
   </div>
 
   <!-- ADMIN/OWNER: LIVE HOST VIEW (big screen) -->
@@ -565,6 +566,7 @@
         <button class="btn-ghost btn-small" onclick="endLiveSessionAndExit()">Seansni tugatish</button>
       </div>
     </div>
+    <div id="liveConnInfoHost" class="row-meta" style="margin:-4px 0 10px;"></div>
     <div id="liveHostBody" class="card"></div>
   </div>
 
@@ -3351,15 +3353,32 @@ async function showResult(record){
    (3) taymer va hisoblagich serverga bog'liq emas — telefonning o'zida har 0,25 soniyada yangilanadi. */
 const LIVE_STUDENT_POLL_MS = 1500;
 function liveSlug(){ return studentIdentity(state.studentName); }
-function liveRtJoin(channel, onState){
+function liveRtJoin(channel, onState, onAnswer){
   try{
     if(!supabaseClient || typeof supabaseClient.channel!=='function') return null;
-    state.liveRtOk = false;
+    state.liveRtOk = false; state.liveRtGot = false;
     const ch = supabaseClient.channel('ft-live-'+channel, { config:{ broadcast:{ self:false } } });
-    if(onState) ch.on('broadcast', { event:'state' }, msg=>{ try{ onState(msg && msg.payload); }catch(e){} });
+    if(onState) ch.on('broadcast', { event:'state' }, msg=>{ state.liveRtGot = true; try{ onState(msg && msg.payload); }catch(e){} });
+    if(onAnswer) ch.on('broadcast', { event:'answer' }, msg=>{ state.liveRtGot = true; try{ onAnswer(msg && msg.payload); }catch(e){} });
     ch.subscribe(status=>{ state.liveRtOk = (status==='SUBSCRIBED'); });
     return ch;
   }catch(e){ return null; }
+}
+// Talaba javobi serverga yozilgach, hostga "javob keldi" turtkisi (host darhol sanab ko'radi)
+function liveRtSendAnswer(sessionId, qIndex, slug){
+  try{ if(state.liveRt && state.liveRtOk) state.liveRt.send({ type:'broadcast', event:'answer', payload:{ sid:sessionId, q:qIndex, slug } }); }catch(e){}
+}
+// Aloqa holati (tashxis uchun): "tezkor" bo'lsa xabarlar bir zumda boradi, aks holda oddiy (sekinroq) rejim
+function liveConnText(role){
+  if(state.liveRtGot) return role==='host' ? 'Tezkor aloqa: ishlayapti ✓' : 'Aloqa: tezkor ✓';
+  if(state.liveRtOk) return role==='host' ? 'Tezkor aloqa: ulangan ✓ (telefondan birinchi javob kutilmoqda)' : 'Aloqa: ulangan ✓';
+  return role==='host' ? 'Tezkor aloqa: ulanmagan (oddiy rejim, biroz sekinroq)' : 'Aloqa: oddiy rejim';
+}
+function updateLiveConnInfo(){
+  const host = !!state.hostSessionId && !document.getElementById('screen-live-host').classList.contains('hidden');
+  const el = document.getElementById(host ? 'liveConnInfoHost' : 'liveConnInfo'); if(!el) return;
+  const t = liveConnText(host ? 'host' : 'student');
+  if(el.textContent !== t) el.textContent = t;
 }
 function liveRtLeave(){
   try{ if(state.liveRt && supabaseClient && supabaseClient.removeChannel) supabaseClient.removeChannel(state.liveRt); }catch(e){}
@@ -3389,13 +3408,14 @@ async function enterLiveStudentFlow(live){
   await liveStudentTick(live); // hozirgina o'qilgan holatni darhol chizamiz
   state.liveRt = liveRtJoin(live.channel, p=>{ if(p && p.sessionId===state.liveSessionId) liveStudentTick(p); });
   state.livePollTimer = setInterval(()=>{
-    // Realtime ishlayotgan bo'lsa, oddiy so'rov faqat zaxira sifatida (har 3-chi marta)
-    if(state.liveRtOk && ((state._livePollN = (state._livePollN||0)+1) % 3)) return;
+    // Realtime haqiqatan xabar yetkazgani isbotlangandan keyingina oddiy so'rov kamaytiriladi (har 2-chi marta)
+    if(state.liveRtGot && ((state._livePollN = (state._livePollN||0)+1) % 2)) return;
     liveStudentTick();
   }, LIVE_STUDENT_POLL_MS);
   state.liveUiTimer = setInterval(liveStudentUiTick, 250);
 }
 function liveStudentUiTick(){
+  updateLiveConnInfo();
   const live = state.liveCurrent; if(!live) return;
   if(live.status==='countdown') updateLiveStudentCountdownUI(live);
   else if(live.status==='question' && !state.liveAnswered) updateLiveStudentTimerUI(live);
@@ -3524,7 +3544,7 @@ function handleLiveAnswerTap(oIdx){
 }
 async function sendLiveAnswer(sessionId, qIndex, rec){
   const ok = await saveLiveAnswer(sessionId, qIndex, liveSlug(), rec);
-  if(ok){ state.liveSent[qIndex] = true; const st = document.getElementById('liveSendStatus'); if(st) st.innerHTML = ''; return; }
+  if(ok){ state.liveSent[qIndex] = true; liveRtSendAnswer(sessionId, qIndex, liveSlug()); const st = document.getElementById('liveSendStatus'); if(st) st.innerHTML = ''; return; }
   const st = document.getElementById('liveSendStatus');
   const cur = state.liveCurrent;
   if(st && cur && cur.qIndex===qIndex){
@@ -5011,7 +5031,8 @@ function openLiveHostView(){
   showScreen('screen-live-host');
   document.getElementById('masthead-sub').textContent = "Jonli seans — Host";
   state.hostRenderedKey = null; state.hostRevealing = false; state._hostTickBusy = false;
-  state.liveRt = liveRtJoin(state.hostChannel, null); // host faqat yuboradi: o'zgarish telefonlarga bir zumda boradi
+  // Holat o'zgarishi telefonlarga bir zumda boradi; telefondan "javob keldi" turtkisi kelsa, host darhol sanab ko'radi
+  state.liveRt = liveRtJoin(state.hostChannel, null, p=>{ if(p && p.sid===state.hostSessionId) liveHostKick(); });
   liveHostTick();
   state.livePollTimer = setInterval(liveHostTick, LIVE_HOST_POLL_MS);
   state.liveUiTimer = setInterval(liveHostUiTick, 250);
@@ -5019,6 +5040,10 @@ function openLiveHostView(){
 // Host seans holatining yagona yozuvchisi, shuning uchun eng so'nggi holat xotirada (state.hostLive) turadi
 // va har bir o'zgarishda serverga hamda (mavjud bo'lsa) Realtime orqali telefonlarga yuboriladi.
 function liveHostCurrent(){ return (state.hostLive && state.hostLive.sessionId===state.hostSessionId) ? state.hostLive : null; }
+function liveHostKick(){
+  if(state._hostTickBusy){ state._hostTickAgain = true; return; }
+  liveHostTick();
+}
 async function liveHostTick(){
   if(state._hostTickBusy) return;
   state._hostTickBusy = true;
@@ -5032,10 +5057,12 @@ async function liveHostTick(){
     // 'countdown' is intentionally not handled here — runHostCountdown() owns that transition on its own fast timer
   } finally {
     state._hostTickBusy = false;
+    if(state._hostTickAgain){ state._hostTickAgain = false; setTimeout(liveHostTick, 0); } // tick davomida kelgan turtki yo'qolmasin
   }
 }
 // Savol vaqti tugasa, host bosmasa ham javoblar o'zi ochiladi (telefondagi taymer ham shu paytda tugaydi)
 function liveHostUiTick(){
+  updateLiveConnInfo();
   const live = liveHostCurrent(); if(!live || live.status!=='question') return;
   const test = state.config.tests.find(t=>t.id===live.testId); if(!test) return;
   const q = test.questions[live.qIndex]; if(!q) return;
