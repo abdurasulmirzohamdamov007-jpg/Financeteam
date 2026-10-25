@@ -15,6 +15,13 @@
 <meta name="twitter:description" content="Buxgalteriya bo'yicha onlayn testlar, jonli seanslar va imtihonlar platformasi.">
 <meta name="twitter:image" content="https://abdurasulmirzohamdamov007-jpg.github.io/Financeteam/logo.png">
 <link rel="icon" id="faviconLink" type="image/png" href="">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0F2A26">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="FINANCE TEAM">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -72,6 +79,19 @@
   .vpage canvas{display:block;width:100%;height:100%;max-height:none;position:absolute;left:0;top:0;}
   .mat-cat{display:inline-block;font-size:0.72rem;padding:2px 8px;border-radius:8px;background:var(--edge);color:var(--ink-soft);}
   @media print{ body.viewer-open .app{display:none !important;} body.viewer-open::before{content:"Bu material chop etilmaydi.";display:block;padding:40px;font-size:20px;} }
+
+  /* --- Nazorat (qoidabuzarlik qaydi) --- */
+  .proctor-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:0.78rem;color:var(--ink-soft);margin:-4px 0 12px;padding:8px 10px;border:1px dashed var(--edge);border-radius:9px;}
+  .proctor-bar:empty{display:none;}
+  .proctor-bar .icon{width:15px;height:15px;margin:0;flex:none;}
+  .proctor-cnt{color:var(--red);font-weight:700;margin-left:auto;}
+  .vio-chip{border:1px solid var(--edge);border-radius:999px;padding:2px 9px;font-size:0.76rem;font-weight:700;cursor:pointer;background:transparent;color:var(--ink);white-space:nowrap;}
+  .vio-chip.vio-lo{border-color:#C9A227;color:#E7C547;}
+  .vio-chip.vio-hi{border-color:var(--red);color:var(--red);background:rgba(229,88,75,.10);}
+  :root[data-theme="light"] .vio-chip.vio-lo{color:#8A6A00;}
+  .vio-list{max-height:46vh;overflow:auto;text-align:left;margin-top:6px;}
+  .vio-row{display:grid;grid-template-columns:54px 1fr auto;gap:10px;padding:7px 2px;border-bottom:1px solid var(--edge);font-size:0.86rem;}
+  .vio-row .mono{font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);}
   .theme-toggle{background:transparent;border:1px solid var(--edge);color:var(--ink);border-radius:10px;padding:6px 10px;cursor:pointer;font-size:0.95rem;line-height:1;}
   *{box-sizing:border-box;}
   body{
@@ -370,6 +390,67 @@
     .live-opt-grid{grid-template-columns:1fr;}
     .qtext{font-size:0.97rem;}
   }
+
+  /* ===== Mashq markazi / Provodka / Yutuqlar / Davomat / Uyga vazifa ===== */
+  .pr-head{display:flex;gap:14px;flex-wrap:wrap;align-items:stretch;margin-bottom:16px;}
+  .pr-lvl{flex:1 1 280px;background:rgba(0,0,0,0.16);border:1px solid var(--edge);border-radius:12px;padding:14px 16px;}
+  .pr-lvl-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:10px;}
+  .pr-lvl-name{font-weight:700;display:inline-flex;align-items:center;color:var(--teal);}
+  .pr-pts{font-family:'IBM Plex Mono',monospace;font-weight:600;}
+  .pr-bar{height:8px;border-radius:5px;background:rgba(255,255,255,0.09);overflow:hidden;}
+  .pr-bar>i{display:block;height:100%;background:var(--teal);border-radius:5px;transition:width .35s ease;}
+  .pr-lvl .row-meta{margin-top:6px;}
+  #practiceHead:empty,#practiceTabs:empty{display:none;margin:0;}
+  .pr-chips{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;}
+  .pr-chip{display:inline-flex;align-items:center;gap:4px;padding:10px 14px;border-radius:12px;background:rgba(0,0,0,0.16);border:1px solid var(--edge);font-size:0.85rem;}
+  .pr-chip .icon{color:#F0A24B;}
+  .pr-gain{color:var(--teal);font-weight:700;margin-left:8px;}
+  .pr-fb{margin-top:14px;padding:12px 14px;border-radius:10px;border:1px solid var(--edge);}
+  .pr-fb.ok{border-color:var(--teal);background:rgba(47,199,174,0.1);}
+  .pr-fb.bad{border-color:var(--red);background:rgba(229,88,75,0.1);}
+  .pr-expl{margin-top:8px;font-size:0.9rem;color:var(--ink-soft);line-height:1.5;}
+  :root[data-theme="light"] .pr-lvl,:root[data-theme="light"] .pr-chip,:root[data-theme="light"] .bdg-card,:root[data-theme="light"] .hw-file{background:#F4F8F6;}
+  :root[data-theme="light"] .pr-bar{background:rgba(15,42,38,0.12);}
+  .prov-cats{display:flex;flex-wrap:wrap;gap:8px;}
+  .prov-row{display:grid;grid-template-columns:28px 1fr 1fr;gap:12px;margin-bottom:12px;align-items:start;}
+  .prov-n{font-family:'IBM Plex Mono',monospace;color:var(--teal);font-weight:600;padding-top:30px;}
+  .prov-side label{display:block;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);margin-bottom:4px;}
+  .prov-side input{font-family:'IBM Plex Mono',monospace;font-size:1.1rem;letter-spacing:0.06em;text-align:center;}
+  .prov-side input.prov-ok{border-color:var(--teal);background:rgba(47,199,174,0.16);}
+  .prov-side input.prov-bad{border-color:var(--red);background:rgba(229,88,75,0.14);}
+  .prov-name{font-size:0.78rem;min-height:1.1em;margin-top:4px;color:var(--ink-soft);line-height:1.3;}
+  .prov-name.ok{color:var(--teal);} .prov-name.warn{color:var(--red);}
+  .prov-sg{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
+  .prov-sg-i{text-align:left;padding:7px 10px;border-radius:8px;border:1px solid var(--edge);background:rgba(255,255,255,0.04);color:var(--ink);font-size:0.82rem;cursor:pointer;font-family:inherit;}
+  .prov-sg-i:hover{border-color:var(--teal);}
+  .prov-ref{max-height:340px;overflow:auto;border:1px solid var(--edge);border-radius:10px;padding:6px 12px;}
+  .prov-ref-h{font-weight:700;color:var(--teal);margin:10px 0 4px;font-size:0.85rem;}
+  .prov-ref-row{display:flex;gap:10px;padding:3px 0;font-size:0.85rem;}
+  .prov-ref-row b{font-family:'IBM Plex Mono',monospace;min-width:44px;}
+  .prov-ans{margin:6px 0;line-height:1.5;}
+  .prov-ans-code{font-family:'IBM Plex Mono',monospace;font-weight:700;}
+  .bdg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+  .bdg-card{border:1px solid var(--edge);border-radius:12px;padding:14px 10px;text-align:center;background:rgba(0,0,0,0.14);}
+  .bdg-card.locked{opacity:0.45;filter:grayscale(1);}
+  .bdg-medal{display:inline-flex;align-items:center;justify-content:center;flex:none;width:52px;height:52px;border-radius:50%;background:color-mix(in srgb,var(--bdg) 22%,transparent);color:var(--bdg);border:2px solid var(--bdg);}
+  .bdg-medal .icon{width:55%;height:55%;margin:0;}
+  .bdg-name{font-weight:700;margin-top:8px;font-size:0.9rem;}
+  .bdg-desc{font-size:0.75rem;color:var(--ink-soft);margin-top:4px;min-height:2.4em;line-height:1.3;}
+  .bdg-date{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--teal);margin-top:6px;}
+  .bdg-new{display:flex;gap:12px;align-items:center;padding:10px 0;text-align:left;}
+  .att-row{align-items:center;}
+  .att-btns{display:inline-flex;gap:6px;flex-wrap:wrap;}
+  .att-btn{padding:7px 12px;border-radius:8px;border:1px solid var(--edge);background:rgba(255,255,255,0.04);color:var(--ink-soft);font-weight:600;font-size:0.8rem;cursor:pointer;font-family:inherit;}
+  .att-btn.att-keldi.on{background:var(--teal);color:#06231E;border-color:var(--teal);}
+  .att-btn.att-kelmadi.on{background:var(--red);color:#fff;border-color:var(--red);}
+  .att-btn.att-sababli.on{background:#C9A227;color:#1b1500;border-color:#C9A227;}
+  .att-note{flex:1 1 160px;min-width:140px;max-width:260px;}
+  .hw-files{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0;}
+  .hw-thumb img{width:96px;height:96px;object-fit:cover;border-radius:10px;border:1px solid var(--edge);display:block;}
+  .hw-file{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--edge);border-radius:10px;color:var(--ink);text-decoration:none;font-size:0.85rem;background:rgba(0,0,0,0.14);max-width:100%;}
+  .hw-file span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px;}
+  .hw-card{margin-bottom:14px;}
+  @media (max-width:560px){ .prov-row{grid-template-columns:1fr 1fr;} .prov-n{display:none;} .att-btns{width:100%;} .att-btn{flex:1;} .att-note{max-width:none;flex-basis:100%;} }
 </style>
 </head>
 <body>
@@ -432,7 +513,7 @@
       </div>
       <button class="btn-primary" onclick="handleAccountLogin()">Kirish</button>
     </div>
-    <div class="footer-link"><button class="toplink" onclick="showAdminLogin()">Boshqaruv paneli</button></div>
+    <div class="footer-link"><button class="toplink hidden" id="installLink" onclick="installApp()">Telefonga o'rnatish</button> <button class="toplink" onclick="showAdminLogin()">Boshqaruv paneli</button></div>
   </div>
 
   <!-- STUDENT: TEST LIST -->
@@ -456,6 +537,17 @@
       <button class="btn-ghost btn-small" onclick="renderTestList()">Orqaga</button>
     </div>
     <div id="studentProfileBody"></div>
+  </div>
+
+  <!-- STUDENT: MASHQ MARKAZI -->
+  <div id="screen-practice" class="card hidden">
+    <div class="toolbar">
+      <div class="lead" style="margin:0;">Mashq markazi</div>
+      <button class="btn-ghost btn-small" onclick="prFlush();renderTestList()">Orqaga</button>
+    </div>
+    <div id="practiceHead"></div>
+    <div id="practiceTabs" class="tabs" style="margin-bottom:14px;"></div>
+    <div id="practiceBody"></div>
   </div>
 
   <!-- STUDENT: LEADERBOARD -->
@@ -502,6 +594,7 @@
       <button class="btn-ghost btn-small sound-toggle-btn" onclick="toggleSound(this)"><svg class="icon" viewBox="0 0 24 24" style="margin-right:0;"><path d="M11 5 6 9H2v6h4l5 4Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></button>
       <button class="btn-ghost btn-small" onclick="exitTest()">Chiqish</button>
     </div>
+    <div class="proctor-bar" id="proctorBarTest"></div>
     <div class="progress-wrap">
       <div class="progress-track"><div class="progress-fill" id="questionProgressFill" style="width:0%;"></div></div>
       <div class="progress-label" id="questionProgressLabel"></div>
@@ -533,6 +626,7 @@
     <div class="toolbar">
       <div class="lead" id="examTakeTitle" style="margin:0;"></div>
     </div>
+    <div class="proctor-bar" id="proctorBarExam"></div>
     <div class="timer-wrap">
       <div class="timer-bar-track"><div class="timer-bar-fill" id="examTimerFill"></div></div>
       <div class="timer-num" id="examTimerNum">00:00</div>
@@ -604,6 +698,9 @@
     <div id="adminTab-home" class="admin-tab card"></div>
     <div id="adminTab-tests" class="admin-tab card hidden"></div>
     <div id="adminTab-exams" class="admin-tab card hidden"></div>
+    <div id="adminTab-practice" class="admin-tab card hidden"></div>
+    <div id="adminTab-homework" class="admin-tab card hidden"></div>
+    <div id="adminTab-attendance" class="admin-tab card hidden"></div>
     <div id="adminTab-materials" class="admin-tab card hidden"></div>
     <div id="adminTab-groups" class="admin-tab card hidden"></div>
     <div id="adminTab-accounts" class="admin-tab card hidden"></div>
@@ -691,7 +788,10 @@ const ICONS = {
   exam: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3"/><path d="M8 10h8M8 14h8M8 18h5"/>',
   folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/>',
   video: '<rect x="2" y="5" width="15" height="14" rx="2"/><path d="m17 10 5-3v10l-5-3Z"/>',
-  file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/>'
+  file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/>',
+  flame: '<path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-10Z"/>',
+  star: '<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1Z"/>',
+  medal: '<circle cx="12" cy="8" r="7"/><path d="m8.21 13.89-1.21 9.11 5-3 5 3-1.21-9.12"/>'
 };
 function icon(name, size){
   const cls = size==='lg' ? 'icon icon-lg' : 'icon';
@@ -796,7 +896,7 @@ function withTimeout(promise, ms){
    otherwise a later save would overwrite real data with blank defaults. */
 /* Tezlik: bir xil so'rov bir vaqtda ikki marta ketmasin (dedupe) va juda qisqa muddat eslab qolinsin.
    Yozish/o'chirishda tegishli kesh darhol tozalanadi, shuning uchun admin o'z o'zgarishini darhol ko'radi. */
-const _CFG_KEYS = new Set(['app-config','exam-config','materials-config']);
+const _CFG_KEYS = new Set(['app-config','exam-config','materials-config','practice-config','prov-config','homework-config']);
 const _cfgCache = new Map();   // key -> {t, p}
 const _rowsCache = new Map();  // prefix -> {t, p}
 const CFG_TTL = 4000, ROWS_TTL = 6000;
@@ -1191,6 +1291,11 @@ function showModal(message, buttons){
 }
 function closeModal(){
   document.getElementById('modalOverlay').classList.add('hidden');
+}
+/* HTML bilan modal (ichida forma/ro'yxat bo'lishi mumkin). Matn xavfsizligi chaqiruvchi zimmasida: escapeHtml ishlating. */
+function showModalHtml(html, buttons){
+  showModal('', buttons||[{label:'Yopish', primary:true, onClick:closeModal}]);
+  document.getElementById('modalMessage').innerHTML = html;
 }
 function showToast(msg, isError){
   document.querySelectorAll('.toast').forEach(t=>t.remove());
@@ -1902,6 +2007,1838 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   }
 });
 
+/* ============ PROVODKA TRENAJYORI: hisoblar rejasi va tayyor amaliyotlar ============
+   Hisoblar rejasi — buxgalter.uz (Hisobvaraqlar rejasi, 01.01.2026 tahriri) bo'yicha tekshirilgan 4 xonali hisobvaraqlar. */
+const PROV_ACCOUNTS_RAW = `
+0110|Yer
+0111|Yerni obodonlashtirish
+0120|Binolar, inshootlar va uzatuvchi moslamalar
+0130|Mashina va asbob-uskunalar
+0140|Mebel va ofis jihozlari
+0150|Kompyuter jihozlari va hisoblash texnikasi
+0160|Transport vositalari
+0170|Ishchi va mahsuldor hayvonlar
+0180|Ko'p yillik o'simliklar
+0190|Boshqa asosiy vositalar
+0199|Konservatsiya qilingan asosiy vositalar
+0211|Yerni obodonlashtirishning eskirishi
+0220|Bino, inshoot va uzatuvchi moslamalarning eskirishi
+0230|Mashina va asbob-uskunalarning eskirishi
+0240|Mebel va ofis jihozlarining eskirishi
+0250|Kompyuter jihozlari va hisoblash texnikasining eskirishi
+0260|Transport vositalarining eskirishi
+0270|Ishchi hayvonlarning eskirishi
+0280|Ko'p yillik o'simliklarning eskirishi
+0290|Boshqa asosiy vositalarning eskirishi
+0299|Moliyaviy ijaraga olingan asosiy vositalarning eskirishi
+0410|Patentlar, litsenziyalar va nou-xau
+0420|Savdo markalari, tovar belgilari va sanoat namunalari
+0430|Dasturiy ta'minot
+0440|Yerdan va tabiat resurslaridan foydalanish huquqlari
+0460|Franchayzing
+0470|Mualliflik huquqlari
+0480|Gudvill
+0490|Boshqa nomoddiy aktivlar
+0510|Patentlar, litsenziyalar va nou-xauning amortizatsiyasi
+0520|Savdo markalari, tovar belgilari va sanoat namunalarining amortizatsiyasi
+0530|Dasturiy ta'minotning amortizatsiyasi
+0540|Yer va tabiat resurslaridan foydalanish huquqlarining amortizatsiyasi
+0560|Franchayzing amortizatsiyasi
+0570|Mualliflik huquqlarining amortizatsiyasi
+0590|Boshqa nomoddiy aktivlarning amortizatsiyasi
+0810|Tugallanmagan qurilish
+0820|Asosiy vositalarni xarid qilish
+0830|Nomoddiy aktivlarni xarid qilish
+0840|Asosiy podani tashkil qilish
+0850|Yerni obodonlashtirishga kapital qo'yilmalar
+0860|Moliyaviy ijaraga olingan asosiy vositalarga kapital qo'yilmalar
+0870|Operativ ijaraga olingan asosiy vositalarga kapital qo'yilmalar
+0890|Boshqa kapital qo'yilmalar
+1010|Xom ashyo va materiallar
+1020|Sotib olingan yarim tayyor mahsulotlar va butlovchi buyumlar
+1030|Yoqilg'ilar
+1040|Ehtiyot qismlar
+1050|Qurilish materiallari
+1060|Tara
+1070|Chetga qayta ishlash uchun berilgan materiallar
+1080|Inventar va xo'jalik jihozlari
+1090|Boshqa materiallar
+1510|Materiallarni tayyorlash va xarid qilish
+2010|Asosiy ishlab chiqarish
+2510|Umumiy ishlab chiqarish xarajatlari
+2810|Ombordagi tayyor mahsulotlar
+2820|Ko'rgazmadagi tayyor mahsulotlar
+2830|Vositachilik shartnomasi bo'yicha berilgan tayyor mahsulotlar
+2910|Ombordagi tovarlar
+2920|Chakana savdodagi tovarlar
+2930|Ko'rgazmadagi tovarlar
+2940|Prokatdagi buyumlar
+2950|Tovarlar bilan band va bo'sh taralar
+2960|Vositachilik shartnomasi bo'yicha berilgan tovarlar
+2970|Yo'ldagi tovarlar
+2980|Savdo ustamasi
+2990|Boshqa tovarlar
+3110|Oldindan to'langan operativ ijara haqi
+4010|Xaridorlar va buyurtmachilardan olinadigan hisobvaraqlar
+4020|Olingan veksellar
+4210|Ish haqi bo'yicha berilgan bo'naklar
+4220|Xizmat safarlariga berilgan bo'naklar
+4230|Umumxo'jalik xarajatlari uchun berilgan bo'naklar
+4290|Xodimlarga berilgan boshqa bo'naklar
+4310|TMZ uchun mol yetkazib beruvchilar va pudratchilarga berilgan bo'naklar
+4320|Uzoq muddatli aktivlar uchun mol yetkazib beruvchilar va pudratchilarga berilgan bo'naklar
+4330|Boshqa berilgan bo'naklar
+4410|Byudjetga soliqlar va yig'imlar bo'yicha bo'nak to'lovlari
+4610|Ustav kapitaliga ta'sischilarning ulushlari bo'yicha qarzi
+4710|Kreditga sotilgan tovarlar bo'yicha xodimlarning qarzi
+4720|Berilgan qarzlar bo'yicha xodimlarning qarzi
+4730|Moddiy zararni qoplash bo'yicha xodimlarning qarzi
+4790|Xodimlarning boshqa qarzlari
+4810|Moliyaviy ijara bo'yicha olinadigan joriy to'lovlar
+4820|Operativ ijara bo'yicha olinadigan joriy to'lovlar
+4830|Olinadigan foizlar
+4840|Olinadigan dividendlar
+4850|Olinadigan royalti
+4860|Da'volar bo'yicha olinadigan to'lovlar
+4890|Boshqa debitorlik qarzlar
+4910|Shubhali qarzlar bo'yicha zaxira
+5010|Milliy valyutadagi pul mablag'lari (kassa)
+5020|Chet el valyutasidagi pul mablag'lari (kassa)
+5110|Hisob-kitob hisobvarag'i
+6010|Mol yetkazib beruvchilar va pudratchilarga to'lovlar
+6020|Berilgan veksellar
+6210|Diskont (chegirma)lar ko'rinishidagi kechiktirilgan daromadlar
+6220|Mukofot (ustama)lar ko'rinishidagi kechiktirilgan daromadlar
+6230|Boshqa kechiktirilgan daromadlar
+6240|Soliqlar va yig'imlar bo'yicha kechiktirilgan majburiyatlar
+6250|Vaqtinchalik farqlar bo'yicha kechiktirilgan foyda solig'i majburiyatlari
+6290|Boshqa kechiktirilgan majburiyatlar
+6310|Xaridorlar va buyurtmachilardan olingan bo'naklar (joriy qismi)
+6320|Aksiyaga obunachilardan olingan bo'naklar
+6390|Boshqa olingan bo'naklar
+6410|Byudjetga to'lovlar bo'yicha qarzlar (turlari bo'yicha)
+6510|Sug'urta bo'yicha to'lovlar
+6520|Davlat maqsadli jamg'armalariga to'lovlar
+6610|To'lanadigan dividendlar
+6620|Chiqib ketayotgan ta'sischilarga ulushlari bo'yicha qarz
+6630|Ta'sischilarning ustav kapitalini oshirish bo'yicha ulushlari
+6710|Ish haqi bo'yicha xodimlar bilan hisob-kitoblar
+6720|Deponentlangan ish haqi
+6810|Qisqa muddatli kreditlar
+6820|Qisqa muddatli qarzlar
+6830|To'lanadigan obligatsiyalar
+6840|To'lanadigan veksellar
+6910|To'lanadigan operativ ijara
+6920|Hisoblangan foizlar
+6930|Royalti bo'yicha qarzlar
+6940|Kafolatlar bo'yicha qarzlar
+6950|Uzoq muddatli majburiyatlar (joriy qismi)
+6960|Da'volar bo'yicha to'lovlar
+6970|Hisobdor shaxslarga bo'lgan qarzlar
+6990|Boshqa majburiyatlar
+7810|Uzoq muddatli kreditlar
+7820|Uzoq muddatli qarzlar
+7830|To'lanadigan uzoq muddatli obligatsiyalar
+7840|To'lanadigan uzoq muddatli veksellar
+8310|Oddiy aksiyalar
+8320|Imtiyozli aksiyalar
+8330|Pay va ulushlar
+8410|Emissiya daromadi
+8420|Ustav kapitalini shakllantirishdagi kurs farqi
+8510|Uzoq muddatli aktivlarni qayta baholash bo'yicha tuzatishlar
+8520|Rezerv kapitali (fondi)
+8530|Tekinga olingan mol-mulk
+8710|Hisobot davrining taqsimlanmagan foydasi (qoplanmagan zarari)
+8720|Jamg'arilgan foyda (qoplanmagan zarar)
+8910|Kelgusi xarajatlar va to'lovlar zaxiralari
+9010|Tayyor mahsulotlarni sotishdan daromadlar
+9020|Tovarlarni sotishdan daromadlar
+9030|Ishlar bajarish va xizmatlar ko'rsatishdan daromadlar
+9040|Sotilgan tovarlar (mahsulotlar)ning qaytishi
+9050|Xaridorlar va buyurtmachilarga berilgan chegirmalar
+9110|Sotilgan tayyor mahsulotlarning tannarxi
+9120|Sotilgan tovarlarning tannarxi
+9130|Bajarilgan ish va ko'rsatilgan xizmatlarning tannarxi
+9210|Asosiy vositalarning chiqib ketishi
+9220|Boshqa aktivlarning chiqib ketishi
+9310|Asosiy vositalarning chiqib ketishidan foyda
+9320|Boshqa aktivlarning chiqib ketishidan foyda
+9330|Undirilgan jarima, penya va ustamalar
+9340|O'tgan yillar foydalari
+9350|Operativ ijaradan daromadlar
+9360|Kreditor va deponent qarzlarni hisobdan chiqarishdan daromadlar
+9370|Xizmat ko'rsatuvchi xo'jaliklar daromadlari
+9380|Qaytarilmaydigan moliyaviy yordam
+9390|Boshqa operatsion daromadlar
+9410|Sotish xarajatlari
+9420|Ma'muriy xarajatlar
+9430|Boshqa operatsion xarajatlar
+9510|Royalti ko'rinishidagi daromadlar
+9520|Dividendlar ko'rinishidagi daromadlar
+9530|Foizlar ko'rinishidagi daromadlar
+9540|Valyutalar kursi farqidan daromadlar
+9550|Moliyaviy ijaradan daromadlar
+9560|Qimmatli qog'ozlarni qayta baholashdan daromadlar
+9590|Moliyaviy faoliyatning boshqa daromadlari
+9610|Foizlar ko'rinishidagi xarajatlar
+9620|Valyutalar kursi farqidan zararlar
+9630|Qimmatli qog'ozlarni chiqarish va tarqatish bo'yicha xarajatlar
+9690|Moliyaviy faoliyat bo'yicha boshqa xarajatlar
+9810|Foyda solig'i bo'yicha xarajatlar
+9820|Foydadan hisoblangan boshqa soliq majburiyatlari bo'yicha xarajatlar
+9910|Yakuniy moliyaviy natija (foyda yoki zarar)
+`;
+const PROV_ACCOUNTS = PROV_ACCOUNTS_RAW.trim().split('\n').map(l=>{ const i = l.indexOf('|'); return { code:l.slice(0,i), name:l.slice(i+1) }; });
+const PROV_BY_CODE = {}; PROV_ACCOUNTS.forEach(a=>{ PROV_BY_CODE[a.code] = a; });
+const PROV_SECTIONS = [
+  ['0',"Uzoq muddatli aktivlar"], ['1',"Materiallar"], ['2',"Ishlab chiqarish, tayyor mahsulot, tovarlar"], ['3',"Kelgusi davr xarajatlari"],
+  ['4',"Debitorlik qarzlari (olinadigan hisobvaraqlar)"], ['5',"Pul mablag'lari"], ['6',"Joriy majburiyatlar"], ['7',"Uzoq muddatli majburiyatlar"],
+  ['8',"Kapital"], ['9',"Daromad va xarajatlar"]
+];
+const PROV_LEVELS = { 1:"Oson: 1 ta provodka", 2:"O'rta: 2 ta provodka yoki QQS", 3:"Murakkab: 3 ta provodka" };
+/* Tayyor amaliyotlar: [id, daraja, bo'lim, matn, "dt>kt>summa;..." , izoh]. Summalar faqat misol uchun (tekshirilmaydi). */
+const PROV_OPS_RAW = [
+ ['b01',1,"Kapital va pul","Ta'sischilar ustav kapitaliga 50 000 000 so'm ulush qo'shishni e'lon qildi (pul hali kiritilmagan).","4610>8330>50000000","Ta'sischining qarzi (aktiv) paydo bo'ldi: Dt 4610. Ustav kapitali (passiv) ko'paydi: Kt 8330."],
+ ['b02',1,"Kapital va pul","Ta'sischi o'z ulushini (50 000 000 so'm) hisob-kitob schyotiga kiritdi.","5110>4610>50000000","Pul ko'paydi: Dt 5110. Ta'sischining qarzi so'ndi: Kt 4610."],
+ ['b03',1,"Kapital va pul","Hisob-kitob schyotidan ish haqi to'lash uchun kassaga 8 000 000 so'm olindi.","5010>5110>8000000","Kassadagi pul ko'paydi: Dt 5010. Hisob-kitob schyotidagi pul kamaydi: Kt 5110."],
+ ['b04',1,"Kapital va pul","Kassadagi 3 000 000 so'm naqd pul hisob-kitob schyotiga topshirildi.","5110>5010>3000000","Hisob-kitob schyotida pul ko'paydi: Dt 5110. Kassada kamaydi: Kt 5010."],
+ ['b05',1,"Xaridlar","Mol yetkazib beruvchidan 10 000 000 so'mlik xom ashyo va materiallar olindi (QQSsiz).","1010>6010>10000000","Materiallar (aktiv) ko'paydi: Dt 1010. Yetkazib beruvchiga qarz paydo bo'ldi: Kt 6010."],
+ ['b06',1,"Xaridlar","Mol yetkazib beruvchiga 10 000 000 so'm hisob-kitob schyotidan to'landi.","6010>5110>10000000","Qarz so'ndi: Dt 6010. Hisob-kitob schyotidagi pul kamaydi: Kt 5110."],
+ ['b07',1,"Xaridlar","Sotish uchun 20 000 000 so'mlik tovarlar sotib olindi va omborga kirim qilindi (QQSsiz).","2910>6010>20000000","Ombordagi tovarlar ko'paydi: Dt 2910. Yetkazib beruvchiga qarz: Kt 6010."],
+ ['b08',1,"Xaridlar","Yoqilg'i 2 000 000 so'mga sotib olindi (QQSsiz).","1030>6010>2000000","Yoqilg'i hisobvarag'i 1030 — materiallar guruhi. Qarz: Kt 6010."],
+ ['b09',1,"Xaridlar","Ehtiyot qismlar 1 500 000 so'mga sotib olindi (QQSsiz).","1040>6010>1500000","Ehtiyot qismlar — 1040. Qarz: Kt 6010."],
+ ['b10',1,"Xaridlar","Ofis uchun inventar va xo'jalik jihozlari 800 000 so'mga sotib olindi (QQSsiz).","1080>6010>800000","Inventar va xo'jalik jihozlari — 1080. Qarz: Kt 6010."],
+ ['b11',1,"Sotuvlar","Xaridorga 30 000 000 so'mlik tayyor mahsulot jo'natildi (QQSsiz): daromad e'tirof etildi.","4010>9010>30000000","Xaridorning qarzi (debitorlik) paydo bo'ldi: Dt 4010. Tayyor mahsulot sotishdan daromad: Kt 9010."],
+ ['b12',1,"Sotuvlar","Xaridor 30 000 000 so'mni hisob-kitob schyotimizga o'tkazdi.","5110>4010>30000000","Pul keldi: Dt 5110. Xaridorning qarzi so'ndi: Kt 4010."],
+ ['b13',1,"Sotuvlar","Xaridor 5 000 000 so'mni naqd pul bilan kassaga to'ladi.","5010>4010>5000000","Kassaga pul keldi: Dt 5010. Xaridorning qarzi kamaydi: Kt 4010."],
+ ['b14',1,"Sotuvlar","Sotilgan tayyor mahsulotning tannarxi (18 000 000 so'm) hisobdan chiqarildi.","9110>2810>18000000","Sotilgan mahsulot tannarxi (xarajat): Dt 9110. Ombordagi tayyor mahsulot kamaydi: Kt 2810."],
+ ['b15',1,"Sotuvlar","Tovarlar 12 000 000 so'mga xaridorga sotildi (QQSsiz): daromad e'tirof etildi.","4010>9020>12000000","Xaridor qarzi: Dt 4010. Tovarlarni sotishdan daromad: Kt 9020."],
+ ['b16',1,"Sotuvlar","Sotilgan tovarlarning tannarxi (8 000 000 so'm) hisobdan chiqarildi.","9120>2910>8000000","Sotilgan tovarlar tannarxi: Dt 9120. Ombordagi tovarlar kamaydi: Kt 2910."],
+ ['b17',1,"Sotuvlar","Mijozga 4 000 000 so'mlik xizmat ko'rsatildi (QQSsiz): daromad e'tirof etildi.","4010>9030>4000000","Xaridor qarzi: Dt 4010. Xizmatlardan daromad: Kt 9030."],
+ ['b18',1,"Sotuvlar","Xaridordan 6 000 000 so'm bo'nak (oldindan to'lov) hisob-kitob schyotiga tushdi.","5110>6310>6000000","Pul keldi: Dt 5110. Xaridordan olingan bo'nak — bizning majburiyatimiz: Kt 6310."],
+ ['b19',1,"Sotuvlar","Xaridordan olingan bo'nak (6 000 000 so'm) sotuv hisobiga o'tkazildi (zachyot).","6310>4010>6000000","Bo'nak majburiyati so'ndi: Dt 6310. Xaridorning qarzi kamaydi: Kt 4010."],
+ ['b20',1,"Ishlab chiqarish","Ishlab chiqarishga 7 000 000 so'mlik xom ashyo va materiallar sarflandi.","2010>1010>7000000","Ishlab chiqarish xarajati: Dt 2010. Materiallar kamaydi: Kt 1010."],
+ ['b21',1,"Ishlab chiqarish","Uskunani ta'mirlash uchun 500 000 so'mlik ehtiyot qismlar sarflandi.","2510>1040>500000","Umumiy ishlab chiqarish xarajatlari: Dt 2510. Ehtiyot qismlar kamaydi: Kt 1040."],
+ ['b22',1,"Ishlab chiqarish","Umumiy ishlab chiqarish xarajatlari (2 400 000 so'm) asosiy ishlab chiqarishga yuklandi.","2010>2510>2400000","Xarajat asosiy ishlab chiqarishga o'tdi: Dt 2010. 2510 hisobvarag'i yopildi: Kt 2510."],
+ ['b23',1,"Ishlab chiqarish","Ishlab chiqarilgan tayyor mahsulot (18 000 000 so'm) omborga kirim qilindi.","2810>2010>18000000","Tayyor mahsulot ko'paydi: Dt 2810. Ishlab chiqarish xarajatlari yopildi: Kt 2010."],
+ ['b24',1,"Mehnat haqi","Ma'muriy xodimlarga 9 000 000 so'm ish haqi hisoblandi.","9420>6710>9000000","Ma'muriy xarajat: Dt 9420. Xodimlar oldidagi majburiyat: Kt 6710."],
+ ['b25',1,"Mehnat haqi","Ishlab chiqarish ishchilariga 12 000 000 so'm ish haqi hisoblandi.","2010>6710>12000000","Ishlab chiqarish xarajati: Dt 2010. Xodimlar oldidagi majburiyat: Kt 6710."],
+ ['b26',1,"Mehnat haqi","Sotuv bo'limi xodimlariga 5 000 000 so'm ish haqi hisoblandi.","9410>6710>5000000","Sotish xarajatlari: Dt 9410. Xodimlar oldidagi majburiyat: Kt 6710."],
+ ['b27',1,"Mehnat haqi","Hisoblangan ish haqidan JShDS (1 080 000 so'm) ushlab qolindi.","6710>6410>1080000","Xodimga qarz kamaydi: Dt 6710. Byudjetga qarz paydo bo'ldi: Kt 6410."],
+ ['b28',1,"Mehnat haqi","Ish haqi 5 000 000 so'm kassadan xodimlarga berildi.","6710>5010>5000000","Xodimlar oldidagi majburiyat so'ndi: Dt 6710. Kassadan pul chiqdi: Kt 5010."],
+ ['b29',1,"Mehnat haqi","Ish haqi 4 000 000 so'm xodimlarning plastik kartalariga hisob-kitob schyotidan o'tkazildi.","6710>5110>4000000","Majburiyat so'ndi: Dt 6710. Hisob-kitob schyotidan pul chiqdi: Kt 5110."],
+ ['b31',1,"Asosiy vositalar","Ishlab chiqarish uskunasiga 1 200 000 so'm amortizatsiya (eskirish) hisoblandi.","2510>0230>1200000","Xarajat (umumiy ishlab chiqarish): Dt 2510. Mashina va asbob-uskunalarning eskirishi: Kt 0230."],
+ ['b32',1,"Asosiy vositalar","Ma'muriy foydalanishdagi mebelga 300 000 so'm amortizatsiya hisoblandi.","9420>0240>300000","Ma'muriy xarajat: Dt 9420. Mebel va ofis jihozlarining eskirishi: Kt 0240."],
+ ['b33',1,"Asosiy vositalar","Dasturiy ta'minot (nomoddiy aktiv)ga 250 000 so'm amortizatsiya hisoblandi (ma'muriy foydalanish).","9420>0530>250000","Ma'muriy xarajat: Dt 9420. Dasturiy ta'minotning amortizatsiyasi: Kt 0530."],
+ ['b35',1,"Bo'naklar va hisobdorlar","Xodimga xizmat safari uchun kassadan 1 500 000 so'm bo'nak berildi.","4220>5010>1500000","Xodimga berilgan bo'nak (aktiv): Dt 4220. Kassadan pul chiqdi: Kt 5010."],
+ ['b36',1,"Bo'naklar va hisobdorlar","Xizmat safari bo'yicha avans hisoboti tasdiqlandi: 1 500 000 so'm ma'muriy xarajatga o'tkazildi.","9420>4220>1500000","Xarajat tan olindi: Dt 9420. Berilgan bo'nak yopildi: Kt 4220."],
+ ['b37',1,"Bo'naklar va hisobdorlar","Materiallar uchun mol yetkazib beruvchiga 4 000 000 so'm bo'nak o'tkazildi.","4310>5110>4000000","TMZ uchun berilgan bo'nak: Dt 4310. Hisob-kitob schyotidan pul chiqdi: Kt 5110."],
+ ['b38',1,"Bo'naklar va hisobdorlar","Pudratchiga asosiy vosita sotib olish uchun 10 000 000 so'm bo'nak o'tkazildi.","4320>5110>10000000","Uzoq muddatli aktivlar uchun berilgan bo'nak: Dt 4320. Pul chiqdi: Kt 5110."],
+ ['b39',1,"Bo'naklar va hisobdorlar","Mol yetkazib beruvchiga berilgan bo'nak (4 000 000 so'm) kelgan materiallar hisobiga o'tkazildi.","6010>4310>4000000","Yetkazib beruvchiga qarz kamaydi: Dt 6010. Berilgan bo'nak yopildi: Kt 4310."],
+ ['b40',1,"Xarajatlar va kredit","Ofisning elektr energiyasi uchun hisob keldi: 900 000 so'm (QQSsiz).","9420>6010>900000","Ma'muriy xarajat: Dt 9420. Yetkazib beruvchiga qarz: Kt 6010."],
+ ['b41',1,"Xarajatlar va kredit","Reklama xizmati uchun hisob keldi: 2 000 000 so'm (QQSsiz) — sotish xarajati.","9410>6010>2000000","Sotish xarajatlari: Dt 9410. Yetkazib beruvchiga qarz: Kt 6010."],
+ ['b42',1,"Xarajatlar va kredit","Qisqa muddatli bank krediti 50 000 000 so'm hisob-kitob schyotiga tushdi.","5110>6810>50000000","Pul keldi: Dt 5110. Kredit majburiyati paydo bo'ldi: Kt 6810."],
+ ['b43',1,"Xarajatlar va kredit","Kredit bo'yicha foizlar 1 000 000 so'm hisoblandi.","9610>6920>1000000","Foiz xarajati (moliyaviy faoliyat): Dt 9610. Hisoblangan foizlar bo'yicha qarz: Kt 6920."],
+ ['b44',1,"Xarajatlar va kredit","Qisqa muddatli kredit 50 000 000 so'm hisob-kitob schyotidan qaytarildi.","6810>5110>50000000","Kredit majburiyati so'ndi: Dt 6810. Pul chiqdi: Kt 5110."],
+ ['b50',1,"Yakuniy natija","Ta'sischilarga 5 000 000 so'm dividend hisoblandi.","8710>6610>5000000","Taqsimlanmagan foyda kamaydi: Dt 8710. Dividend bo'yicha qarz: Kt 6610."],
+ ['b51',1,"Yakuniy natija","Dividend 5 000 000 so'm hisob-kitob schyotidan to'landi.","6610>5110>5000000","Qarz so'ndi: Dt 6610. Pul chiqdi: Kt 5110."],
+ ['b52',1,"Yakuniy natija","Hisobot davri foydasidan foyda solig'i 2 000 000 so'm hisoblandi.","9810>6410>2000000","Foyda solig'i bo'yicha xarajat: Dt 9810. Byudjetga qarz: Kt 6410."],
+ ['b53',1,"Yakuniy natija","Yil oxirida tayyor mahsulot sotishdan daromad (30 000 000 so'm) yakuniy moliyaviy natijaga yopildi.","9010>9910>30000000","Daromad hisobvarag'i yopiladi: Dt 9010. Natija 9910 ga o'tadi: Kt 9910."],
+ ['b54',1,"Yakuniy natija","Yil oxirida sotilgan mahsulot tannarxi (18 000 000 so'm) yakuniy moliyaviy natijaga hisobdan chiqarildi.","9910>9110>18000000","Xarajat natijaga o'tadi: Dt 9910. Tannarx hisobvarag'i yopiladi: Kt 9110."],
+ ['b55',1,"Yakuniy natija","Sof foyda (6 000 000 so'm) taqsimlanmagan foydaga o'tkazildi.","9910>8710>6000000","Natija hisobvarag'i yopiladi: Dt 9910. Taqsimlanmagan foyda ko'paydi: Kt 8710."],
+ ['c01',2,"QQS","Mol yetkazib beruvchidan 10 000 000 so'mlik materiallar olindi; hisob-fakturada QQS 12% (1 200 000 so'm) alohida ko'rsatilgan. Ikkala provodkani yozing.","1010>6010>10000000;4410>6010>1200000","Material qiymati Dt 1010. Hisobga olinadigan kirim QQS summasi Dt 4410. Ikkalasi ham yetkazib beruvchiga qarz: Kt 6010."],
+ ['c02',2,"QQS","Xaridorga 30 000 000 so'mlik tayyor mahsulot QQS 12% (3 600 000 so'm) bilan sotildi. Daromad va QQS provodkalarini yozing.","4010>9010>30000000;4010>6410>3600000","Daromad: Dt 4010 Kt 9010. Hisoblangan QQS byudjetga qarz: Dt 4010 Kt 6410."],
+ ['c03',2,"QQS","Hisobot davrida kirim QQS (1 200 000 so'm) byudjetga to'lanadigan QQS hisobiga o'tkazildi (zachyot).","6410>4410>1200000","Byudjetga qarz kamaydi: Dt 6410. Hisobga olinadigan kirim QQS ishlatildi: Kt 4410."],
+ ['c04',2,"Asosiy vositalar","Kompyuter jihozlari 8 000 000 so'mga (QQSsiz) sotib olindi va foydalanishga topshirildi. Ikki provodka yozing.","0820>6010>8000000;0150>0820>8000000","Xarid: Dt 0820 Kt 6010. Foydalanishga topshirish: Dt 0150 (kompyuter jihozlari) Kt 0820."],
+ ['c05',2,"Asosiy vositalar","Ishlab chiqarish uskunasi 40 000 000 so'mga (QQSsiz) olindi va ishga tushirildi. Ikki provodka yozing.","0820>6010>40000000;0130>0820>40000000","Xarid: Dt 0820 Kt 6010. Ishga tushirish: Dt 0130 (mashina va asbob-uskunalar) Kt 0820."],
+ ['c06',2,"Mehnat haqi","Ma'muriy xodimlarga 9 000 000 so'm ish haqi hisoblandi va undan JShDS 1 080 000 so'm ushlab qolindi.","9420>6710>9000000;6710>6410>1080000","Hisoblash: Dt 9420 Kt 6710. JShDS ushlash: Dt 6710 Kt 6410."],
+ ['c07',2,"Sotuvlar","Tayyor mahsulot 30 000 000 so'mga sotildi (QQSsiz), tannarxi 18 000 000 so'm hisobdan chiqarildi.","4010>9010>30000000;9110>2810>18000000","Daromad: Dt 4010 Kt 9010. Tannarx: Dt 9110 Kt 2810."],
+ ['c08',2,"Sotuvlar","Tovarlar 12 000 000 so'mga sotildi (QQSsiz), tannarxi 8 000 000 so'm.","4010>9020>12000000;9120>2910>8000000","Daromad: Dt 4010 Kt 9020. Tannarx: Dt 9120 Kt 2910."],
+ ['c09',2,"Bo'naklar va hisobdorlar","Xodimga xizmat safari uchun kassadan 1 500 000 so'm berildi, keyin hisobot topshirilib, summa ma'muriy xarajatga o'tkazildi.","4220>5010>1500000;9420>4220>1500000","Berish: Dt 4220 Kt 5010. Hisobot: Dt 9420 Kt 4220."],
+ ['c10',2,"Bo'naklar va hisobdorlar","Mol yetkazib beruvchiga 4 000 000 so'm bo'nak berildi, keyin u kelgan materiallar hisobiga o'tkazildi.","4310>5110>4000000;6010>4310>4000000","Berish: Dt 4310 Kt 5110. Hisobga olish: Dt 6010 Kt 4310."],
+ ['c11',2,"Xarajatlar va kredit","Kredit foizlari 1 000 000 so'm hisoblandi va hisob-kitob schyotidan to'landi.","9610>6920>1000000;6920>5110>1000000","Hisoblash: Dt 9610 Kt 6920. To'lash: Dt 6920 Kt 5110."],
+ ['c12',2,"Yakuniy natija","Dividend 5 000 000 so'm hisoblandi va hisob-kitob schyotidan to'landi.","8710>6610>5000000;6610>5110>5000000","Hisoblash: Dt 8710 Kt 6610. To'lash: Dt 6610 Kt 5110."],
+ ['c13',2,"Kapital va pul","Ta'sischi ustav kapitaliga 20 000 000 so'm ulush qo'shishni e'lon qildi va uni hisob-kitob schyotiga kiritdi.","4610>8330>20000000;5110>4610>20000000","E'lon: Dt 4610 Kt 8330. Kiritish: Dt 5110 Kt 4610."],
+ ['c14',2,"Sotuvlar","Xaridordan oldindan to'lov 6 000 000 so'm keldi va keyin shu summa sotuv hisobiga o'tkazildi.","5110>6310>6000000;6310>4010>6000000","Bo'nak keldi: Dt 5110 Kt 6310. Hisobga olish: Dt 6310 Kt 4010."],
+ ['c15',2,"Ishlab chiqarish","Ishlab chiqarishga 7 000 000 so'mlik materiallar sarflandi; tayyor mahsulot 12 000 000 so'm tannarxda omborga kirim qilindi.","2010>1010>7000000;2810>2010>12000000","Sarflash: Dt 2010 Kt 1010. Kirim: Dt 2810 Kt 2010."],
+ ['c16',2,"Xarajatlar va kredit","Ofisning elektr energiyasi hisobi (900 000 so'm, QQSsiz) keldi va hisob-kitob schyotidan to'landi.","9420>6010>900000;6010>5110>900000","Hisob keldi: Dt 9420 Kt 6010. To'lov: Dt 6010 Kt 5110."],
+ ['c17',2,"Yakuniy natija","Foyda solig'i 2 000 000 so'm hisoblandi va byudjetga hisob-kitob schyotidan to'landi.","9810>6410>2000000;6410>5110>2000000","Hisoblash: Dt 9810 Kt 6410. To'lash: Dt 6410 Kt 5110."],
+ ['d01',3,"Asosiy vositalar","Pudratchiga uskuna uchun 10 000 000 so'm bo'nak berildi; uskuna 50 000 000 so'mga (QQSsiz) keldi; bo'nak hisobga olindi. Uchala provodkani yozing.","4320>5110>10000000;0820>6010>50000000;6010>4320>10000000","Bo'nak: Dt 4320 Kt 5110. Uskuna keldi: Dt 0820 Kt 6010. Bo'nakni hisobga olish: Dt 6010 Kt 4320."],
+ ['d02',3,"QQS","Xaridorga 30 000 000 so'mlik tayyor mahsulot QQS 12% bilan sotildi va tannarxi (18 000 000 so'm) hisobdan chiqarildi.","4010>9010>30000000;4010>6410>3600000;9110>2810>18000000","Daromad: Dt 4010 Kt 9010. QQS: Dt 4010 Kt 6410. Tannarx: Dt 9110 Kt 2810."],
+ ['d03',3,"Mehnat haqi","Ma'muriy xodimlarga 9 000 000 so'm ish haqi hisoblandi, JShDS 1 080 000 so'm ushlab qolindi va 4 000 000 so'm kassadan berildi.","9420>6710>9000000;6710>6410>1080000;6710>5010>4000000","Hisoblash: Dt 9420 Kt 6710. JShDS: Dt 6710 Kt 6410. Berish: Dt 6710 Kt 5010."],
+ ['d04',3,"QQS","Materiallar (10 000 000 so'm + QQS 1 200 000 so'm) olindi va hisob-kitob schyotidan to'liq to'landi.","1010>6010>10000000;4410>6010>1200000;6010>5110>11200000","Material: Dt 1010 Kt 6010. Kirim QQS: Dt 4410 Kt 6010. To'lov (QQS bilan): Dt 6010 Kt 5110."],
+ ['d05',3,"Asosiy vositalar","Kompyuter 8 000 000 so'mga olinib ishga tushirildi; keyin ma'muriy foydalanishdagi shu kompyuterga 200 000 so'm amortizatsiya hisoblandi.","0820>6010>8000000;0150>0820>8000000;9420>0250>200000","Xarid: Dt 0820 Kt 6010. Ishga tushirish: Dt 0150 Kt 0820. Amortizatsiya: Dt 9420 Kt 0250."],
+ ['d06',3,"Yakuniy natija","Yil oxirida (soddalashtirilgan misol): daromad 30 000 000 va tannarx 18 000 000 so'm yakuniy natijaga yopildi, sof foyda taqsimlanmagan foydaga o'tkazildi.","9010>9910>30000000;9910>9110>18000000;9910>8710>12000000","Daromad: Dt 9010 Kt 9910. Tannarx: Dt 9910 Kt 9110. Foyda: Dt 9910 Kt 8710."]
+];
+
+/* ============ MASHQ MARKAZI: mustaqil mashg'ulot, ball, seriya, reyting ============
+   Nazorat testlari va imtihonlardan butunlay ALOHIDA: ularning natijasiga, reytingiga va sertifikatiga ta'sir qilmaydi.
+   Talaba progressi: kv_store "progress:<identifikator>" (har talabaga bitta yozuv). */
+const PR = { SESSION:10, DAILY_CAP:100, STREAK_MIN:5, MASTER_AT:2 };
+const PR_LEVELS = [
+  {min:0, name:"Boshlovchi"}, {min:100, name:"O'rganuvchi"}, {min:300, name:"Mohir"},
+  {min:700, name:"Tajribali"}, {min:1500, name:"Mutaxassis"}, {min:3000, name:"Ustoz"}
+];
+function prLevel(pts){
+  let i = 0; PR_LEVELS.forEach((l,k)=>{ if(pts>=l.min) i = k; });
+  const cur = PR_LEVELS[i], nxt = PR_LEVELS[i+1] || null;
+  return { idx:i, name:cur.name, next:nxt, pct: nxt ? Math.round(100*(pts-cur.min)/(nxt.min-cur.min)) : 100 };
+}
+function dayKey(d){ d = d || new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function weekKey(d){ const x = d ? new Date(d) : new Date(); const y = new Date(x.getFullYear(), x.getMonth(), x.getDate()); y.setDate(y.getDate() - ((y.getDay()+6)%7)); return dayKey(y); }
+function prYesterday(){ return dayKey(new Date(Date.now() - 86400000)); }
+function myIdentity(){ return studentIdentity(state.studentName); }
+function prShuffle(a){ return shuffleArray(a); }
+
+/* ---- sozlama: mavzular (admin boshqaradi) ---- */
+async function loadPracticeConfig(){
+  const r = await storageGetStrict('practice-config');
+  if(!r.ok) return { topics:[], _loadFailed:true };
+  if(r.value){ try{ const c = JSON.parse(r.value); if(!c.topics) c.topics = []; return c; }catch(e){} }
+  return { topics:[] };
+}
+async function savePracticeConfig(cfg){
+  if(cfg._loadFailed){ showToast("Mashq ma'lumotlari yuklanmagani uchun saqlash to'xtatildi. Sahifani yangilang.", true); return false; }
+  const ok = await storageSet('practice-config', JSON.stringify({ topics:cfg.topics }));
+  if(!ok) showToast("Xatolik: mashq ma'lumotini saqlashda muammo yuz berdi.", true);
+  return ok;
+}
+function prTopicsForMe(cfg){ return (cfg.topics||[]).filter(t=> t.active && (t.questions||[]).length>0 && isAssignedToMe(t.assignTo)); }
+
+/* ---- talaba progressi ---- */
+function prEmpty(){
+  return { v:1, identity:myIdentity(), name:state.studentName||'', group:state.studentGroup||'', pts:0,
+    week:{k:weekKey(), pts:0}, day:{d:dayKey(), answered:0, pts:0}, streak:{cur:0, best:0, last:''},
+    pq:{}, stats:{answered:0, correct:0}, drill:{answered:0, correct:0, items:{}}, badges:{}, t:0 };
+}
+function prNormalize(p){
+  const e = prEmpty(); p = Object.assign(e, p||{});
+  p.week = Object.assign(prEmpty().week, p.week||{}); p.day = Object.assign(prEmpty().day, p.day||{}); p.streak = Object.assign(prEmpty().streak, p.streak||{});
+  p.stats = Object.assign({answered:0, correct:0}, p.stats||{}); p.drill = Object.assign({answered:0, correct:0, items:{}}, p.drill||{}); p.drill.items = p.drill.items || {};
+  p.pq = p.pq || {}; p.badges = p.badges || {};
+  return p;
+}
+async function prLoad(force){
+  const cached = state.progress;
+  if(cached && cached.identity===myIdentity() && !cached._loadFailed && (!force || cached._dirty)) return cached;
+  const r = await storageGetStrict('progress:' + myIdentity());
+  if(!r.ok){ const p = prNormalize(null); p._loadFailed = true; state.progress = p; return p; }
+  let obj = null; if(r.value){ try{ obj = JSON.parse(r.value); }catch(e){} }
+  const p = prNormalize(obj);
+  p.identity = myIdentity(); p.name = state.studentName || p.name; p.group = state.studentGroup || p.group;
+  state.progress = p; return p;
+}
+function prRoll(p){
+  const d = dayKey(), w = weekKey();
+  if(p.day.d !== d) p.day = { d, answered:0, pts:0 };
+  if(p.week.k !== w) p.week = { k:w, pts:0 };
+}
+function prAward(p, n){
+  prRoll(p);
+  const give = Math.max(0, Math.min(n, PR.DAILY_CAP - p.day.pts));
+  p.pts += give; p.day.pts += give; p.week.pts += give;
+  return give;
+}
+function prNoteAnswer(p, ok, kind){
+  prRoll(p);
+  if(kind==='drill'){ p.drill.answered++; if(ok) p.drill.correct++; }
+  else { p.stats.answered++; if(ok) p.stats.correct++; }
+  p.day.answered++;
+  if(p.day.answered >= PR.STREAK_MIN && p.streak.last !== dayKey()){
+    p.streak.cur = (p.streak.last === prYesterday()) ? p.streak.cur + 1 : 1;
+    p.streak.last = dayKey();
+    p.streak.best = Math.max(p.streak.best, p.streak.cur);
+  }
+}
+function prStreakNow(p){ return (p.streak.last === dayKey() || p.streak.last === prYesterday()) ? p.streak.cur : 0; }
+function prMarkDirty(p){ p._dirty = true; clearTimeout(state._prTimer); state._prTimer = setTimeout(()=>{ prFlush(); }, 3000); }
+function prMerge(remote, local){
+  remote = prNormalize(remote);
+  const baseIsRemote = remote.pts > local.pts;
+  const base = baseIsRemote ? remote : local, other = baseIsRemote ? local : remote;
+  const out = prNormalize(JSON.parse(JSON.stringify(base)));
+  Object.keys(other.pq).forEach(k=>{ const a = out.pq[k], b = other.pq[k]; if(!a || (b.t||0) > (a.t||0)) out.pq[k] = b; });
+  Object.keys(other.drill.items).forEach(k=>{ const a = out.drill.items[k], b = other.drill.items[k]; if(!a || (b.t||0) > (a.t||0)) out.drill.items[k] = b; });
+  Object.keys(other.badges).forEach(k=>{ if(!out.badges[k] || other.badges[k] < out.badges[k]) out.badges[k] = other.badges[k]; });
+  out.stats.answered = Math.max(out.stats.answered, other.stats.answered); out.stats.correct = Math.max(out.stats.correct, other.stats.correct);
+  out.drill.answered = Math.max(out.drill.answered, other.drill.answered); out.drill.correct = Math.max(out.drill.correct, other.drill.correct);
+  if((other.streak.last||'') > (out.streak.last||'')) out.streak = Object.assign({}, other.streak);
+  out.streak.best = Math.max(out.streak.best, other.streak.best);
+  if(other.day.d === out.day.d){ out.day.answered = Math.max(out.day.answered, other.day.answered); out.day.pts = Math.max(out.day.pts, other.day.pts); }
+  else if(other.day.d > out.day.d) out.day = Object.assign({}, other.day);
+  if(other.week.k === out.week.k) out.week.pts = Math.max(out.week.pts, other.week.pts);
+  else if(other.week.k > out.week.k) out.week = Object.assign({}, other.week);
+  out.identity = local.identity; out.name = local.name || out.name; out.group = local.group || out.group;
+  return out;
+}
+async function prFlush(){
+  const p = state.progress;
+  if(!p || p._loadFailed || !p._dirty) return true;
+  if(state._prFlushing) return state._prFlushing;
+  clearTimeout(state._prTimer);
+  state._prFlushing = (async()=>{
+    p._dirty = false;
+    const key = 'progress:' + p.identity;
+    const r = await _storageGetStrictRaw(key);
+    if(!r.ok){ p._dirty = true; return false; }
+    let out = p;
+    if(r.value){ try{ out = prMerge(JSON.parse(r.value), p); }catch(e){ out = p; } }
+    out.t = Date.now(); out.name = state.studentName || out.name; out.group = state.studentGroup || out.group;
+    const clean = JSON.stringify(out, (k,v)=> (k==='_dirty' || k==='_loadFailed') ? undefined : v);
+    const ok = await storageSet(key, clean);
+    if(!ok){ p._dirty = true; return false; }
+    storageSet('pboard:' + p.identity, JSON.stringify({ identity:out.identity, name:out.name, group:out.group, pts:out.pts, week:out.week, t:out.t })).catch(()=>{});
+    if(state.progress === p && out !== p){ out._dirty = p._dirty; state.progress = out; }
+    return true;
+  })().finally(()=>{ state._prFlushing = null; });
+  return state._prFlushing;
+}
+(function initProgressFlush(){
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden) prFlush(); });
+  window.addEventListener('pagehide', ()=>{ prFlush(); });
+})();
+
+/* ---- savol bo'yicha natija yozish ---- */
+function prIsMastered(e){ return !!e && e.c >= PR.MASTER_AT; }
+function prRecord(p, qid, ok){
+  const e = p.pq[qid] || (p.pq[qid] = { c:0, w:0, d:'', m:0, t:0 });
+  const today = dayKey(); let pts = 0, mastered = false;
+  if(ok){
+    e.c++; e.w = 0;
+    if(e.d !== today){ pts += 1; e.d = today; }          // har bir savol kuniga faqat 1 marta ball beradi
+    if(e.c >= PR.MASTER_AT && !e.m){ e.m = 1; pts += 5; mastered = true; }   // birinchi marta o'zlashtirilganda bonus
+  } else { e.c = 0; e.w = 1; }
+  e.t = Date.now();
+  prNoteAnswer(p, ok, 'mavzu');
+  const given = prAward(p, pts);
+  prMarkDirty(p);
+  return { pts:given, wanted:pts, mastered };
+}
+function prTopicStats(t, p){
+  let seen = 0, mastered = 0, wrong = 0;
+  (t.questions||[]).forEach(q=>{ const e = p.pq[q.id]; if(!e) return; seen++; if(prIsMastered(e)) mastered++; if(e.w) wrong++; });
+  const total = (t.questions||[]).length;
+  return { total, seen, mastered, wrong, pct: total ? Math.round(100*mastered/total) : 0 };
+}
+
+/* ---- Mashq markazi ekrani ---- */
+const PR_TABS = [ ['topics',"Mavzular"], ['prov',"Provodka"], ['badges',"Yutuqlar"], ['board',"Reyting"] ];
+async function showPractice(tab){
+  if(tab) state.prTab = tab;
+  if(!state.prTab) state.prTab = 'topics';
+  state.pr = null;
+  hideAll();
+  showScreen('screen-practice');
+  document.getElementById('practiceBody').innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  const [cfg, p] = await Promise.all([ loadPracticeConfig(), prLoad(true) ]);
+  state.practiceCfg = cfg;
+  if(p._loadFailed) showToast("Mashq natijalari yuklanmadi — internetni tekshiring. Ball saqlanmaydi.", true);
+  prRenderCenter();
+}
+function prRenderHead(p){
+  const lv = prLevel(p.pts), st = prStreakNow(p);
+  const left = Math.max(0, PR.DAILY_CAP - (p.day.d===dayKey() ? p.day.pts : 0));
+  return `<div class="pr-head">
+    <div class="pr-lvl">
+      <div class="pr-lvl-top"><span class="pr-lvl-name">${icon('star')}${escapeHtml(lv.name)}</span><span class="pr-pts">${p.pts} ball</span></div>
+      <div class="pr-bar"><i style="width:${lv.pct}%"></i></div>
+      <div class="row-meta">${lv.next ? `Keyingi daraja: ${escapeHtml(lv.next.name)} — ${lv.next.min - p.pts} ball qoldi` : "Eng yuqori daraja!"}</div>
+    </div>
+    <div class="pr-chips">
+      <div class="pr-chip" title="Ketma-ket mashq qilingan kunlar">${icon('flame')}<b>${st}</b> kun</div>
+      <div class="pr-chip" title="Bugun yig'ish mumkin bo'lgan ball">Bugun: <b>${left}</b> ball qoldi</div>
+    </div>
+  </div>`;
+}
+function prRenderCenter(){
+  const p = state.progress; if(!p) return;
+  const tabs = PR_TABS.map(([id,label])=> `<button class="tab ${state.prTab===id?'active':''}" onclick="showPractice('${id}')">${label}</button>`).join('');
+  document.getElementById('practiceTabs').innerHTML = tabs;
+  document.getElementById('practiceHead').innerHTML = prRenderHead(p);
+  const body = document.getElementById('practiceBody');
+  if(state.prTab==='topics') prRenderTopics(body);
+  else if(state.prTab==='prov') provRender(body);
+  else if(state.prTab==='badges') badgesRender(body);
+  else prRenderBoard(body);
+}
+function prRenderTopics(body){
+  const p = state.progress, cfg = state.practiceCfg;
+  const list = prTopicsForMe(cfg);
+  let html = `<p class="desc">Mustaqil mashg'ulot: mavzular bo'yicha savollarni xohlagancha ishlang. Bu <b>nazorat natijalariga ta'sir qilmaydi</b>, faqat bilimingizni mustahkamlaydi va ball beradi. Savolga ketma-ket 2 marta to'g'ri javob bersangiz, u «o'zlashtirilgan» hisoblanadi.</p>`;
+  if(list.length===0){
+    html += `<div class="empty">Hozircha sizga ochiq mashq mavzusi yo'q. O'qituvchi mavzu qo'shganda shu yerda paydo bo'ladi.</div>`;
+  } else {
+    html += list.map(t=>{
+      const s = prTopicStats(t, p);
+      return `<div class="row-item pr-topic">
+        <span class="row-title">${escapeHtml(t.name)}<br><span class="row-meta">${s.total} ta savol · o'zlashtirilgan ${s.mastered} (${s.pct}%)${s.wrong?` · xatolar: ${s.wrong}`:''}</span>
+          <div class="pr-bar" style="margin-top:6px;"><i style="width:${s.pct}%"></i></div></span>
+        <button class="btn-primary btn-small" onclick="prOpenTopic('${t.id}')">Mashq</button>
+      </div>`;
+    }).join('');
+  }
+  // eski funksiya: nazorat testlaridagi xatolar ustida ishlash
+  if(window._practicePool && window._practicePool.length){
+    html += `<div class="row-item" style="margin-top:12px;"><span class="row-title">Nazorat testlaridagi xatolarim<br><span class="row-meta">Oldin noto'g'ri javob bergan ${window._practicePool.length} ta savol (ball bermaydi)</span></span><button class="btn-ghost btn-small" onclick="startPractice()">Boshlash</button></div>`;
+  }
+  body.innerHTML = html;
+}
+function prOpenTopic(id){
+  const t = (state.practiceCfg.topics||[]).find(x=>x.id===id); if(!t) return;
+  const p = state.progress, s = prTopicStats(t, p);
+  const body = document.getElementById('practiceBody');
+  document.getElementById('practiceTabs').innerHTML = '';
+  body.innerHTML = `<div class="toolbar"><div class="lead" style="margin:0;">${escapeHtml(t.name)}</div><button class="btn-ghost btn-small" onclick="prRenderCenter()">Orqaga</button></div>
+    ${t.desc?`<p class="desc">${escapeHtml(t.desc)}</p>`:''}
+    <div class="stat-grid" style="margin-bottom:16px;">
+      <div class="stat-box"><div class="num">${s.total}</div><div class="lbl">Savollar</div></div>
+      <div class="stat-box"><div class="num">${s.mastered}</div><div class="lbl">O'zlashtirilgan</div></div>
+      <div class="stat-box"><div class="num">${s.wrong}</div><div class="lbl">Xatolarim</div></div>
+    </div>
+    <div class="pr-bar" style="margin-bottom:18px;"><i style="width:${s.pct}%"></i></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn-primary" onclick="prStart('${t.id}','smart')">Mashqni boshlash (${Math.min(PR.SESSION, s.total)} ta)</button>
+      ${s.wrong?`<button class="btn-ghost" onclick="prStart('${t.id}','wrong')">Faqat xatolarim (${s.wrong})</button>`:''}
+      <button class="btn-ghost" onclick="prStart('${t.id}','all')">Hamma savollar (${s.total})</button>
+    </div>`;
+}
+function prPickQueue(t, p, mode){
+  const qs = (t.questions||[]).map(q=>({ ...q }));
+  if(mode==='all') return prShuffle(qs);
+  if(mode==='wrong') return prShuffle(qs.filter(q=> p.pq[q.id] && p.pq[q.id].w));
+  const wrong = [], unseen = [], learning = [], mastered = [];
+  qs.forEach(q=>{ const e = p.pq[q.id]; if(!e) unseen.push(q); else if(e.w) wrong.push(q); else if(prIsMastered(e)) mastered.push(q); else learning.push(q); });
+  return [...prShuffle(wrong), ...prShuffle(unseen), ...prShuffle(learning), ...prShuffle(mastered)].slice(0, PR.SESSION);
+}
+async function prStart(topicId, mode){
+  const t = (state.practiceCfg.topics||[]).find(x=>x.id===topicId); if(!t) return;
+  let p = state.progress;
+  if(p._loadFailed){ p = await prLoad(true); if(p._loadFailed){ showToast("Natijalarni yuklab bo'lmadi. Internetni tekshiring.", true); return; } }
+  const queue = prPickQueue(t, p, mode);
+  if(!queue.length){ showToast("Bu rejim uchun savol yo'q.", true); return; }
+  state.pr = { topicId, topicName:t.name, queue, i:0, right:0, wrong:[], pts:0, mastered:0, locked:false, order:[], answered:0 };
+  document.getElementById('practiceTabs').innerHTML = '';
+  document.getElementById('practiceHead').innerHTML = '';
+  prRenderQ();
+}
+function prRenderQ(){
+  const S = state.pr, body = document.getElementById('practiceBody');
+  if(!S) return;
+  if(S.i >= S.queue.length){ prFinish(false); return; }
+  const q = S.queue[S.i];
+  const order = prShuffle(q.options.map((_,k)=>k));
+  S.order = order; S.locked = false;
+  body.innerHTML = `<div class="qblock">
+    <div class="qnum">${escapeHtml(S.topicName)} · savol ${S.i+1} / ${S.queue.length}</div>
+    <div class="pr-bar" style="margin:6px 0 12px;"><i style="width:${Math.round(100*S.i/S.queue.length)}%"></i></div>
+    <div class="qtext">${escapeHtml(q.text)}</div>
+    ${order.map((oi,pos)=> `<div class="opt" id="propt-${pos}" onclick="prAnswer(${pos})"><input type="radio" name="prq"><span>${escapeHtml(q.options[oi])}</span></div>`).join('')}
+    <div id="prFeedback"></div>
+    <div style="margin-top:14px;"><button class="btn-ghost btn-small" onclick="prFinish(true)">Mashqni yakunlash</button></div></div>`;
+}
+function prAnswer(pos){
+  const S = state.pr; if(!S || S.locked) return; S.locked = true;
+  const q = S.queue[S.i], p = state.progress;
+  const chosen = S.order[pos], ok = chosen === q.correct;
+  const r = prRecord(p, q.id, ok);
+  S.answered++; S.pts += r.pts; if(r.mastered) S.mastered++;
+  if(ok){ S.right++; playCorrectSound(); } else { S.wrong.push(q); playWrongSound(); }
+  S.order.forEach((oi,k)=>{ const el = document.getElementById('propt-'+k); if(!el) return; if(oi===q.correct) el.classList.add('correct'); else if(k===pos) el.classList.add('wrong'); });
+  const fb = document.getElementById('prFeedback');
+  const hasExpl = !!(q.explanation && q.explanation.trim());
+  const gain = r.pts>0 ? `<span class="pr-gain">+${r.pts} ball${r.mastered?' · o\'zlashtirildi!':''}</span>` : (r.wanted>0 && r.pts===0 ? `<span class="row-meta">Bugungi ball chegarasi to'ldi</span>` : '');
+  if(fb) fb.innerHTML = `<div class="pr-fb ${ok?'ok':'bad'}">
+      <b>${ok?"To'g'ri!":"Noto'g'ri."}</b> ${ok?'':`To'g'ri javob: <b>${escapeHtml(q.options[q.correct])}</b>.`} ${gain}
+      ${hasExpl?`<div class="pr-expl">${escapeHtml(q.explanation)}</div>`:''}
+      <div style="margin-top:10px;"><button class="btn-primary btn-small" onclick="prNext()">Keyingisi</button></div></div>`;
+  if(ok && !hasExpl) setTimeout(()=>{ if(state.pr===S && S.locked && S.i < S.queue.length && S.queue[S.i]===q) prNext(); }, 700);
+}
+function prNext(){ const S = state.pr; if(!S || !S.locked) return; S.locked = false; S.i++; prRenderQ(); }
+async function prFinish(early){
+  const S = state.pr; if(!S) return;
+  const p = state.progress;
+  let bonus = 0;
+  if(S.answered >= 5 && !S._bonusGiven){ S._bonusGiven = true; bonus = prAward(p, 3); S.pts += bonus; prMarkDirty(p); }
+  const newBadges = badgesCheck(p);
+  prMarkDirty(p); await prFlush();
+  const body = document.getElementById('practiceBody');
+  const pct = S.answered ? Math.round(100*S.right/S.answered) : 0;
+  body.innerHTML = `<div class="lead" style="text-align:center;">${early?'Mashq to\'xtatildi':'Mashq tugadi'}</div>
+    <div class="stat-grid" style="margin:16px 0;">
+      <div class="stat-box"><div class="num">${S.right}/${S.answered}</div><div class="lbl">To'g'ri javob</div></div>
+      <div class="stat-box"><div class="num">${pct}%</div><div class="lbl">Aniqlik</div></div>
+      <div class="stat-box"><div class="num">+${S.pts}</div><div class="lbl">Ball${bonus?` (shundan ${bonus} — yakunlash bonusi)`:''}</div></div>
+    </div>
+    ${S.mastered?`<p class="desc" style="text-align:center;">Bu mashqda <b>${S.mastered}</b> ta savol o'zlashtirildi.</p>`:''}
+    ${S.wrong.length?`<p class="desc" style="text-align:center;">${S.wrong.length} ta savolda adashdingiz. Ular keyingi mashqda birinchi bo'lib chiqadi.</p>`:`<p class="desc" style="text-align:center;">Barakalla — xatosiz!</p>`}
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-primary" onclick="prStart('${S.topicId}','smart')">Yana mashq qilish</button>
+      <button class="btn-ghost" onclick="showPractice('topics')">Mavzularga qaytish</button>
+    </div>`;
+  document.getElementById('practiceHead').innerHTML = prRenderHead(p);
+  state.pr = null;
+  if(newBadges.length) badgesAnnounce(newBadges);
+}
+
+/* ---- Reyting (mashq balli bo'yicha; test reytingidan alohida) ---- */
+async function prRenderBoard(body){
+  if(!state.prBoard) state.prBoard = { mode:'week', scope:'group' };
+  const B = state.prBoard;
+  body.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  const rows = await storageGetObjects('pboard:');
+  const wk = weekKey(), myId = myIdentity();
+  let all = rows.map(r=>({ id:r.identity||'', name:r.name||'', group:r.group||'', pts: B.mode==='week' ? ((r.week && r.week.k===wk) ? (r.week.pts||0) : 0) : (r.pts||0) })).filter(r=>r.id);
+  if(!all.some(r=>r.id===myId)) all.push({ id:myId, name:state.studentName, group:state.studentGroup||'', pts:0 });
+  if(B.scope==='group') all = all.filter(r=> r.group===state.studentGroup);
+  all = all.filter(r=> r.pts>0 || r.id===myId).sort((a,b)=> b.pts-a.pts || a.name.localeCompare(b.name));
+  const meIdx = all.findIndex(r=>r.id===myId);
+  let list = all.map((r,i)=>({ ...r, rank:i+1 }));
+  if(list.length>20){ const top = list.slice(0,20); if(meIdx>=20) top.push({ ...list[meIdx] }); list = top; }
+  const shown = r=> (B.scope==='center' && r.id!==myId && r.group!==state.studentGroup) ? (()=>{ const q = r.name.split(' '); return q.length>1 ? q[0]+' '+q[q.length-1][0]+'.' : r.name; })() : r.name;
+  const sw = (k,v,label)=> `<button class="tab ${B[k]===v?'active':''}" onclick="state.prBoard.${k}='${v}';prRenderBoard(document.getElementById('practiceBody'))">${label}</button>`;
+  body.innerHTML = `<div class="tabs" style="margin-bottom:10px;">${sw('mode','week','Shu hafta')}${sw('mode','all','Umumiy')}${sw('scope','group','Mening guruhim')}${sw('scope','center','Butun markaz')}</div>
+    <p class="desc">Mashq balli bo'yicha reyting. Bu <b>nazorat testlari reytingidan alohida</b> — u yerga ta'sir qilmaydi.${meIdx>=0?` Sizning o'rningiz: <strong style="color:var(--teal);">${meIdx+1}</strong> / ${all.length}.`:''}</p>
+    ${list.length===0?`<div class="empty">Hali hech kim ball to'plamagan. Birinchi bo'ling!</div>`:`<div class="tbl-wrap"><table class="lb-table"><thead><tr><th>O'rin</th><th>O'quvchi</th>${B.scope==='center'?'<th>Guruh</th>':''}<th>Ball</th></tr></thead><tbody>
+      ${list.map(r=>`<tr style="${r.id===myId?'font-weight:700;color:var(--teal);':''}"><td><span class="rank-pill rank-${r.rank<=3?r.rank:'n'}">${r.rank}</span></td><td>${escapeHtml(shown(r))}${r.id===myId?' (siz)':''}</td>${B.scope==='center'?`<td>${escapeHtml(r.group||'—')}</td>`:''}<td>${r.pts}</td></tr>`).join('')}
+      </tbody></table></div>`}`;
+}
+
+/* ============ PROVODKA TRENAJYORI: talaba qismi ============ */
+function provParseEntries(str){ return String(str).split(';').filter(Boolean).map(s=>{ const [dt,kt,sum] = s.split('>'); return { dt, kt, sum:+sum||0 }; }); }
+const PROV_BUILTIN = PROV_OPS_RAW.map(r=>({ id:r[0], lv:r[1], cat:r[2], text:r[3], e:provParseEntries(r[4]), x:r[5], builtin:true }));
+const PROV_CATS = [...new Set(PROV_BUILTIN.map(o=>o.cat))];
+const PROV_DRILL_PTS = 3;
+async function loadProvConfig(){
+  const r = await storageGetStrict('prov-config');
+  if(!r.ok) return { ops:[], disabled:[], _loadFailed:true };
+  if(r.value){ try{ const c = JSON.parse(r.value); c.ops = c.ops||[]; c.disabled = c.disabled||[]; return c; }catch(e){} }
+  return { ops:[], disabled:[] };
+}
+async function saveProvConfig(cfg){
+  if(cfg._loadFailed){ showToast("Provodka ma'lumotlari yuklanmagani uchun saqlash to'xtatildi. Sahifani yangilang.", true); return false; }
+  const ok = await storageSet('prov-config', JSON.stringify({ ops:cfg.ops, disabled:cfg.disabled }));
+  if(!ok) showToast("Xatolik: provodka ma'lumotini saqlashda muammo yuz berdi.", true);
+  return ok;
+}
+function provAllOps(cfg){
+  const dis = new Set((cfg && cfg.disabled) || []);
+  return [ ...PROV_BUILTIN.filter(o=>!dis.has(o.id)), ...(((cfg && cfg.ops) || []).filter(o=>o.active!==false)) ];
+}
+function provAccName(code){ const a = PROV_BY_CODE[code]; return a ? a.name : null; }
+function provFmt(n){ return String(n||0).replace(/\B(?=(\d{3})+(?!\d))/g,' '); }
+
+/* --- Talaba: Provodka tabi --- */
+async function provRender(body){
+  body.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  if(!state.provCfg || state.provCfgAt < Date.now()-20000){ state.provCfg = await loadProvConfig(); state.provCfgAt = Date.now(); }
+  const p = state.progress, ops = provAllOps(state.provCfg);
+  const mine = id=> p.drill.items[id];
+  const wrongCount = ops.filter(o=> mine(o.id) && mine(o.id).w).length;
+  const masteredCount = ops.filter(o=> prIsMastered(mine(o.id))).length;
+  const acc = p.drill.answered ? Math.round(100*p.drill.correct/p.drill.answered) : null;
+  const btn = (label, onclick, cls)=> `<button class="${cls||'btn-ghost'}" onclick="${onclick}">${label}</button>`;
+  body.innerHTML = `<p class="desc">Xo'jalik amaliyot beriladi — siz <b>Debet</b> va <b>Kredit</b> hisobvaraq raqamlarini (4 xonali) yozasiz. Javob zumda tekshiriladi. Raqamini bilmasangiz, hisobvaraq nomining bir qismini yozib qidirishingiz yoki pastdagi «Hisoblar rejasi»dan foydalanishingiz mumkin. Bu ham <b>nazoratga ta'sir qilmaydi</b>.</p>
+    <div class="stat-grid" style="margin-bottom:16px;">
+      <div class="stat-box"><div class="num">${masteredCount}/${ops.length}</div><div class="lbl">O'zlashtirilgan</div></div>
+      <div class="stat-box"><div class="num">${p.drill.answered}</div><div class="lbl">Javoblar</div></div>
+      <div class="stat-box"><div class="num">${acc===null?'—':acc+'%'}</div><div class="lbl">Aniqlik</div></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+      ${btn('Tasodifiy mashq (10 ta)',"provStart({})",'btn-primary')}
+      ${btn("1-daraja: oson","provStart({lv:1})")}${btn("2-daraja: o'rta","provStart({lv:2})")}${btn("3-daraja: murakkab","provStart({lv:3})")}
+      ${wrongCount?btn(`Xatolarim (${wrongCount})`,"provStart({wrong:true})"):''}
+    </div>
+    <div class="lead" style="font-size:1rem;margin:16px 0 8px;">Mavzu bo'yicha</div>
+    <div class="prov-cats">${PROV_CATS.filter(c=>ops.some(o=>o.cat===c)).concat([...new Set(ops.filter(o=>!PROV_CATS.includes(o.cat)).map(o=>o.cat))]).map(c=>`<button class="tab" onclick="provStart({cat:${jsArg(c)}})">${escapeHtml(c)} <span class="row-meta">(${ops.filter(o=>o.cat===c).length})</span></button>`).join('')}</div>
+    <div style="margin-top:18px;"><button class="btn-ghost btn-small" onclick="provToggleRef()">Hisoblar rejasi (ma'lumotnoma)</button></div>
+    <div id="provRef" class="hidden"></div>`;
+}
+function provToggleRef(){
+  const el = document.getElementById('provRef'); if(!el) return;
+  if(!el.classList.contains('hidden')){ el.classList.add('hidden'); return; }
+  el.classList.remove('hidden');
+  el.innerHTML = `<input type="text" id="provRefQ" placeholder="Kod yoki nom bo'yicha qidirish..." oninput="provRefFilter()" style="margin:10px 0;"><div id="provRefList" class="prov-ref"></div>`;
+  provRefFilter();
+}
+function provRefFilter(){
+  const q = (document.getElementById('provRefQ')||{value:''}).value.trim().toLowerCase();
+  const list = document.getElementById('provRefList'); if(!list) return;
+  let html = '';
+  PROV_SECTIONS.forEach(([d,label])=>{
+    const items = PROV_ACCOUNTS.filter(a=> a.code[0]===d && (!q || a.code.includes(q) || a.name.toLowerCase().includes(q)));
+    if(!items.length) return;
+    html += `<div class="prov-ref-h">${d}000 — ${escapeHtml(label)}</div>` + items.map(a=>`<div class="prov-ref-row"><b>${a.code}</b><span>${escapeHtml(a.name)}</span></div>`).join('');
+  });
+  list.innerHTML = html || `<div class="empty">Topilmadi</div>`;
+}
+function provPickQueue(ops, p, f){
+  let pool = ops.slice();
+  if(f.lv) pool = pool.filter(o=>o.lv===f.lv);
+  if(f.cat) pool = pool.filter(o=>o.cat===f.cat);
+  if(f.wrong) pool = pool.filter(o=> p.drill.items[o.id] && p.drill.items[o.id].w);
+  const wrong = [], unseen = [], learning = [], mastered = [];
+  pool.forEach(o=>{ const e = p.drill.items[o.id]; if(!e) unseen.push(o); else if(e.w) wrong.push(o); else if(prIsMastered(e)) mastered.push(o); else learning.push(o); });
+  const all = [...prShuffle(wrong), ...prShuffle(unseen), ...prShuffle(learning), ...prShuffle(mastered)];
+  return (f.cat || f.wrong) ? all.slice(0, 15) : all.slice(0, PR.SESSION);
+}
+async function provStart(f){
+  let p = state.progress;
+  if(p._loadFailed){ p = await prLoad(true); if(p._loadFailed){ showToast("Natijalarni yuklab bo'lmadi. Internetni tekshiring.", true); return; } }
+  if(!state.provCfg) state.provCfg = await loadProvConfig();
+  const queue = provPickQueue(provAllOps(state.provCfg), p, f||{});
+  if(!queue.length){ showToast("Bu tanlov uchun amaliyot yo'q.", true); return; }
+  state.prov = { queue, i:0, right:0, pts:0, answered:0, mastered:0, wrong:[], checked:false, f:f||{} };
+  document.getElementById('practiceTabs').innerHTML = '';
+  document.getElementById('practiceHead').innerHTML = '';
+  provRenderQ();
+}
+function provRenderQ(){
+  const S = state.prov, body = document.getElementById('practiceBody'); if(!S) return;
+  if(S.i >= S.queue.length){ provFinish(false); return; }
+  const o = S.queue[S.i]; S.checked = false;
+  const k = o.e.length;
+  const rows = o.e.map((_,r)=> `<div class="prov-row">
+      <span class="prov-n">${r+1}</span>
+      <div class="prov-side"><label>Debet (Dt)</label><input type="text" inputmode="numeric" autocomplete="off" maxlength="40" id="prov-dt-${r}" placeholder="Hisob raqami" oninput="provInput(${r},'dt',this)"><div class="prov-name" id="prov-dt-${r}-n"></div><div class="prov-sg" id="prov-dt-${r}-s"></div></div>
+      <div class="prov-side"><label>Kredit (Kt)</label><input type="text" inputmode="numeric" autocomplete="off" maxlength="40" id="prov-kt-${r}" placeholder="Hisob raqami" oninput="provInput(${r},'kt',this)"><div class="prov-name" id="prov-kt-${r}-n"></div><div class="prov-sg" id="prov-kt-${r}-s"></div></div>
+    </div>`).join('');
+  body.innerHTML = `<div class="qblock">
+    <div class="qnum">Provodka · ${S.i+1} / ${S.queue.length} · ${o.lv}-daraja · ${escapeHtml(o.cat)}</div>
+    <div class="pr-bar" style="margin:6px 0 12px;"><i style="width:${Math.round(100*S.i/S.queue.length)}%"></i></div>
+    <div class="qtext">${escapeHtml(o.text)}</div>
+    <p class="row-meta" style="margin:-4px 0 10px;">${k===1?"Bitta provodka yozing.":`${k} ta provodka yozing (tartibi muhim emas).`}</p>
+    ${rows}
+    <div id="provFeedback"></div>
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;" id="provBtns">
+      <button class="btn-primary" onclick="provCheck()">Tekshirish</button>
+      <button class="btn-ghost btn-small" onclick="provFinish(true)">Mashqni yakunlash</button>
+    </div></div>`;
+  const first = document.getElementById('prov-dt-0'); if(first && !/Mobi|Android|iPhone/i.test(navigator.userAgent)) first.focus();
+}
+function provInput(r, side, el){
+  const S = state.prov; if(!S || S.checked) return;
+  const v = el.value.trim();
+  const nameEl = document.getElementById(`prov-${side}-${r}-n`), sg = document.getElementById(`prov-${side}-${r}-s`);
+  el.dataset.code = '';
+  if(/^\d{4}$/.test(v)){
+    const nm = provAccName(v);
+    el.dataset.code = v; sg.innerHTML = '';
+    nameEl.className = 'prov-name ' + (nm?'ok':'warn');
+    nameEl.textContent = nm ? nm : "Bunday hisobvaraq rejada topilmadi";
+    return;
+  }
+  nameEl.textContent = ''; nameEl.className = 'prov-name';
+  if(/^\d{1,3}$/.test(v)){
+    const m = PROV_ACCOUNTS.filter(a=>a.code.startsWith(v)).slice(0,6);
+    sg.innerHTML = m.map(a=>`<button type="button" class="prov-sg-i" onclick="provPick(${r},'${side}','${a.code}')"><b>${a.code}</b> ${escapeHtml(a.name)}</button>`).join('');
+  } else if(v.length>=2 && !/^\d+$/.test(v)){
+    const q = v.toLowerCase();
+    const m = PROV_ACCOUNTS.filter(a=>a.name.toLowerCase().includes(q)).slice(0,6);
+    sg.innerHTML = m.length ? m.map(a=>`<button type="button" class="prov-sg-i" onclick="provPick(${r},'${side}','${a.code}')"><b>${a.code}</b> ${escapeHtml(a.name)}</button>`).join('') : `<div class="row-meta">Topilmadi</div>`;
+  } else sg.innerHTML = '';
+}
+function provPick(r, side, code){
+  const el = document.getElementById(`prov-${side}-${r}`); if(!el) return;
+  el.value = code; provInput(r, side, el);
+  const nxt = side==='dt' ? document.getElementById(`prov-kt-${r}`) : document.getElementById(`prov-dt-${r+1}`);
+  if(nxt && !/Mobi|Android|iPhone/i.test(navigator.userAgent)) nxt.focus();
+}
+function provRecord(p, id, ok){
+  const e = p.drill.items[id] || (p.drill.items[id] = { c:0, w:0, d:'', m:0, t:0 });
+  const today = dayKey(); let pts = 0, mastered = false;
+  if(ok){
+    e.c++; e.w = 0;
+    if(e.d !== today){ pts += PROV_DRILL_PTS; e.d = today; }
+    if(e.c >= PR.MASTER_AT && !e.m){ e.m = 1; pts += 5; mastered = true; }
+  } else { e.c = 0; e.w = 1; }
+  e.t = Date.now();
+  prNoteAnswer(p, ok, 'drill');
+  const given = prAward(p, pts);
+  prMarkDirty(p);
+  return { pts:given, wanted:pts, mastered };
+}
+function provMatch(expected, given){
+  const pool = given.map(g=>({ ...g, used:false }));
+  const res = expected.map(ex=>{
+    const hit = pool.find(g=> !g.used && g.dt===ex.dt && g.kt===ex.kt);
+    if(hit){ hit.used = true; return true; } return false;
+  });
+  return { perExpected:res, ok: res.every(Boolean) };
+}
+function provCheck(){
+  const S = state.prov; if(!S || S.checked) return;
+  const o = S.queue[S.i];
+  const given = o.e.map((_,r)=>{
+    const dt = (document.getElementById(`prov-dt-${r}`).value||'').trim(), kt = (document.getElementById(`prov-kt-${r}`).value||'').trim();
+    return { dt, kt };
+  });
+  if(given.some(g=> !/^\d{4}$/.test(g.dt) || !/^\d{4}$/.test(g.kt))){
+    showToast("Hamma Debet va Kredit maydonlariga 4 xonali hisob raqamini yozing.", true); return;
+  }
+  S.checked = true;
+  const m = provMatch(o.e, given), ok = m.ok, p = state.progress;
+  const r = provRecord(p, o.id, ok);
+  S.answered++; S.pts += r.pts; if(r.mastered) S.mastered++;
+  if(ok){ S.right++; playCorrectSound(); } else { S.wrong.push(o); playWrongSound(); }
+  o.e.forEach((_,i)=>{
+    const rowOk = o.e.some(ex=> ex.dt===given[i].dt && ex.kt===given[i].kt);
+    ['dt','kt'].forEach(side=>{
+      const el = document.getElementById(`prov-${side}-${i}`); el.readOnly = true;
+      el.classList.add(rowOk ? 'prov-ok' : 'prov-bad');
+      document.getElementById(`prov-${side}-${i}-s`).innerHTML = '';
+    });
+  });
+  const rowsHtml = o.e.map(ex=> `<div class="prov-ans"><span class="prov-ans-code">Dt ${ex.dt}</span> <span>${escapeHtml(provAccName(ex.dt)||'')}</span><br><span class="prov-ans-code">Kt ${ex.kt}</span> <span>${escapeHtml(provAccName(ex.kt)||'')}</span>${ex.sum?`<div class="row-meta">Summa: ${provFmt(ex.sum)} so'm</div>`:''}</div>`).join('');
+  const gain = r.pts>0 ? `<span class="pr-gain">+${r.pts} ball${r.mastered?' · o\'zlashtirildi!':''}</span>` : (r.wanted>0 ? `<span class="row-meta">Bugungi ball chegarasi to'ldi</span>` : '');
+  document.getElementById('provFeedback').innerHTML = `<div class="pr-fb ${ok?'ok':'bad'}">
+    <b>${ok?"To'g'ri!":"Noto'g'ri."}</b> ${gain}
+    ${ok?'':`<div style="margin-top:8px;">To'g'ri javob:</div>`}${ok?'':rowsHtml}
+    ${o.x?`<div class="pr-expl">${escapeHtml(o.x)}</div>`:''}
+    <div style="margin-top:10px;"><button class="btn-primary btn-small" onclick="provNext()">Keyingisi</button></div></div>`;
+  document.getElementById('provBtns').classList.add('hidden');
+}
+function provNext(){ const S = state.prov; if(!S || !S.checked) return; S.i++; provRenderQ(); }
+async function provFinish(early){
+  const S = state.prov; if(!S) return;
+  const p = state.progress;
+  let bonus = 0;
+  if(S.answered >= 5 && !S._bonusGiven){ S._bonusGiven = true; bonus = prAward(p, 3); S.pts += bonus; prMarkDirty(p); }
+  const newBadges = badgesCheck(p);
+  prMarkDirty(p); await prFlush();
+  const pct = S.answered ? Math.round(100*S.right/S.answered) : 0;
+  document.getElementById('practiceBody').innerHTML = `<div class="lead" style="text-align:center;">${early?'Mashq to\'xtatildi':'Mashq tugadi'}</div>
+    <div class="stat-grid" style="margin:16px 0;">
+      <div class="stat-box"><div class="num">${S.right}/${S.answered}</div><div class="lbl">To'g'ri</div></div>
+      <div class="stat-box"><div class="num">${pct}%</div><div class="lbl">Aniqlik</div></div>
+      <div class="stat-box"><div class="num">+${S.pts}</div><div class="lbl">Ball${bonus?` (shundan ${bonus} — bonus)`:''}</div></div>
+    </div>
+    ${S.mastered?`<p class="desc" style="text-align:center;">Bu mashqda <b>${S.mastered}</b> ta amaliyot o'zlashtirildi.</p>`:''}
+    ${S.wrong.length?`<p class="desc" style="text-align:center;">${S.wrong.length} ta amaliyotda adashdingiz — ular keyingi mashqda birinchi chiqadi.</p>`:`<p class="desc" style="text-align:center;">Barakalla — xatosiz!</p>`}
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-primary" onclick='provStart(${JSON.stringify(S.f||{}).replace(/'/g,"&#39;")})'>Yana mashq qilish</button>
+      <button class="btn-ghost" onclick="showPractice('prov')">Provodka bo'limiga qaytish</button>
+    </div>`;
+  document.getElementById('practiceHead').innerHTML = prRenderHead(p);
+  state.prov = null;
+  if(newBadges.length) badgesAnnounce(newBadges);
+}
+
+/* --- Admin: provodka amaliyotlari --- */
+async function provAdminRender(holder){
+  holder.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  state.provCfg = await loadProvConfig(); state.provCfgAt = Date.now();
+  const cfg = state.provCfg, dis = new Set(cfg.disabled);
+  const total = PROV_BUILTIN.length - [...dis].filter(id=>PROV_BUILTIN.some(o=>o.id===id)).length + cfg.ops.length;
+  const rowOps = (arr, custom)=> arr.map(o=>`<tr>
+      <td>${escapeHtml(o.id)}</td><td style="max-width:360px;white-space:normal;">${escapeHtml(o.text)}</td><td>${o.lv}</td><td>${escapeHtml(o.cat)}</td>
+      <td style="white-space:normal;">${o.e.map(e=>`Dt ${e.dt} / Kt ${e.kt}`).join('<br>')}</td>
+      <td>${custom ? `<button class="btn-ghost btn-small" onclick="provAdminEdit(${jsArg(o.id)})">${icon('edit')}</button> <button class="btn-danger btn-small" onclick="provAdminDelete(${jsArg(o.id)})">${icon('trash')}</button>`
+        : `<button class="btn-ghost btn-small" onclick="provAdminToggleBuiltin(${jsArg(o.id)})">${dis.has(o.id)?'Yoqish':"O'chirib qo'yish"}</button>`}</td></tr>`).join('');
+  holder.innerHTML = `<div class="notify-banner" style="margin-bottom:14px;"><div class="notify-banner-title">Provodka trenajyori</div>
+    <p class="desc" style="margin:0;">Talabalar bu yerdagi amaliyotlar bo'yicha Debet/Kredit hisobvaraqlarini mashq qiladi. Tayyor to'plam (${PROV_BUILTIN.length} ta amaliyot, 2026-yil hisobvaraqlar rejasi bo'yicha) mavjud; <b>albatta ko'rib chiqing</b> — o'zingizga to'g'ri kelmaydiganini «O'chirib qo'yish» mumkin, o'zingizniki esa qo'shing. Hozir faol: <b>${total}</b> ta.</p></div>
+    <div class="toolbar"><div class="lead" style="margin:0;font-size:1.1rem;">Sizning amaliyotlaringiz (${cfg.ops.length})</div><button class="btn-primary btn-small" onclick="provAdminEdit(null)">${icon('plus')}Yangi amaliyot</button></div>
+    <div id="provEditHolder"></div>
+    ${cfg.ops.length?`<div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Amaliyot</th><th>Daraja</th><th>Bo'lim</th><th>Provodka</th><th></th></tr></thead><tbody>${rowOps(cfg.ops,true)}</tbody></table></div>`:`<div class="empty">Hali o'zingizning amaliyotingiz yo'q.</div>`}
+    <details style="margin-top:20px;"><summary style="cursor:pointer;font-weight:700;">Tayyor to'plam (${PROV_BUILTIN.length} ta)</summary>
+      <div class="tbl-wrap" style="margin-top:10px;"><table><thead><tr><th>ID</th><th>Amaliyot</th><th>Daraja</th><th>Bo'lim</th><th>Provodka</th><th></th></tr></thead><tbody>${rowOps(PROV_BUILTIN,false)}</tbody></table></div></details>`;
+}
+async function provAdminToggleBuiltin(id){
+  const cfg = state.provCfg, i = cfg.disabled.indexOf(id);
+  if(i>=0) cfg.disabled.splice(i,1); else cfg.disabled.push(id);
+  if(!(await saveProvConfig(cfg))){ if(i>=0) cfg.disabled.push(id); else cfg.disabled.pop(); return; }
+  provAdminRender(document.getElementById('provAdminHolder'));
+}
+async function provAdminDelete(id){
+  if(!(await customConfirm("Bu amaliyot o'chiriladi. Davom etasizmi?"))) return;
+  const cfg = state.provCfg, prev = cfg.ops.slice();
+  cfg.ops = prev.filter(o=>o.id!==id);
+  if(!(await saveProvConfig(cfg))){ cfg.ops = prev; return; }
+  showToast("O'chirildi ✓"); provAdminRender(document.getElementById('provAdminHolder'));
+}
+function provAdminEdit(id){
+  const ex = id ? state.provCfg.ops.find(o=>o.id===id) : null;
+  window._draftProv = ex ? JSON.parse(JSON.stringify(ex)) : { id:prNewId('pc_'), lv:1, cat:'', text:'', e:[{dt:'',kt:'',sum:0}], x:'' };
+  provAdminDrawForm();
+}
+function provAdminDrawForm(){
+  const d = window._draftProv, h = document.getElementById('provEditHolder'); if(!d || !h) return;
+  const cats = [...new Set([...PROV_CATS, ...state.provCfg.ops.map(o=>o.cat).filter(Boolean)])];
+  h.innerHTML = `<div class="card" style="margin:10px 0 16px;">
+    <div class="field"><label>Xo'jalik amaliyot matni</label><textarea rows="2" oninput="_draftProv.text=this.value" placeholder="Masalan: Mol yetkazib beruvchidan 5 000 000 so'mlik materiallar olindi (QQSsiz).">${escapeHtml(d.text)}</textarea></div>
+    <div class="flexrow">
+      <div class="field"><label>Daraja</label><select onchange="_draftProv.lv=+this.value"><option value="1" ${d.lv==1?'selected':''}>1 — oson</option><option value="2" ${d.lv==2?'selected':''}>2 — o'rta</option><option value="3" ${d.lv==3?'selected':''}>3 — murakkab</option></select></div>
+      <div class="field"><label>Bo'lim (mavzu)</label><input type="text" list="provCats" value="${escapeAttr(d.cat)}" oninput="_draftProv.cat=this.value" placeholder="Masalan: Xaridlar"><datalist id="provCats">${cats.map(c=>`<option value="${escapeAttr(c)}">`).join('')}</datalist></div>
+    </div>
+    <label>Provodkalar (Dt, Kt — 4 xonali raqamlar; summa ixtiyoriy, faqat javobda ko'rsatiladi)</label>
+    ${d.e.map((e,i)=>`<div class="flexrow" style="margin-bottom:6px;align-items:center;"><input type="text" inputmode="numeric" maxlength="4" value="${escapeAttr(e.dt)}" placeholder="Dt" oninput="_draftProv.e[${i}].dt=this.value.trim();provAdminHint()" style="max-width:110px;"><input type="text" inputmode="numeric" maxlength="4" value="${escapeAttr(e.kt)}" placeholder="Kt" oninput="_draftProv.e[${i}].kt=this.value.trim();provAdminHint()" style="max-width:110px;"><input type="number" value="${e.sum||''}" placeholder="Summa" oninput="_draftProv.e[${i}].sum=+this.value||0" style="max-width:150px;">${d.e.length>1?`<button class="btn-ghost btn-small" onclick="_draftProv.e.splice(${i},1);provAdminDrawForm()">×</button>`:''}</div>`).join('')}
+    <div id="provHint" class="row-meta" style="margin:4px 0 8px;"></div>
+    <button class="btn-ghost btn-small" onclick="_draftProv.e.push({dt:'',kt:'',sum:0});provAdminDrawForm()">+ Provodka qo'shish</button>
+    <div class="field" style="margin-top:12px;"><label>Izoh (ixtiyoriy) — javobdan keyin ko'rsatiladi</label><input type="text" value="${escapeAttr(d.x||'')}" oninput="_draftProv.x=this.value" placeholder="Nima uchun shunday?"></div>
+    <div style="display:flex;gap:10px;"><button class="btn-primary" onclick="provAdminSave()">Saqlash</button><button class="btn-ghost" onclick="document.getElementById('provEditHolder').innerHTML=''">Bekor qilish</button></div></div>`;
+  provAdminHint();
+}
+function provAdminHint(){
+  const d = window._draftProv, el = document.getElementById('provHint'); if(!d || !el) return;
+  el.innerHTML = d.e.map((e,i)=>{ const a = provAccName(e.dt), b = provAccName(e.kt);
+    return `${i+1}) Dt ${escapeHtml(e.dt||'?')} — ${a?escapeHtml(a):(e.dt.length===4?'<span style="color:var(--red);">rejada yo\'q</span>':'...')} · Kt ${escapeHtml(e.kt||'?')} — ${b?escapeHtml(b):(e.kt.length===4?'<span style="color:var(--red);">rejada yo\'q</span>':'...')}`; }).join('<br>');
+}
+async function provAdminSave(){
+  const d = window._draftProv; if(!d) return;
+  if(!d.text.trim()){ await customAlert("Amaliyot matnini yozing."); return; }
+  if(!d.cat.trim()) d.cat = 'Boshqa';
+  for(const e of d.e){ if(!/^\d{4}$/.test(e.dt) || !/^\d{4}$/.test(e.kt)){ await customAlert("Har bir provodkada Dt va Kt 4 xonali raqam bo'lishi kerak."); return; } }
+  const unknown = d.e.flatMap(e=>[e.dt,e.kt]).filter(c=>!PROV_BY_CODE[c]);
+  if(unknown.length && !(await customConfirm(`Bu hisobvaraqlar rejada yo'q: ${[...new Set(unknown)].join(', ')}. Baribir saqlansinmi?`))) return;
+  const rec = { id:d.id, lv:+d.lv, cat:d.cat.trim(), text:d.text.trim(), e:d.e.map(e=>({dt:e.dt, kt:e.kt, sum:+e.sum||0})), x:(d.x||'').trim(), active:true };
+  const cfg = state.provCfg, prev = JSON.stringify(cfg.ops), i = cfg.ops.findIndex(o=>o.id===rec.id);
+  if(i>=0) cfg.ops[i] = rec; else cfg.ops.push(rec);
+  if(!(await saveProvConfig(cfg))){ cfg.ops = JSON.parse(prev); return; }
+  showToast("Saqlandi ✓"); window._draftProv = null; provAdminRender(document.getElementById('provAdminHolder'));
+}
+
+/* ============ YUTUQLAR (nishonlar) ============
+   Nishonlar talabaning test/imtihon, mashq, provodka, davomat va uyga vazifa faoliyatidan hisoblanadi.
+   Birinchi olingan vaqti `progress.badges` ichida saqlanadi (bir marta olingan nishon yo'qolmaydi). */
+const BADGE_TIERS = { bronze:"Bronza", silver:"Kumush", gold:"Oltin" };
+const BADGES = [
+  { id:'first_test',  tier:'bronze', name:"Birinchi qadam",       desc:"Birinchi test yoki imtihonni topshirish",               test:(i)=> i.tests.length + i.exams.length >= 1 },
+  { id:'tests_5',     tier:'silver', name:"Faol talaba",          desc:"5 ta test/imtihon topshirish",                           test:(i)=> i.tests.length + i.exams.length >= 5 },
+  { id:'good_cert',   tier:'bronze', name:"Sertifikat darajasi",  desc:"Sertifikat chegarasidagi natijaga erishish",             test:(i)=> [...i.tests, ...i.exams].some(v=> v >= certMin()) },
+  { id:'great_90',    tier:'silver', name:"A'lochi",              desc:"Test yoki imtihonda kamida 90%",                         test:(i)=> [...i.tests, ...i.exams].some(v=> v >= 90) },
+  { id:'perfect',     tier:'gold',   name:"Mukammal natija",      desc:"Test yoki imtihonda 100%",                               test:(i)=> [...i.tests, ...i.exams].some(v=> v >= 100) },
+  { id:'exam_pass',   tier:'silver', name:"Imtihondan o'tdi",     desc:"Imtihonda sertifikat chegarasidan o'tish",               test:(i)=> i.exams.some(v=> v >= certMin()) },
+  { id:'pr_50',       tier:'bronze', name:"Mashqchi",             desc:"Mashqda 50 ta to'g'ri javob",                            test:(i,p)=> p.stats.correct >= 50 },
+  { id:'pr_250',      tier:'silver', name:"Tinimsiz o'quvchi",    desc:"Mashqda 250 ta to'g'ri javob",                           test:(i,p)=> p.stats.correct >= 250 },
+  { id:'master_10',   tier:'bronze', name:"O'zlashtiruvchi",      desc:"10 ta savolni to'liq o'zlashtirish",                     test:(i,p)=> prMasteredCount(p) >= 10 },
+  { id:'master_50',   tier:'silver', name:"Bilimdon",             desc:"50 ta savolni to'liq o'zlashtirish",                     test:(i,p)=> prMasteredCount(p) >= 50 },
+  { id:'topic_master',tier:'gold',   name:"Mavzu ustasi",         desc:"Bitta mavzuning hamma savolini o'zlashtirish",           test:(i,p)=> prAnyTopicMastered(p) },
+  { id:'streak_3',    tier:'bronze', name:"3 kunlik seriya",      desc:"Ketma-ket 3 kun mashq qilish",                           test:(i,p)=> p.streak.best >= 3 },
+  { id:'streak_7',    tier:'silver', name:"Haftalik seriya",      desc:"Ketma-ket 7 kun mashq qilish",                           test:(i,p)=> p.streak.best >= 7 },
+  { id:'streak_30',   tier:'gold',   name:"Oylik seriya",         desc:"Ketma-ket 30 kun mashq qilish",                          test:(i,p)=> p.streak.best >= 30 },
+  { id:'drill_20',    tier:'bronze', name:"Yosh buxgalter",       desc:"Provodkada 20 ta to'g'ri javob",                         test:(i,p)=> p.drill.correct >= 20 },
+  { id:'drill_100',   tier:'silver', name:"Provodka ustasi",      desc:"Provodkada 100 ta to'g'ri javob",                        test:(i,p)=> p.drill.correct >= 100 },
+  { id:'drill_300',   tier:'gold',   name:"Bosh buxgalter",       desc:"Provodkada 300 ta to'g'ri javob",                        test:(i,p)=> p.drill.correct >= 300 },
+  { id:'att_90',      tier:'silver', name:"Intizomli",            desc:"Kamida 5 ta darsda davomat 90% dan yuqori",              test:(i)=> i.att && i.att.counted >= 5 && i.att.pct >= 90 },
+  { id:'att_100',     tier:'gold',   name:"Bitta dars ham qoldirmagan", desc:"Kamida 10 ta darsda davomat 100%",                 test:(i)=> i.att && i.att.counted >= 10 && i.att.pct >= 100 },
+  { id:'hw_first',    tier:'bronze', name:"Birinchi vazifa",      desc:"Birinchi uyga vazifani topshirish",                      test:(i)=> i.hw.submitted >= 1 },
+  { id:'hw_5',        tier:'silver', name:"Mas'uliyatli",         desc:"5 ta vazifani o'z vaqtida topshirish",                   test:(i)=> i.hw.onTime >= 5 },
+  { id:'hw_90',       tier:'silver', name:"Vazifa a'lochisi",     desc:"Uyga vazifadan 90 va undan yuqori ball olish",           test:(i)=> i.hw.best >= 90 }
+];
+const BADGE_BY_ID = Object.fromEntries(BADGES.map(b=>[b.id,b]));
+function prMasteredCount(p){ return Object.values(p.pq||{}).filter(e=>prIsMastered(e)).length; }
+function prAnyTopicMastered(p){
+  const topics = (state.practiceCfg && state.practiceCfg.topics) || [];
+  return topics.some(t=> (t.questions||[]).length >= 5 && t.questions.every(q=> prIsMastered(p.pq[q.id])));
+}
+/* Kirish ma'lumotlari: test/imtihon xotiradan (oxirgi yuklangan), davomat va vazifa — qo'shimcha yuklab olinadi */
+function badgesInputsNow(){
+  const d = state._studentData || { myTests:{}, myExams:{} };
+  const tests = Object.values(d.myTests||{}).map(r=>r.percentage).filter(v=>typeof v==='number' && !isNaN(v));
+  const exams = Object.values(d.myExams||{}).filter(r=>r.openGraded).map(r=>r.overallPercentage).filter(v=>typeof v==='number' && !isNaN(v));
+  const x = state._badgeExtra || {};
+  return { tests, exams, att:x.att||null, hw:x.hw||{submitted:0,onTime:0,best:0} };
+}
+async function badgesRefreshInputs(){
+  try{
+    const [att, hw] = await Promise.all([ attLoadMine().catch(()=>null), hwSummaryMine().catch(()=>null) ]);
+    state._badgeExtra = { att: att ? { counted:att.counted, pct:att.pct } : null, hw: hw || {submitted:0,onTime:0,best:0} };
+  }catch(e){}
+}
+/* Yangi olingan nishonlarni belgilaydi va ro'yxatini qaytaradi (saqlash — chaqiruvchi zimmasida) */
+function badgesCheck(p){
+  if(!p || p._loadFailed) return [];
+  const inp = badgesInputsNow(), fresh = [], now = Date.now();
+  BADGES.forEach(b=>{
+    if(p.badges[b.id]) return;
+    let ok = false; try{ ok = !!b.test(inp, p); }catch(e){}
+    if(ok){ p.badges[b.id] = now; fresh.push(b); }
+  });
+  if(fresh.length) prMarkDirty(p);
+  return fresh;
+}
+function badgeMedal(tier, size){
+  const c = tier==='gold' ? '#E0B73A' : tier==='silver' ? '#B9C4C8' : '#C98A52';
+  return `<span class="bdg-medal" style="--bdg:${c};${size?`width:${size}px;height:${size}px;`:''}">${icon('medal')}</span>`;
+}
+function badgesAnnounce(list, soft){
+  if(!list || !list.length) return;
+  try{ playCorrectSound(); }catch(e){}
+  if(soft){ showToast(`Yangi yutuq: ${list.map(b=>b.name).join(', ')} — Mashq → Yutuqlar`); return; }
+  const html = `<div class="bdg-announce"><div class="lead" style="text-align:center;margin-bottom:6px;">Yangi yutuq${list.length>1?'lar':''}!</div>
+    ${list.map(b=>`<div class="bdg-new">${badgeMedal(b.tier, 44)}<div><b>${escapeHtml(b.name)}</b> <span class="row-meta">· ${BADGE_TIERS[b.tier]}</span><div class="row-meta" style="margin-top:2px;">${escapeHtml(b.desc)}</div></div></div>`).join('')}</div>`;
+  showModalHtml(html, [{label:'Yutuqlarni ko\'rish', primary:false, onClick:()=>{ closeModal(); showPractice('badges'); }}, {label:'Yopish', primary:true, onClick:closeModal}]);
+}
+/* Bosh sahifa va boshqa joylarda: ma'lumotlarni yangilab, yangi nishon bo'lsa e'lon qilish */
+async function badgesQuickCheck(skipRefresh){
+  try{
+    if(!state.studentSlug || state.role) return;
+    const p = await prLoad(false); if(p._loadFailed) return;
+    if(!skipRefresh) await badgesRefreshInputs();
+    try{ if(!state.practiceCfg) state.practiceCfg = await loadPracticeConfig(); }catch(e){}
+    const fresh = badgesCheck(p);
+    if(fresh.length){ await prFlush(); badgesAnnounce(fresh, true); }
+  }catch(e){}
+}
+async function badgesRender(body){
+  const p = state.progress;
+  body.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  await badgesRefreshInputs();
+  try{ if(!state.practiceCfg) state.practiceCfg = await loadPracticeConfig(); }catch(e){}
+  const fresh = badgesCheck(p);
+  if(fresh.length) prFlush();
+  const got = BADGES.filter(b=>p.badges[b.id]).length;
+  const card = b=>{
+    const ts = p.badges[b.id];
+    return `<div class="bdg-card ${ts?'got':'locked'}" title="${escapeAttr(b.desc)}">${badgeMedal(b.tier)}<div class="bdg-name">${escapeHtml(b.name)}</div><div class="bdg-desc">${escapeHtml(b.desc)}</div><div class="bdg-date">${ts?new Date(ts).toLocaleDateString('uz-UZ'):BADGE_TIERS[b.tier]}${ts && ts > Date.now()-3*86400000 ? ' · yangi' : ''}</div></div>`;
+  };
+  body.innerHTML = `<p class="desc">Faoliyatingiz uchun nishonlar beriladi. Bir marta olingan nishon yo'qolmaydi. Olingan: <b>${got} / ${BADGES.length}</b>.</p>
+    <div class="bdg-grid">${[...BADGES].sort((a,b)=> (p.badges[b.id]?1:0)-(p.badges[a.id]?1:0)).map(card).join('')}</div>`;
+  if(fresh.length) badgesAnnounce(fresh);
+}
+
+/* ============ DAVOMAT ============
+   Har bir guruh + kun uchun bitta yozuv: kv_store "attendance:<guruh-slug>:<YYYY-MM-DD>"
+   { group, date, marks:{ <identifikator>:{ name, status:'keldi'|'kelmadi'|'sababli', note, auto? } }, by, ts }
+   Foiz = keldi / (keldi + kelmadi). «Sababli» foizga ta'sir qilmaydi. */
+const ATT_STATUS = { keldi:"Keldi", kelmadi:"Kelmadi", sababli:"Sababli" };
+function attKey(group, date){ return `attendance:${slugify(group)}:${date}`; }
+function attStats(statuses){
+  const keldi = statuses.filter(s=>s==='keldi').length, kelmadi = statuses.filter(s=>s==='kelmadi').length, sababli = statuses.filter(s=>s==='sababli').length;
+  const counted = keldi + kelmadi;
+  return { keldi, kelmadi, sababli, counted, total: keldi+kelmadi+sababli, pct: counted ? Math.round(100*keldi/counted) : null };
+}
+function attParse(o){ return (o && typeof o==='object' && o.marks && o.date) ? o : null; }
+
+/* --- Talaba: o'z davomati --- */
+async function attLoadMine(){
+  if(!state.studentGroup) return { days:[], keldi:0, kelmadi:0, sababli:0, counted:0, total:0, pct:null };
+  const memo = state._attMemo, memoKey = myIdentity() + '|' + state.studentGroup;
+  if(memo && memo.k===memoKey && Date.now()-memo.t < 20000) return memo.v;
+  const raw = await storageGetRows(`attendance:${slugify(state.studentGroup)}:`, { descending:true, limit:90 });
+  const rows = raw.map(r=>{ try{ return attParse(JSON.parse(r.value)); }catch(e){ return null; } }).filter(Boolean);
+  const me = myIdentity(), days = [];
+  rows.forEach(r=>{ const m = r.marks[me]; if(m && ATT_STATUS[m.status]) days.push({ date:r.date, status:m.status, note:m.note||'' }); });
+  days.sort((a,b)=> b.date.localeCompare(a.date));
+  const out = Object.assign({ days }, attStats(days.map(d=>d.status)));
+  state._attMemo = { k:memoKey, t:Date.now(), v:out };
+  return out;
+}
+function attMineHtml(a){
+  if(!a || !a.total) return `<div class="empty">Davomat hali belgilanmagan.</div>`;
+  const cls = s=> s==='keldi' ? 'badge-open' : s==='sababli' ? 'badge-done' : 'badge-closed';
+  return `<div class="stat-grid" style="margin-bottom:12px;">
+      <div class="stat-box"><div class="num">${a.pct===null?'—':a.pct+'%'}</div><div class="lbl">Davomat</div></div>
+      <div class="stat-box"><div class="num">${a.keldi}</div><div class="lbl">Keldi</div></div>
+      <div class="stat-box"><div class="num">${a.kelmadi}</div><div class="lbl">Kelmadi</div></div>
+      <div class="stat-box"><div class="num">${a.sababli}</div><div class="lbl">Sababli</div></div>
+    </div>
+    <p class="row-meta" style="margin:0 0 10px;">Oxirgi 90 ta dars hisobga olingan. Sababli kelmagan kunlar foizga ta'sir qilmaydi.</p>
+    ${a.days.slice(0,12).map(d=>`<div class="row-item"><span class="row-title">${escapeHtml(d.date.split('-').reverse().join('.'))}${d.note?`<br><span class="row-meta">${escapeHtml(d.note)}</span>`:''}</span><span class="badge ${cls(d.status)}">${ATT_STATUS[d.status]}</span></div>`).join('')}
+    ${a.days.length>12?`<p class="row-meta">Oxirgi 12 ta dars ko'rsatilgan (jami ${a.days.length}).</p>`:''}`;
+}
+
+/* --- Jonli seans tugaganda: qo'shilganlar avtomatik «keldi» (o'qituvchi belgilagan bo'lsa tegilmaydi) --- */
+async function attAutoFromLive(players){
+  try{
+    const date = dayKey(), byGroup = {};
+    (players||[]).forEach(pl=>{ const g = (pl.group||'').trim(); if(!g) return; (byGroup[g] = byGroup[g] || []).push(pl); });
+    for(const g of Object.keys(byGroup)){
+      const key = attKey(g, date), raw = await storageGet(key);
+      let rec = null; try{ rec = raw ? JSON.parse(raw) : null; }catch(e){}
+      rec = attParse(rec) || { group:g, date, marks:{}, by:'', ts:0 };
+      let changed = false;
+      byGroup[g].forEach(pl=>{ const id = studentIdentity(pl.name); if(!rec.marks[id]){ rec.marks[id] = { name:pl.name, status:'keldi', note:'', auto:true }; changed = true; } });
+      if(changed){ rec.ts = Date.now(); rec.by = rec.by || 'jonli seans'; await storageSet(key, JSON.stringify(rec)); }
+    }
+  }catch(e){}
+}
+
+/* --- Admin: Davomat bo'limi --- */
+async function attRoster(group){
+  const ids = new Map();
+  const add = (name)=>{ const n = String(name||'').trim(); if(!n) return; const id = studentIdentity(n); if(!ids.has(id)) ids.set(id, n); };
+  (state.config.studentAccounts||[]).filter(a=>a.group===group).forEach(a=>add(a.fullName));
+  try{
+    const [ros, res, ex] = await Promise.all([ fetchRoster(), fetchAllResults(), fetchAllExamResultsEvery() ]);
+    ros.filter(r=>r.group===group).forEach(r=>add(r.name));
+    [...res, ...ex].filter(r=>r.studentGroup===group).forEach(r=>add(r.studentName));
+  }catch(e){}
+  return ids;
+}
+async function renderAdminAttendance(){
+  const el = document.getElementById('adminTab-attendance');
+  const groups = collectKnownGroupNamesSync();
+  if(!state.att) state.att = { view:'mark', group:groups[0]||'', date:dayKey(), from:dayKey(new Date(Date.now()-29*86400000)), to:dayKey() };
+  const A = state.att;
+  if(A.group && !groups.includes(A.group)) A.group = groups[0]||'';
+  const vt = (id,label)=> `<button class="tab ${A.view===id?'active':''}" onclick="attSetView('${id}')">${label}</button>`;
+  el.innerHTML = `<div class="toolbar"><div class="lead" style="margin:0;">Davomat</div></div>
+    <div class="tabs" style="margin-bottom:14px;">${vt('mark','Belgilash')}${vt('report','Hisobot')}</div>
+    ${groups.length===0 ? `<div class="empty">Avval «Guruhlar» bo'limida guruh yarating.</div>` : `<div id="attBody"></div>`}`;
+  if(groups.length===0) return;
+  if(A.view==='report') attRenderReport(); else attRenderMark();
+}
+async function attSetView(v){
+  if(state.att && state.att.draft && state.att.dirty && !(await customConfirm("Saqlanmagan belgilar bor. Baribir o'tasizmi?"))) return;
+  state.att.view = v; state.att.draft = null; state.att.dirty = false; renderAdminAttendance();
+}
+function attGroupSelect(onchange){
+  const groups = collectKnownGroupNamesSync();
+  return `<select onchange="${onchange}(this.value)" style="max-width:260px;">${groups.map(g=>`<option value="${escapeAttr(g)}" ${state.att.group===g?'selected':''}>${escapeHtml(g)}</option>`).join('')}</select>`;
+}
+async function attConfirmLeave(){
+  const A = state.att;
+  if(A.draft && A.dirty && !(await customConfirm("Saqlanmagan belgilar bor. Baribir o'tasizmi?"))) return false;
+  return true;
+}
+async function attPickGroup(g){ if(!(await attConfirmLeave())){ renderAdminAttendance(); return; } state.att.group = g; state.att.draft = null; state.att.dirty = false; attRenderMark(); }
+async function attPickDate(d){ if(!d) return; if(!(await attConfirmLeave())){ renderAdminAttendance(); return; } state.att.date = d; state.att.draft = null; state.att.dirty = false; attRenderMark(); }
+async function attRenderMark(){
+  const A = state.att, holder = document.getElementById('attBody'); if(!holder) return;
+  holder.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  const key = attKey(A.group, A.date);
+  const [roster, r] = await Promise.all([ attRoster(A.group), storageGetStrict(key) ]);
+  if(!r.ok){ holder.innerHTML = `<div class="empty">Yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.</div>`; return; }
+  let rec = null; try{ rec = r.value ? JSON.parse(r.value) : null; }catch(e){}
+  rec = attParse(rec) || { group:A.group, date:A.date, marks:{}, by:'', ts:0 };
+  Object.keys(rec.marks).forEach(id=>{ if(!roster.has(id)) roster.set(id, rec.marks[id].name || id); });
+  A.roster = roster; A.draft = JSON.parse(JSON.stringify(rec.marks)); A.dirty = false; A.base = rec; A.touched = new Set();
+  attDrawMark();
+}
+function attDrawMark(){
+  const A = state.att, holder = document.getElementById('attBody'); if(!holder || !A.roster) return;
+  const ids = [...A.roster.keys()].sort((a,b)=> A.roster.get(a).localeCompare(A.roster.get(b)));
+  const cnt = attStats(ids.map(id=> (A.draft[id]||{}).status).filter(Boolean));
+  const unmarked = ids.filter(id=>!A.draft[id]).length;
+  const btn = (id, st)=> { const cur = (A.draft[id]||{}).status; return `<button class="att-btn att-${st} ${cur===st?'on':''}" onclick="attSet(${jsArg(id)},'${st}')">${ATT_STATUS[st]}</button>`; };
+  holder.innerHTML = `<div class="flexrow" style="align-items:flex-end;margin-bottom:12px;">
+      <div class="field" style="margin:0;"><label>Guruh</label>${attGroupSelect('attPickGroup')}</div>
+      <div class="field" style="margin:0;"><label>Sana</label><input type="date" value="${A.date}" max="${dayKey()}" onchange="attPickDate(this.value)" style="max-width:190px;"></div>
+    </div>
+    ${A.base && A.base.ts ? `<p class="row-meta" style="margin:0 0 10px;">Oxirgi saqlangan: ${new Date(A.base.ts).toLocaleString('uz-UZ')}${A.base.by?` · ${escapeHtml(A.base.by)}`:''}</p>` : ''}
+    <div class="stat-grid" style="margin-bottom:12px;">
+      <div class="stat-box"><div class="num">${cnt.keldi}</div><div class="lbl">Keldi</div></div>
+      <div class="stat-box"><div class="num">${cnt.kelmadi}</div><div class="lbl">Kelmadi</div></div>
+      <div class="stat-box"><div class="num">${cnt.sababli}</div><div class="lbl">Sababli</div></div>
+      <div class="stat-box"><div class="num">${unmarked}</div><div class="lbl">Belgilanmagan</div></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+      <button class="btn-ghost btn-small" onclick="attAll('keldi')">Belgilanmaganlarni «Keldi» qilish</button>
+      <button class="btn-ghost btn-small" onclick="attAddName()">${icon('plus')}Ism qo'shish</button>
+    </div>
+    ${ids.length===0 ? `<div class="empty">Bu guruhda hali talaba yo'q. «Ism qo'shish» orqali qo'lda qo'shing.</div>` : ids.map(id=>{
+      const m = A.draft[id] || {};
+      return `<div class="row-item att-row"><span class="row-title">${escapeHtml(A.roster.get(id))}${m.auto?` <span class="row-meta">(jonli seansdan)</span>`:''}</span>
+        <span class="att-btns">${btn(id,'keldi')}${btn(id,'kelmadi')}${btn(id,'sababli')}</span>
+        <input type="text" class="att-note" placeholder="Izoh (ixtiyoriy)" value="${escapeAttr(m.note||'')}" oninput="attNote(${jsArg(id)},this.value)"></div>`; }).join('')}
+    <div style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;"><button class="btn-primary" id="attSaveBtn" onclick="attSave()">Saqlash</button><span class="row-meta" id="attDirtyNote">${A.dirty?'Saqlanmagan o\'zgarish bor':''}</span></div>`;
+}
+function attSet(id, st){
+  const A = state.att; const cur = A.draft[id] || { name:A.roster.get(id), note:'' };
+  if(cur.status===st){ delete A.draft[id]; } else { A.draft[id] = Object.assign({}, cur, { name:A.roster.get(id), status:st, auto:false }); }
+  A.touched.add(id); A.dirty = true; attDrawMark();
+}
+function attNote(id, v){
+  const A = state.att; const cur = A.draft[id] || { name:A.roster.get(id), status:'', note:'' };
+  cur.note = v; A.draft[id] = cur; A.touched.add(id); A.dirty = true;
+  const n = document.getElementById('attDirtyNote'); if(n) n.textContent = "Saqlanmagan o'zgarish bor";
+}
+function attAll(st){
+  const A = state.att;
+  [...A.roster.keys()].forEach(id=>{ if(!(A.draft[id] && A.draft[id].status)){ A.draft[id] = Object.assign({ note:'' }, A.draft[id]||{}, { name:A.roster.get(id), status:st, auto:false }); A.touched.add(id); } });
+  A.dirty = true; attDrawMark();
+}
+async function attAddName(){
+  const name = await customPromptText("Talabaning ism-familiyasi:");
+  if(!name || !name.trim()) return;
+  const A = state.att, id = studentIdentity(name);
+  if(!A.roster.has(id)) A.roster.set(id, name.trim());
+  A.dirty = true; attDrawMark();
+}
+async function attSave(){
+  const A = state.att; if(!A.draft) return;
+  const btn = document.getElementById('attSaveBtn'); if(btn) btn.disabled = true;
+  const key = attKey(A.group, A.date);
+  const r = await storageGetStrict(key);
+  if(!r.ok){ showToast("Saqlab bo'lmadi: internetni tekshiring.", true); if(btn) btn.disabled = false; return; }
+  let cur = null; try{ cur = r.value ? JSON.parse(r.value) : null; }catch(e){}
+  cur = attParse(cur) || { group:A.group, date:A.date, marks:{}, by:'', ts:0 };
+  // faqat o'zgartirilgan talabalar yangilanadi: boshqa joyda (masalan jonli seansda) qo'shilganlar saqlanib qoladi
+  A.touched.forEach(id=>{
+    const m = A.draft[id];
+    if(m && m.status){ cur.marks[id] = { name:m.name || A.roster.get(id) || id, status:m.status, note:(m.note||'').trim() }; }
+    else delete cur.marks[id];
+  });
+  cur.group = A.group; cur.date = A.date; cur.ts = Date.now(); cur.by = state.role==='rahbar' ? 'Rahbar' : 'Admin';
+  const ok = await storageSet(key, JSON.stringify(cur));
+  if(btn) btn.disabled = false;
+  if(!ok){ showToast("Xatolik: davomat saqlanmadi.", true); return; }
+  showToast("Davomat saqlandi ✓");
+  A.dirty = false; attRenderMark();
+}
+async function attRenderReport(){
+  const A = state.att, holder = document.getElementById('attBody'); if(!holder) return;
+  holder.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  const rows = (await storageGetObjects(`attendance:${slugify(A.group)}:`, {fresh:true})).map(attParse).filter(Boolean)
+    .filter(r=> r.date >= A.from && r.date <= A.to).sort((a,b)=> a.date.localeCompare(b.date));
+  const people = new Map();
+  rows.forEach(r=> Object.keys(r.marks).forEach(id=>{ if(!people.has(id)) people.set(id, r.marks[id].name || id); }));
+  const list = [...people.keys()].map(id=>{
+    const sts = rows.map(r=> (r.marks[id]||{}).status).filter(Boolean);
+    return Object.assign({ id, name:people.get(id) }, attStats(sts));
+  }).sort((a,b)=> (b.pct===null?-1:b.pct) - (a.pct===null?-1:a.pct) || a.name.localeCompare(b.name));
+  A.reportRows = rows; A.reportList = list; A.reportPeople = people;
+  holder.innerHTML = `<div class="flexrow" style="align-items:flex-end;margin-bottom:12px;">
+      <div class="field" style="margin:0;"><label>Guruh</label>${attGroupSelect('attReportGroup')}</div>
+      <div class="field" style="margin:0;"><label>Dan</label><input type="date" value="${A.from}" onchange="state.att.from=this.value;attRenderReport()" style="max-width:170px;"></div>
+      <div class="field" style="margin:0;"><label>Gacha</label><input type="date" value="${A.to}" onchange="state.att.to=this.value;attRenderReport()" style="max-width:170px;"></div>
+      <button class="btn-owner btn-small" onclick="attExport()" ${list.length?'':'disabled'}>${icon('download')}Excel</button>
+    </div>
+    <p class="desc">Tanlangan davrda belgilangan darslar: <b>${rows.length}</b> ta. Foiz = «Keldi» / («Keldi» + «Kelmadi»); «Sababli» hisobga olinmaydi.</p>
+    ${list.length===0 ? `<div class="empty">Bu davrda davomat belgilanmagan.</div>` : `<div class="tbl-wrap"><table><thead><tr><th>Talaba</th><th>Keldi</th><th>Kelmadi</th><th>Sababli</th><th>Davomat</th></tr></thead><tbody>
+      ${list.map(r=>`<tr><td>${escapeHtml(r.name)}</td><td>${r.keldi}</td><td>${r.kelmadi}</td><td>${r.sababli}</td><td class="pct-cell ${r.pct!==null && r.pct<70?'pct-low':'pct-ok'}">${r.pct===null?'—':r.pct+'%'}</td></tr>`).join('')}</tbody></table></div>`}`;
+}
+async function attReportGroup(g){ state.att.group = g; attRenderReport(); }
+function attExport(){
+  const A = state.att; if(!A.reportRows || !A.reportList || !window.XLSX) return;
+  const dates = A.reportRows.map(r=>r.date);
+  const head = ['Talaba', ...dates.map(d=>d.split('-').reverse().join('.')), 'Keldi', 'Kelmadi', 'Sababli', 'Davomat %'];
+  const short = {keldi:'+', kelmadi:'−', sababli:'S'};
+  const body = A.reportList.map(r=> [ r.name, ...A.reportRows.map(x=> short[(x.marks[r.id]||{}).status] || ''), r.keldi, r.kelmadi, r.sababli, r.pct===null?'':r.pct ]);
+  const ws = XLSX.utils.aoa_to_sheet([head, ...body]);
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Davomat");
+  XLSX.writeFile(wb, `davomat-${slugify(A.group)}-${A.from}_${A.to}.xlsx`);
+  logActivity('export', `Davomat hisoboti: ${A.group}`);
+}
+
+/* ============ UYGA VAZIFA ============
+   Vazifalar: kv_store "homework-config" { items:[{ id, title, desc, deadline, assignTo, active, attachment, created }] }
+   Topshirish (talaba yozadi): "hw-sub:<vazifaId>:<identifikator>" { hwId, identity, name, group, files:[{name,url,path,size,type}], note, submittedAt, late, attempts }
+   Baho (FAQAT admin yozadi): "hw-grade:<vazifaId>:<identifikator>" { hwId, identity, status:'qabul'|'qayta', score, feedback, gradedAt, gradedBy, forSubmittedAt }
+   Baho alohida kalitda — shunda keyinchalik RLS yoqilganda talaba o'z ballini/holatini o'zgartira olmaydi.
+   Baho faqat `forSubmittedAt` shu topshirishga mos kelsa amal qiladi (talaba qayta topshirsa, eski baho avtomatik bekor bo'ladi).
+   Fayllar Supabase Storage "materials" baketida: homework/<vazifaId>/<identifikator>/... */
+const HW = { MAX_FILES:5, MAX_BYTES:10*1024*1024, EXT:['jpg','jpeg','png','webp','gif','heic','heif','pdf','doc','docx','xls','xlsx'] };
+const HW_STATUS = { topshirildi:"Tekshirilmoqda", qabul:"Qabul qilindi", qayta:"Qayta ishlang" };
+function hwNewId(){ return 'hw_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+async function loadHwConfig(){
+  const r = await storageGetStrict('homework-config');
+  if(!r.ok) return { items:[], _loadFailed:true };
+  if(r.value){ try{ const c = JSON.parse(r.value); c.items = c.items || []; return c; }catch(e){} }
+  return { items:[] };
+}
+async function saveHwConfig(cfg){
+  if(cfg._loadFailed){ showToast("Vazifalar yuklanmagani uchun saqlash to'xtatildi. Sahifani yangilang.", true); return false; }
+  const ok = await storageSet('homework-config', JSON.stringify({ items:cfg.items }));
+  if(!ok) showToast("Xatolik: vazifani saqlashda muammo yuz berdi.", true);
+  return ok;
+}
+function hwDeadlineEnd(item){ if(!item.deadline) return Infinity; const t = new Date(item.deadline + 'T23:59:59').getTime(); return isNaN(t) ? Infinity : t; }
+function hwFmtDate(ts){ return ts ? new Date(ts).toLocaleString('uz-UZ', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : ''; }
+function hwFileKind(f){ const n = (f.name||'').toLowerCase(); return /\.(jpe?g|png|webp|gif|heic|heif)$/.test(n) || /^image\//.test(f.type||'') ? 'img' : 'doc'; }
+function hwEffective(sub, grade){
+  if(!sub) return null;
+  const e = Object.assign({}, sub, { status:'topshirildi', score:null, feedback:'', gradedAt:0, outdated:false });
+  if(grade){
+    e.feedback = grade.feedback || '';
+    if(grade.forSubmittedAt === sub.submittedAt){ e.status = grade.status; e.score = (typeof grade.score==='number') ? grade.score : null; e.gradedAt = grade.gradedAt || 0; }
+    else e.outdated = true;
+  }
+  return e;
+}
+function hwFilesHtml(files){
+  return (files||[]).map(f=> hwFileKind(f)==='img'
+    ? `<a class="hw-thumb" href="${escapeAttr(f.url)}" target="_blank" rel="noopener"><img src="${escapeAttr(f.url)}" alt="${escapeAttr(f.name)}" loading="lazy"></a>`
+    : `<a class="hw-file" href="${escapeAttr(f.url)}" target="_blank" rel="noopener">${icon('file')}<span>${escapeHtml(f.name)}</span></a>`).join('');
+}
+
+/* ---------- Talaba ---------- */
+async function hwLoadMine(force){
+  const memo = state._hwMemo;
+  if(!force && memo && memo.k===myIdentity() && Date.now()-memo.t < 15000) return memo.v;
+  const v = await hwLoadMineRaw();
+  if(!v.failed) state._hwMemo = { k:myIdentity(), t:Date.now(), v };
+  return v;
+}
+async function hwLoadMineRaw(){
+  const cfg = await loadHwConfig();
+  if(cfg._loadFailed) return { failed:true, items:[], subs:{} };
+  const items = cfg.items.filter(h=> h.active !== false && isAssignedToMe(h.assignTo)).slice(-20);
+  const me = myIdentity(), subs = {};
+  let failed = false;
+  await Promise.all(items.map(async h=>{
+    const [r, g] = await Promise.all([ storageGetStrict(`hw-sub:${h.id}:${me}`), storageGetStrict(`hw-grade:${h.id}:${me}`) ]);
+    if(!r.ok || !g.ok){ failed = true; return; }
+    let sub = null, grade = null;
+    if(r.value){ try{ sub = JSON.parse(r.value); }catch(e){} }
+    if(g.value){ try{ grade = JSON.parse(g.value); }catch(e){} }
+    if(sub) subs[h.id] = hwEffective(sub, grade);
+  }));
+  return { failed, items, subs };
+}
+function hwSummaryOf(d){
+  const list = Object.values(d.subs||{});
+  return { submitted:list.length, onTime:list.filter(s=>!s.late).length, best:list.reduce((m,s)=> Math.max(m, typeof s.score==='number' ? s.score : 0), 0) };
+}
+async function hwSummaryMine(){ return hwSummaryOf(await hwLoadMine()); }
+function hwStatusBadge(item, sub){
+  if(!sub) return hwDeadlineEnd(item) < Date.now() ? `<span class="badge badge-closed">Muddati o'tgan</span>` : `<span class="badge badge-open">Topshirilmagan</span>`;
+  const late = sub.late ? ' · kechikdi' : '';
+  if(sub.status==='qabul') return `<span class="badge badge-done">Qabul${typeof sub.score==='number'?` · ${sub.score} ball`:''}${late}</span>`;
+  if(sub.status==='qayta') return `<span class="badge badge-closed" style="color:var(--red);">Qayta ishlang</span>`;
+  return `<span class="badge badge-done">Topshirildi${late}</span>`;
+}
+function hwDeadlineText(item){
+  if(!item.deadline) return '';
+  const left = hwDeadlineEnd(item) - Date.now();
+  if(left < 0) return `Muddat: ${item.deadline} (tugagan)`;
+  const days = Math.ceil(left/86400000);
+  return days<=1 ? 'Muddat: bugun tugaydi!' : `Muddat: ${item.deadline} (${days} kun qoldi)`;
+}
+async function renderStudentHwView(){
+  const holder = document.getElementById('studentView');
+  holder.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  const d = await hwLoadMine(true);
+  state._hw = d;
+  if(d.failed && !d.items.length){ holder.innerHTML = `<div class="empty">Vazifalarni yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.</div>`; return; }
+  if(!d.items.length){ holder.innerHTML = `<div class="empty">Hozircha uyga vazifa yo'q. O'qituvchi vazifa berganda shu yerda paydo bo'ladi.</div>`; return; }
+  const sorted = d.items.slice().sort((a,b)=>{
+    const sa = d.subs[a.id] ? 1 : 0, sb = d.subs[b.id] ? 1 : 0; if(sa!==sb) return sa-sb;
+    return (a.deadline||'9999').localeCompare(b.deadline||'9999');
+  });
+  holder.innerHTML = (d.failed ? `<p class="row-meta">Ba'zi vazifalar holatini yuklab bo'lmadi.</p>` : '') + sorted.map(h=>{
+    const sub = d.subs[h.id], late = !sub && hwDeadlineEnd(h) < Date.now();
+    return `<div class="row-item"><span class="row-title">${escapeHtml(h.title)}<br><span class="row-meta" style="${!sub && !late && hwDeadlineEnd(h)-Date.now()<2*86400000?'color:var(--red);':''}">${escapeHtml(hwDeadlineText(h) || 'Muddatsiz')}</span></span>${hwStatusBadge(h, sub)}<button class="${sub?'btn-ghost':'btn-primary'} btn-small" onclick="hwOpen(${jsArg(h.id)})">${sub?"Ko'rish":'Topshirish'}</button></div>`;
+  }).join('');
+}
+function hwOpen(id){
+  const d = state._hw; if(!d) return;
+  const h = d.items.find(x=>x.id===id); if(!h) return;
+  const sub = d.subs[id]; state.hwFiles = []; state.hwOpenId = id;
+  const holder = document.getElementById('studentView');
+  const locked = sub && sub.status==='qabul';
+  holder.innerHTML = `<div class="toolbar"><div class="lead" style="margin:0;">${escapeHtml(h.title)}</div><button class="btn-ghost btn-small" onclick="switchStudentView('hw')">Orqaga</button></div>
+    ${h.desc ? `<p class="desc" style="white-space:pre-wrap;">${escapeHtml(h.desc)}</p>` : ''}
+    ${h.attachment ? `<div class="hw-files">${hwFilesHtml([{ name:h.attachment.name, url:h.attachment.url, type:h.attachment.type }])}</div>` : ''}
+    <p class="row-meta">${escapeHtml(hwDeadlineText(h) || 'Muddatsiz')}</p>
+    ${sub ? `<div class="notify-banner" style="margin:12px 0;"><div class="notify-banner-title">${HW_STATUS[sub.status]||'Topshirildi'}${typeof sub.score==='number'?` · ${sub.score} ball`:''}${sub.late?' · kechikib topshirilgan':''}</div>
+        <p class="row-meta" style="margin:0 0 6px;">Topshirilgan: ${hwFmtDate(sub.submittedAt)}${sub.attempts>1?` · ${sub.attempts}-urinish`:''}</p>
+        ${sub.feedback ? `<p class="desc" style="margin:6px 0 0;white-space:pre-wrap;"><b>O'qituvchi izohi${sub.outdated?' (oldingi topshirishga)':''}:</b> ${escapeHtml(sub.feedback)}</p>` : ''}</div>
+      <div class="hw-files">${hwFilesHtml(sub.files)}</div>${sub.note?`<p class="desc" style="margin-top:8px;"><b>Sizning izohingiz:</b> ${escapeHtml(sub.note)}</p>`:''}` : ''}
+    ${locked ? `<p class="desc" style="margin-top:14px;">Vazifa qabul qilingan, qayta topshirib bo'lmaydi.</p>` : `
+      <div class="lead" style="font-size:1rem;margin:18px 0 8px;">${sub?'Qayta topshirish':'Javobingizni yuklang'}</div>
+      <p class="row-meta" style="margin:0 0 8px;">Rasm, PDF, Word yoki Excel · ko'pi bilan ${HW.MAX_FILES} ta fayl · har biri 10 MB gacha.${sub?' Yangi fayl tanlasangiz, oldingilari almashtiriladi.':''}</p>
+      <input type="file" id="hwFileInput" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="hwPickFiles(this)" style="display:none;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;"><button class="btn-ghost btn-small" onclick="document.getElementById('hwFileInput').click()">${icon('upload')}Fayl tanlash</button></div>
+      <div id="hwPicked"></div>
+      <div class="field"><label>Izoh (ixtiyoriy)</label><textarea id="hwNote" rows="2" placeholder="O'qituvchiga qisqa izoh...">${escapeHtml(sub ? (sub.note||'') : '')}</textarea></div>
+      <button class="btn-primary" id="hwSubmitBtn" onclick="hwSubmit(${jsArg(id)})">Topshirish</button><span class="row-meta" id="hwProgress" style="margin-left:10px;"></span>`}`;
+}
+function hwExt(name){ const m = /\.([a-z0-9]+)$/i.exec(name||''); return m ? m[1].toLowerCase() : ''; }
+function hwPickFiles(input){
+  const picked = Array.from(input.files||[]); input.value = '';
+  const cur = state.hwFiles || [];
+  for(const f of picked){
+    if(!HW.EXT.includes(hwExt(f.name))){ showToast(`«${f.name}» — bu turdagi fayl qabul qilinmaydi.`, true); continue; }
+    if(f.size > 25*1024*1024){ showToast(`«${f.name}» juda katta.`, true); continue; }
+    if(cur.length >= HW.MAX_FILES){ showToast(`Eng ko'pi bilan ${HW.MAX_FILES} ta fayl.`, true); break; }
+    cur.push(f);
+  }
+  state.hwFiles = cur; hwDrawPicked();
+}
+function hwDrawPicked(){
+  const el = document.getElementById('hwPicked'); if(!el) return;
+  const kb = n=> n>1048576 ? (n/1048576).toFixed(1)+' MB' : Math.max(1,Math.round(n/1024))+' KB';
+  el.innerHTML = (state.hwFiles||[]).map((f,i)=>`<div class="row-item" style="padding:8px 12px;"><span class="row-title" style="min-width:0;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(f.name)}<br><span class="row-meta">${kb(f.size)}</span></span><button class="btn-ghost btn-small" onclick="hwUnpick(${i})">×</button></div>`).join('');
+}
+function hwUnpick(i){ state.hwFiles.splice(i,1); hwDrawPicked(); }
+/* Rasmlarni yuborishdan oldin kichraytiradi (telefon rasmlari 5–10 MB bo'ladi) */
+async function hwPrepareFile(file){
+  if(!/^image\//.test(file.type) || /gif/.test(file.type)) return file;
+  if(file.size < 600*1024 && /jpe?g|png|webp/.test(file.type)) return file;
+  try{
+    const bmp = await createImageBitmap(file);
+    const max = 1800, k = Math.min(1, max/Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width*k); c.height = Math.round(bmp.height*k);
+    const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height); ctx.drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise(res=> c.toBlob(res, 'image/jpeg', 0.82));
+    if(!blob || blob.size >= file.size && file.size < HW.MAX_BYTES) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type:'image/jpeg' });
+  }catch(e){ return file; }
+}
+async function hwUploadOne(path, file){
+  const { error } = await withTimeout(supabaseClient.storage.from('materials').upload(path, file, { cacheControl:'3600', upsert:false, contentType:file.type || undefined }), 60000);
+  if(error) throw error;
+  const { data } = supabaseClient.storage.from('materials').getPublicUrl(path);
+  return data.publicUrl;
+}
+async function hwSubmit(id){
+  const h = (state._hw && state._hw.items.find(x=>x.id===id)); if(!h) return;
+  if(state._hwBusy) return;
+  const me = myIdentity(), picked = state.hwFiles || [];
+  const prog = document.getElementById('hwProgress'), btn = document.getElementById('hwSubmitBtn');
+  const note = ((document.getElementById('hwNote')||{}).value || '').trim().slice(0, 1000);
+  const [rr, gr] = await Promise.all([ storageGetStrict(`hw-sub:${id}:${me}`), storageGetStrict(`hw-grade:${id}:${me}`) ]);
+  if(!rr.ok || !gr.ok){ showToast("Internetni tekshiring va qayta urining.", true); return; }
+  let old = null, oldGrade = null; try{ old = rr.value ? JSON.parse(rr.value) : null; }catch(e){} try{ oldGrade = gr.value ? JSON.parse(gr.value) : null; }catch(e){}
+  const oldEff = hwEffective(old, oldGrade);
+  if(oldEff && oldEff.status==='qabul'){ showToast("Bu vazifa allaqachon qabul qilingan.", true); return; }
+  if(!picked.length && !(old && old.files && old.files.length)){ showToast("Avval fayl tanlang.", true); return; }
+  state._hwBusy = true; if(btn) btn.disabled = true;
+  const uploaded = [];
+  try{
+    for(let i=0;i<picked.length;i++){
+      if(prog) prog.textContent = `Yuklanmoqda ${i+1}/${picked.length}...`;
+      const f = await hwPrepareFile(picked[i]);
+      if(f.size > HW.MAX_BYTES) throw new Error(`«${picked[i].name}» 10 MB dan katta.`);
+      const path = `homework/${id}/${me}/${Date.now()}_${i}_${sanitizeFileName(f.name)}`;
+      const url = await hwUploadOne(path, f);
+      uploaded.push({ name:picked[i].name, url, path, size:f.size, type:f.type||'' });
+    }
+    const files = uploaded.length ? uploaded : (old.files || []);
+    const rec = { hwId:id, identity:me, name:state.studentName, group:state.studentGroup, files, note,
+      submittedAt:Date.now(), late: Date.now() > hwDeadlineEnd(h), attempts: (old ? (old.attempts||1) : 0) + 1 };
+    const ok = await storageSet(`hw-sub:${id}:${me}`, JSON.stringify(rec));
+    if(!ok) throw new Error("Saqlab bo'lmadi");
+    if(uploaded.length && old && old.files) old.files.forEach(f=>{ if(f.path) deleteMaterialFile(f.path); });
+    state._hw.subs[id] = hwEffective(rec, oldGrade); state.hwFiles = []; state._hwMemo = null;
+    showToast("Vazifa topshirildi ✓");
+    hwOpen(id);
+    badgesQuickCheck();
+  }catch(e){
+    uploaded.forEach(f=> deleteMaterialFile(f.path));
+    console.error('hwSubmit', e);
+    showToast((e && e.message && /10 MB/.test(e.message)) ? e.message : "Yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.", true);
+    if(btn) btn.disabled = false; if(prog) prog.textContent = '';
+  }finally{ state._hwBusy = false; }
+}
+
+/* ---------- Admin ---------- */
+async function renderAdminHomework(){
+  const el = document.getElementById('adminTab-homework');
+  const V = state.hwAdmin || (state.hwAdmin = { view:'list', id:null });
+  if(V.view==='edit'){ hwAdminDrawForm(); return; }
+  if(V.view==='detail'){ hwAdminDetail(V.id); return; }
+  el.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  const [cfg, rawSubs, grades] = await Promise.all([ loadHwConfig(), storageGetObjects('hw-sub:', {fresh:true}), storageGetObjects('hw-grade:', {fresh:true}) ]);
+  const gmap = hwGradeMap(grades), subs = rawSubs.map(s=> hwEffective(s, gmap[`${s.hwId}:${s.identity}`]));
+  state.hwCfg = cfg;
+  if(cfg._loadFailed){ el.innerHTML = `<div class="empty">Vazifalarni yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.</div>`; return; }
+  const by = {}; subs.forEach(s=>{ (by[s.hwId] = by[s.hwId] || []).push(s); });
+  const who = a=> !a || a.type==='all' ? 'Hammaga' : a.type==='groups' ? (a.groups||[]).join(', ') || 'Guruh tanlanmagan' : `${(a.accounts||[]).length} ta talaba`;
+  el.innerHTML = `<div class="toolbar"><div class="lead" style="margin:0;">Uyga vazifa</div><button class="btn-primary btn-small" onclick="hwAdminEdit(null)">${icon('plus')}Yangi vazifa</button></div>
+    <p class="desc">Talabalar vazifani rasm, PDF, Word yoki Excel fayl ko'rinishida topshiradi. Siz har birini ko'rib, ball va izoh qo'yasiz, «Qayta ishlang» deb qaytarishingiz mumkin.</p>
+    ${cfg.items.length===0 ? `<div class="empty">Hali vazifa yo'q.</div>` : cfg.items.slice().reverse().map(h=>{
+      const list = by[h.id] || [], pend = list.filter(s=>s.status==='topshirildi').length;
+      return `<div class="row-item"><span class="row-title">${escapeHtml(h.title)}<br><span class="row-meta">${escapeHtml(who(h.assignTo))} · ${h.deadline?`muddat ${escapeHtml(h.deadline)}`:'muddatsiz'} · topshirgan: ${list.length}${pend?` · tekshirilmagan: ${pend}`:''}</span></span>
+        <span class="badge ${h.active!==false?'badge-open':'badge-closed'}">${h.active!==false?'Faol':'Yopiq'}</span>
+        <button class="btn-primary btn-small" onclick="hwAdminOpen(${jsArg(h.id)})">Topshirganlar${pend?` <span class="count-badge">${pend}</span>`:''}</button>
+        <button class="btn-ghost btn-small" onclick="hwAdminEdit(${jsArg(h.id)})">${icon('edit')}</button>
+        <button class="btn-ghost btn-small" onclick="hwAdminToggle(${jsArg(h.id)})">${h.active!==false?'Yopish':'Ochish'}</button>
+        <button class="btn-danger btn-small" onclick="hwAdminDelete(${jsArg(h.id)})">${icon('trash')}</button></div>`;
+    }).join('')}`;
+}
+function hwGradeMap(grades){ const m = {}; (grades||[]).forEach(g=>{ m[`${g.hwId}:${g.identity}`] = g; }); return m; }
+function hwAdminOpen(id){ state.hwAdmin = { view:'detail', id }; renderAdminHomework(); }
+function hwAdminBack(){ state.hwAdmin = { view:'list', id:null }; window._draftHw = null; renderAdminHomework(); }
+async function hwAdminToggle(id){
+  const cfg = await loadHwConfig(); const h = cfg.items.find(x=>x.id===id); if(!h) return;
+  h.active = !(h.active!==false);
+  if(await saveHwConfig(cfg)) renderAdminHomework();
+}
+async function hwAdminDelete(id){
+  if(!(await customConfirm("Vazifa, uning barcha topshiriqlari va yuklangan fayllar o'chadi. Davom etasizmi?"))) return;
+  const cfg = await loadHwConfig(); const h = cfg.items.find(x=>x.id===id); if(!h) return;
+  const subs = await storageGetObjects(`hw-sub:${id}:`, {fresh:true});
+  const gradeKeys = await storageListKeys(`hw-grade:${id}:`);
+  cfg.items = cfg.items.filter(x=>x.id!==id);
+  if(!(await saveHwConfig(cfg))) return;
+  const paths = []; subs.forEach(s=> (s.files||[]).forEach(f=> f.path && paths.push(f.path)));
+  if(h.attachment && h.attachment.path) paths.push(h.attachment.path);
+  for(const k of [...subs.map(s=>s._key).filter(Boolean), ...gradeKeys]) await storageDelete(k);
+  for(const p of paths) await deleteMaterialFile(p);
+  showToast("Vazifa o'chirildi ✓"); renderAdminHomework();
+}
+async function hwAdminEdit(id){
+  const cfg = await loadHwConfig(); if(cfg._loadFailed){ showToast("Yuklab bo'lmadi. Qayta urinib ko'ring.", true); return; }
+  const ex = id ? cfg.items.find(x=>x.id===id) : null;
+  window._draftHw = ex ? JSON.parse(JSON.stringify(ex)) : { id:hwNewId(), title:'', desc:'', deadline:'', assignTo:{type:'all',groups:[],accounts:[]}, active:true, attachment:null, created:Date.now() };
+  window._hwIsNew = !ex; window._hwNewAttach = null;
+  state.hwAdmin = { view:'edit', id };
+  hwAdminDrawForm();
+}
+function hwAdminDrawForm(){
+  const d = window._draftHw, el = document.getElementById('adminTab-homework'); if(!d){ hwAdminBack(); return; }
+  el.innerHTML = `<div class="toolbar"><div class="lead" style="margin:0;">${window._hwIsNew?'Yangi vazifa':'Vazifani tahrirlash'}</div><button class="btn-ghost btn-small" onclick="hwAdminBack()">Orqaga</button></div>
+    <div class="field"><label>Sarlavha</label><input type="text" value="${escapeAttr(d.title)}" oninput="_draftHw.title=this.value" placeholder="Masalan: 50-hisobvaraq bo'yicha 5 ta provodka"></div>
+    <div class="field"><label>Topshiriq matni</label><textarea rows="4" oninput="_draftHw.desc=this.value" placeholder="Nima qilish kerakligini yozing...">${escapeHtml(d.desc)}</textarea></div>
+    <div class="flexrow"><div class="field"><label>Topshirish muddati (ixtiyoriy)</label><input type="date" value="${escapeAttr(d.deadline||'')}" onchange="_draftHw.deadline=this.value" style="max-width:200px;"></div>
+      <div class="field"><label>Holati</label><select onchange="_draftHw.active=(this.value==='1')" style="max-width:220px;"><option value="1" ${d.active!==false?'selected':''}>Faol (talabalarga ochiq)</option><option value="0" ${d.active===false?'selected':''}>Yopiq</option></select></div></div>
+    <div class="field"><label>Qo'shimcha fayl (ixtiyoriy — masalan, topshiriq PDF'i)</label>
+      ${d.attachment ? `<div class="hw-files">${hwFilesHtml([d.attachment])}</div><button class="btn-ghost btn-small" onclick="hwAdminRemoveAttach()">Faylni olib tashlash</button>` : `<input type="file" id="hwAttachInput" onchange="hwAdminPickAttach(this)">`}</div>
+    ${assignToOptionsHtml(d.assignTo, 'hw')}
+    <div style="margin-top:14px;"><button class="btn-primary" id="hwSaveBtn" onclick="hwAdminSave()">Saqlash</button></div>`;
+}
+async function hwAdminPickAttach(input){
+  const f = input.files && input.files[0]; if(!f) return;
+  if(f.size > 20*1024*1024){ showToast("Fayl 20 MB dan katta.", true); input.value=''; return; }
+  showToast("Yuklanmoqda...");
+  const up = await uploadMaterialFile(f);
+  if(!up){ showToast("Faylni yuklab bo'lmadi.", true); input.value=''; return; }
+  const prev = window._draftHw.attachment;
+  window._draftHw.attachment = { name:f.name, url:up.url, path:up.path, type:f.type||'' };
+  window._hwNewAttach = up.path;
+  if(prev && prev.path && prev.path !== up.path && prev.path === window._hwOrigAttach) {} // eski fayl saqlashda o'chiriladi
+  hwAdminDrawForm();
+}
+function hwAdminRemoveAttach(){ window._draftHw.attachment = null; hwAdminDrawForm(); }
+async function hwAdminSave(){
+  const d = window._draftHw; if(!d) return;
+  if(!d.title.trim()){ await customAlert("Vazifa sarlavhasini yozing."); return; }
+  if(!d.desc.trim() && !d.attachment){ await customAlert("Topshiriq matnini yozing yoki fayl biriktiring."); return; }
+  if(d.assignTo && d.assignTo.type==='groups' && !(d.assignTo.groups||[]).length){ await customAlert("Kamida bitta guruhni tanlang."); return; }
+  if(d.assignTo && d.assignTo.type==='accounts' && !(d.assignTo.accounts||[]).length){ await customAlert("Kamida bitta talabani tanlang."); return; }
+  const btn = document.getElementById('hwSaveBtn'); if(btn) btn.disabled = true;
+  const cfg = await loadHwConfig();
+  if(cfg._loadFailed){ showToast("Yuklab bo'lmadi. Qayta urinib ko'ring.", true); if(btn) btn.disabled = false; return; }
+  const rec = { id:d.id, title:d.title.trim(), desc:d.desc.trim(), deadline:d.deadline||'', assignTo:d.assignTo, active:d.active!==false, attachment:d.attachment||null, created:d.created||Date.now(), updated:Date.now() };
+  const i = cfg.items.findIndex(x=>x.id===rec.id);
+  const oldAttach = i>=0 ? cfg.items[i].attachment : null;
+  if(i>=0) cfg.items[i] = rec; else cfg.items.push(rec);
+  if(!(await saveHwConfig(cfg))){ if(btn) btn.disabled = false; return; }
+  if(oldAttach && oldAttach.path && (!rec.attachment || rec.attachment.path !== oldAttach.path)) deleteMaterialFile(oldAttach.path);
+  showToast("Saqlandi ✓"); window._draftHw = null; hwAdminBack();
+}
+/* topshirganlar ro'yxati va baholash */
+async function hwExpectedStudents(h){
+  const out = new Map();
+  const add = (name, group)=>{ const n = String(name||'').trim(); if(!n) return; const id = studentIdentity(n); if(!out.has(id)) out.set(id, { id, name:n, group:group||'' }); };
+  const a = h.assignTo || {type:'all'};
+  if(a.type==='accounts'){
+    (state.config.studentAccounts||[]).filter(x=>(a.accounts||[]).includes(x.id)).forEach(x=>add(x.fullName, x.group));
+  } else {
+    const inScope = g=> a.type==='all' || (a.groups||[]).includes(g);
+    (state.config.studentAccounts||[]).filter(x=>inScope(x.group)).forEach(x=>add(x.fullName, x.group));
+    try{ (await fetchRoster()).filter(r=>inScope(r.group)).forEach(r=>add(r.name, r.group)); }catch(e){}
+  }
+  return out;
+}
+async function hwAdminDetail(id){
+  const el = document.getElementById('adminTab-homework');
+  el.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  const cfg = await loadHwConfig(); const h = cfg.items.find(x=>x.id===id);
+  if(!h){ hwAdminBack(); return; }
+  const [rawSubs, grades, expected] = await Promise.all([ storageGetObjects(`hw-sub:${id}:`, {fresh:true}), storageGetObjects(`hw-grade:${id}:`, {fresh:true}), hwExpectedStudents(h) ]);
+  const gmap = hwGradeMap(grades), subs = rawSubs.map(s=> hwEffective(s, gmap[`${s.hwId}:${s.identity}`]));
+  state.hwSubs = subs.slice().sort((a,b)=> (a.status==='topshirildi'?0:1)-(b.status==='topshirildi'?0:1) || (b.submittedAt||0)-(a.submittedAt||0));
+  const done = new Set(subs.map(s=>s.identity));
+  const missing = [...expected.values()].filter(x=>!done.has(x.id)).sort((a,b)=>a.name.localeCompare(b.name));
+  const pend = subs.filter(s=>s.status==='topshirildi').length;
+  el.innerHTML = `<div class="toolbar"><div class="lead" style="margin:0;">${escapeHtml(h.title)}</div><div style="display:flex;gap:8px;"><button class="btn-owner btn-small" onclick="hwAdminExport(${jsArg(id)})" ${subs.length?'':'disabled'}>${icon('download')}Excel</button><button class="btn-ghost btn-small" onclick="hwAdminBack()">Orqaga</button></div></div>
+    <div class="stat-grid" style="margin-bottom:14px;">
+      <div class="stat-box"><div class="num">${subs.length}</div><div class="lbl">Topshirgan</div></div>
+      <div class="stat-box"><div class="num">${pend}</div><div class="lbl">Tekshirilmagan</div></div>
+      <div class="stat-box"><div class="num">${subs.filter(s=>s.status==='qabul').length}</div><div class="lbl">Qabul qilingan</div></div>
+      <div class="stat-box"><div class="num">${missing.length}</div><div class="lbl">Topshirmagan</div></div>
+    </div>
+    ${state.hwSubs.length===0 ? `<div class="empty">Hali hech kim topshirmagan.</div>` : state.hwSubs.map((s,i)=> hwAdminCard(s, i)).join('')}
+    ${missing.length ? `<div class="lead" style="font-size:1rem;margin:18px 0 8px;">Topshirmaganlar (${missing.length})</div><div class="live-lobby-players">${missing.map(m=>`<span class="live-player-chip">${escapeHtml(m.name)}${m.group?` <span class="row-meta">· ${escapeHtml(m.group)}</span>`:''}</span>`).join('')}</div>` : ''}`;
+}
+function hwAdminCard(s, i){
+  return `<div class="qeditor hw-card" id="hwcard-${i}"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;">
+      <b>${escapeHtml(s.name)}</b> <span class="row-meta">${escapeHtml(s.group||'')} · ${hwFmtDate(s.submittedAt)}${s.attempts>1?` · ${s.attempts}-urinish`:''}${s.late?' · <span style="color:var(--red);">kechikkan</span>':''}</span>
+      <span class="badge ${s.status==='qabul'?'badge-done':s.status==='qayta'?'badge-closed':'badge-open'}">${HW_STATUS[s.status]||s.status}</span></div>
+    <div class="hw-files" style="margin:10px 0;">${hwFilesHtml(s.files)}</div>
+    ${s.note ? `<p class="desc" style="margin:0 0 8px;"><b>Talaba izohi:</b> ${escapeHtml(s.note)}</p>` : ''}
+    <div class="flexrow" style="align-items:flex-end;">
+      <div class="field" style="margin:0;"><label>Holat</label><select id="hwst-${i}"><option value="qabul" ${s.status==='qabul'?'selected':''}>Qabul qilindi</option><option value="qayta" ${s.status==='qayta'?'selected':''}>Qayta ishlang</option><option value="topshirildi" ${s.status==='topshirildi'?'selected':''}>Tekshirilmoqda</option></select></div>
+      <div class="field" style="margin:0;"><label>Ball (0–100)</label><input type="number" id="hwsc-${i}" min="0" max="100" value="${typeof s.score==='number'?s.score:''}" style="max-width:110px;"></div>
+    </div>
+    <div class="field" style="margin-top:8px;"><label>Izoh (talabaga ko'rinadi)</label><input type="text" id="hwfb-${i}" value="${escapeAttr(s.feedback||'')}" placeholder="Masalan: 3-provodka xato, qayta qarang."></div>
+    <button class="btn-primary btn-small" onclick="hwAdminGrade(${i})">Saqlash</button></div>`;
+}
+async function hwAdminGrade(i){
+  const s = state.hwSubs[i]; if(!s) return;
+  const r = await storageGetStrict(`hw-sub:${s.hwId}:${s.identity}`);
+  if(!r.ok || !r.value){ showToast("Yuklab bo'lmadi. Qayta urinib ko'ring.", true); return; }
+  let cur; try{ cur = JSON.parse(r.value); }catch(e){ return; }
+  if(cur.submittedAt !== s.submittedAt){ showToast("Talaba bu orada qayta topshirgan. Sahifa yangilanmoqda.", true); hwAdminDetail(s.hwId); return; }
+  const st = document.getElementById(`hwst-${i}`).value, scRaw = document.getElementById(`hwsc-${i}`).value.trim();
+  const score = scRaw==='' ? null : Math.round(Number(scRaw));
+  if(score!==null && (isNaN(score) || score<0 || score>100)){ showToast("Ball 0 dan 100 gacha bo'lishi kerak.", true); return; }
+  const grade = { hwId:s.hwId, identity:s.identity, status:(st==='topshirildi' ? 'qayta' : st), score, feedback:document.getElementById(`hwfb-${i}`).value.trim().slice(0,600),
+    gradedAt:Date.now(), gradedBy: state.role==='rahbar' ? 'Rahbar' : 'Admin', forSubmittedAt:cur.submittedAt };
+  if(st==='topshirildi'){ await storageDelete(`hw-grade:${s.hwId}:${s.identity}`); showToast("Baho olib tashlandi ✓"); hwAdminDetail(s.hwId); return; }
+  if(!(await storageSet(`hw-grade:${s.hwId}:${s.identity}`, JSON.stringify(grade)))){ showToast("Saqlab bo'lmadi.", true); return; }
+  showToast("Saqlandi ✓"); hwAdminDetail(s.hwId);
+}
+async function hwAdminExport(id){
+  if(!window.XLSX) return;
+  const cfg = await loadHwConfig(); const h = cfg.items.find(x=>x.id===id); if(!h) return;
+  const [rawSubs, grades] = await Promise.all([ storageGetObjects(`hw-sub:${id}:`, {fresh:true}), storageGetObjects(`hw-grade:${id}:`, {fresh:true}) ]);
+  const gmap = hwGradeMap(grades), subs = rawSubs.map(s=> hwEffective(s, gmap[`${s.hwId}:${s.identity}`]));
+  const rows = [["Talaba","Guruh","Topshirilgan","Kechikdi","Holat","Ball","Izoh"], ...subs.sort((a,b)=>a.name.localeCompare(b.name)).map(s=>[s.name, s.group||'', hwFmtDate(s.submittedAt), s.late?'ha':'', HW_STATUS[s.status]||s.status, typeof s.score==='number'?s.score:'', s.feedback||''])];
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), "Vazifa");
+  XLSX.writeFile(wb, `vazifa-${slugify(h.title).slice(0,30)}.xlsx`);
+}
+
+/* ============ ADMIN: MASHQ (mustaqil mashg'ulot mavzulari) ============ */
+function prNewId(prefix){ return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function prEnsureQIds(t){ (t.questions||[]).forEach(q=>{ if(!q.id) q.id = prNewId('q_'); }); }
+async function renderAdminPractice(){
+  const el = document.getElementById('adminTab-practice');
+  if(!state.prAdminSub) state.prAdminSub = 'list';
+  el.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  state.practiceCfg = await loadPracticeConfig();
+  state.config = state.config || await loadConfig();
+  const sub = state.prAdminSub;
+  const nTopics = state.practiceCfg.topics.length;
+  const tab = (id,label)=> `<button class="tab ${sub===id?'active':''}" onclick="prAdminSwitch('${id}')">${label}</button>`;
+  let html = `<div class="tabs" style="margin-bottom:18px;">${tab('list',`Mavzular (${nTopics})`)}${tab('create','+ Yangi mavzu / Import')}${tab('prov','Provodka trenajyori')}${tab('activity','Talabalar faolligi')}</div>`;
+  if(sub==='create'){ el.innerHTML = html + prAdminCreateHtml() + `<div id="prEditorHolder"></div>`; if(window._draftPractice) prRenderEditor(); return; }
+  if(sub==='prov'){ el.innerHTML = html + `<div id="provAdminHolder"></div>`; provAdminRender(document.getElementById('provAdminHolder')); return; }
+  if(sub==='activity'){ el.innerHTML = html + `<div id="prActivityHolder"><div class="loading">Yuklanmoqda...</div></div>`; prAdminActivity(); return; }
+  html += `<div class="notify-banner" style="margin-bottom:14px;"><div class="notify-banner-title">Bu nima?</div><p class="desc" style="margin:0;">Bu bo'limdagi savollar talabalarning <b>mustaqil mashg'ulot</b>i uchun. Ular nazorat testlari, imtihon, reyting va sertifikatlarga umuman ta'sir qilmaydi va ularga aralashmaydi. Talabalar mashq uchun ball, seriya va nishonlar oladi.</p></div>`;
+  if(nTopics===0) html += `<div class="empty">Hali mashq mavzusi yo'q — «+ Yangi mavzu / Import» bo'limidan birinchisini yarating.</div>`;
+  state.practiceCfg.topics.forEach((t,i)=>{
+    html += `<div class="row-item">
+      <span class="row-num">${String(i+1).padStart(2,'0')}</span>
+      <span class="row-title">${escapeHtml(t.name)}<br><span class="row-meta">${(t.questions||[]).length} ta savol${t.desc?' · '+escapeHtml(t.desc.slice(0,60)):''}</span></span>
+      <span class="badge ${t.active?'badge-open':'badge-closed'}">${t.active?'Faol':'Yopiq'}</span>
+      <button class="btn-ghost btn-small" onclick="prAdminToggle('${t.id}')">${t.active?'Yopish':'Ochish'}</button>
+      <button class="btn-ghost btn-small" onclick="prAdminEdit('${t.id}')">${icon('edit')}Tahrirlash</button>
+      ${canDeleteTests()?`<button class="btn-danger btn-small" onclick="prAdminDelete('${t.id}')">${icon('trash')}O'chirish</button>`:''}
+    </div>`;
+  });
+  if(nTopics) html += `<div style="margin-top:14px;"><button class="btn-ghost btn-small" onclick="prAdminExport()">${icon('download')}Hamma mashq savollarini Excel'ga yuklab olish</button></div>`;
+  el.innerHTML = html;
+}
+function prAdminSwitch(sub){ state.prAdminSub = sub; if(sub!=='create') window._draftPractice = null; renderAdminPractice(); }
+function prAdminCreateHtml(){
+  return `<div class="toolbar"><div class="lead" style="margin:0;">Yangi mashq mavzusi</div><button class="btn-primary btn-small" onclick="prAdminEdit(null)">${icon('plus')}Bo'sh mavzu yaratish</button></div>
+    <div class="qeditor" style="margin-bottom:20px;">
+      <div style="font-weight:700;margin-bottom:6px;">Ommaviy import</div>
+      <p class="desc" style="margin-bottom:14px;">Test importidagi bilan bir xil shablon: «Mavzu» ustuni mashq mavzusi nomi bo'ladi, «Sarlavha» va «Vaqt» e'tiborga olinmaydi. Bir xil nomli mavzu bor bo'lsa, savollar unga qo'shiladi (takrorlari o'tkazib yuboriladi).</p>
+      <div class="flexrow" style="margin-bottom:14px;">
+        <div><label>1. Shablonni yuklab oling</label><button class="btn-ghost btn-small" onclick="downloadTemplateExcel()">${icon('download')}Excel shablonini yuklab olish</button></div>
+        <div><label>2. To'ldirilgan faylni yuklang (.xlsx yoki .csv)</label><input type="file" id="prExcelInput" accept=".xlsx,.xls,.csv" onchange="prAdminExcelImport(event)"></div>
+      </div>
+      <div id="prImportStatus"></div>
+      <div style="border-top:1px solid var(--edge);margin:16px 0;padding-top:16px;">
+        <label>Yoki: Word'dan ko'chirilgan matnni shu yerga joylashtiring</label>
+        <p class="desc" style="margin-bottom:10px;">Format testlardagidek: <span style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;">MAVZU: nom / 1. Savol? / A) ... B) ... / Javob: B</span></p>
+        <textarea id="prTextArea" rows="6" placeholder="MAVZU: ...&#10;1. Savol?&#10;A) ...&#10;B) ...&#10;Javob: A"></textarea>
+        <button class="btn-ghost btn-small" style="margin-top:10px;" onclick="prAdminTextImport()">Matndan import qilish</button>
+      </div>
+    </div>`;
+}
+async function prAdminMergeTests(tests){
+  const cfg = state.practiceCfg; let addedQ = 0, newT = 0, dup = 0;
+  tests.forEach(src=>{
+    const name = String(src.topic||'').trim(); if(!name) return;
+    let t = cfg.topics.find(x=> x.name.trim().toLowerCase()===name.toLowerCase());
+    if(!t){ t = { id:prNewId('pt_'), name, desc:'', active:false, assignTo:{type:'all',groups:[],accounts:[]}, questions:[], created:Date.now() }; cfg.topics.push(t); newT++; }
+    const have = new Set(t.questions.map(q=>q.text.trim().toLowerCase()));
+    (src.questions||[]).forEach(q=>{
+      const k = q.text.trim().toLowerCase();
+      if(have.has(k)){ dup++; return; } have.add(k);
+      t.questions.push({ id:prNewId('q_'), text:q.text.trim(), options:q.options.slice(), correct:q.correct, explanation:(q.explanation||'') });
+      addedQ++;
+    });
+  });
+  return { addedQ, newT, dup };
+}
+function prAdminExcelImport(evt){
+  const file = evt.target.files[0]; if(!file) return;
+  const statusEl = document.getElementById('prImportStatus');
+  statusEl.innerHTML = `<div class="loading">Fayl o'qilmoqda...</div>`;
+  const reader = new FileReader();
+  reader.onload = async (e)=>{
+    try{
+      const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+      const { tests, skipped } = parseTestSheet(wb.Sheets[wb.SheetNames[0]]);
+      if(!tests.length){ statusEl.innerHTML = `<div style="color:var(--red);">Hech qanday to'g'ri qatorni topa olmadim. Har bir qatorda: Mavzu, Savol, kamida 2 ta variant va to'g'ri javob (1-4 yoki A-D) bo'lishi kerak.</div>`; return; }
+      const before = JSON.stringify(state.practiceCfg.topics);
+      const r = await prAdminMergeTests(tests);
+      if(!(await savePracticeConfig(state.practiceCfg))){ state.practiceCfg.topics = JSON.parse(before); statusEl.innerHTML = `<div style="color:var(--red);">Saqlashda xatolik, qayta urinib ko'ring.</div>`; return; }
+      showToast(`${r.addedQ} ta savol qo'shildi ✓`);
+      statusEl.innerHTML = `<div style="color:var(--teal);">${r.addedQ} ta savol qo'shildi${r.newT?`, ${r.newT} ta yangi mavzu ochildi (Yopiq holatda — tekshirib, «Ochish» tugmasini bosing)`:''}.${r.dup?` ${r.dup} ta takror o'tkazildi.`:''}${skipped?` ${skipped} ta qator to'liq emas edi.`:''}</div>`;
+      evt.target.value = '';
+    }catch(err){ statusEl.innerHTML = `<div style="color:var(--red);">Faylni o'qishda xatolik: ${escapeHtml(err.message)}</div>`; }
+  };
+  reader.readAsArrayBuffer(file);
+}
+async function prAdminTextImport(){
+  const raw = document.getElementById('prTextArea').value, statusEl = document.getElementById('prImportStatus');
+  if(!raw.trim()){ statusEl.innerHTML = `<div style="color:var(--red);">Matn kiritilmagan.</div>`; return; }
+  const tests = parseTextFormat(raw);
+  if(!tests.length){ statusEl.innerHTML = `<div style="color:var(--red);">Formatga mos savol topilmadi. Namunaga qarab qayta urinib ko'ring.</div>`; return; }
+  const before = JSON.stringify(state.practiceCfg.topics);
+  const r = await prAdminMergeTests(tests);
+  if(!(await savePracticeConfig(state.practiceCfg))){ state.practiceCfg.topics = JSON.parse(before); statusEl.innerHTML = `<div style="color:var(--red);">Saqlashda xatolik, qayta urinib ko'ring.</div>`; return; }
+  document.getElementById('prTextArea').value = '';
+  showToast(`${r.addedQ} ta savol qo'shildi ✓`);
+  statusEl.innerHTML = `<div style="color:var(--teal);">${r.addedQ} ta savol qo'shildi${r.newT?`, ${r.newT} ta yangi mavzu (Yopiq holatda)`:''}.${r.dup?` ${r.dup} ta takror o'tkazildi.`:''}</div>`;
+}
+function prAdminExport(){
+  const rows = [["Mavzu","Sarlavha","Savol","Variant1","Variant2","Variant3","Variant4","ToGriJavob(1-4 yoki A-D)","Vaqt(soniya)"]];
+  state.practiceCfg.topics.forEach(t=> (t.questions||[]).forEach(q=>{ const o = q.options; rows.push([t.name,'',q.text,o[0]||'',o[1]||'',o[2]||'',o[3]||'',q.correct+1,30]); }));
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), "Mashq savollari");
+  XLSX.writeFile(wb, `mashq-savollari-${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast("Mashq savollari Excel'ga yuklab olindi ✓");
+}
+async function prAdminToggle(id){
+  const t = state.practiceCfg.topics.find(x=>x.id===id); if(!t) return;
+  t.active = !t.active;
+  if(!(await savePracticeConfig(state.practiceCfg))){ t.active = !t.active; return; }
+  showToast(t.active ? "Mavzu ochildi ✓" : "Mavzu yopildi ✓");
+  renderAdminPractice();
+}
+async function prAdminDelete(id){
+  const t = state.practiceCfg.topics.find(x=>x.id===id); if(!t) return;
+  if(!(await customConfirm(`«${t.name}» mavzusi va uning ${t.questions.length} ta savoli o'chiriladi. Davom etasizmi?`))) return;
+  const prev = state.practiceCfg.topics.slice();
+  state.practiceCfg.topics = prev.filter(x=>x.id!==id);
+  if(!(await savePracticeConfig(state.practiceCfg))){ state.practiceCfg.topics = prev; return; }
+  showToast("Mavzu o'chirildi ✓"); renderAdminPractice();
+}
+function prAdminEdit(id){
+  const ex = id ? state.practiceCfg.topics.find(t=>t.id===id) : null;
+  const d = ex ? JSON.parse(JSON.stringify(ex)) : { id:prNewId('pt_'), name:'', desc:'', active:true, assignTo:{type:'all',groups:[],accounts:[]}, questions:[{ id:prNewId('q_'), text:'', options:['','','',''], correct:0, explanation:'' }], created:Date.now() };
+  if(!d.assignTo) d.assignTo = {type:'all',groups:[],accounts:[]};
+  d.questions.forEach(q=>{ if(!q.id) q.id = prNewId('q_'); if(q.explanation===undefined) q.explanation = ''; while(q.options.length<4) q.options.push(''); });
+  window._draftPractice = d; state._prEditingNew = !ex;
+  state.prAdminSub = 'create';
+  renderAdminPractice();
+}
+function prRenderEditor(){
+  const d = window._draftPractice, holder = document.getElementById('prEditorHolder'); if(!d || !holder) return;
+  const qHtml = d.questions.map((q,qi)=> `<div class="qeditor">
+    <div class="qhead"><label>Savol ${qi+1}</label><button class="qdel" type="button" onclick="prDraftRemoveQ(${qi})">${icon('trash')}O'chirish</button></div>
+    <textarea rows="2" oninput="window._draftPractice.questions[${qi}].text=this.value">${escapeHtml(q.text)}</textarea>
+    <label style="margin-top:10px;">Variantlar (to'g'risini belgilang)</label>
+    ${q.options.map((o,oi)=> `<div class="flexrow opt-row" style="margin-bottom:6px;"><input type="radio" name="prcorrect-${qi}" ${q.correct===oi?'checked':''} onchange="window._draftPractice.questions[${qi}].correct=${oi}" style="flex:0 0 20px;"><input type="text" value="${escapeAttr(o)}" placeholder="Variant ${oi+1}" oninput="window._draftPractice.questions[${qi}].options[${oi}]=this.value"></div>`).join('')}
+    <label style="margin-top:8px;">Izoh (ixtiyoriy) — javobdan keyin talabaga ko'rsatiladi</label>
+    <input type="text" value="${escapeAttr(q.explanation||'')}" placeholder="Nima uchun shu javob to'g'ri?" oninput="window._draftPractice.questions[${qi}].explanation=this.value">
+  </div>`).join('');
+  holder.innerHTML = `<div class="card" style="margin-top:10px;">
+    <div class="lead" style="margin-bottom:16px;">${state._prEditingNew?'Yangi mashq mavzusi':'Mavzuni tahrirlash'}</div>
+    <div class="field"><label>Mavzu nomi</label><input type="text" id="prDraftName" value="${escapeAttr(d.name)}" placeholder="Masalan: Asosiy vositalar hisobi" oninput="window._draftPractice.name=this.value"></div>
+    <div class="field"><label>Qisqa tavsif (ixtiyoriy)</label><input type="text" value="${escapeAttr(d.desc||'')}" placeholder="Talabaga ko'rinadi" oninput="window._draftPractice.desc=this.value"></div>
+    <div class="field" style="max-width:260px;"><label>Holati</label><select onchange="window._draftPractice.active=(this.value==='1')"><option value="1" ${d.active?'selected':''}>Faol (talabalarga ochiq)</option><option value="0" ${!d.active?'selected':''}>Yopiq</option></select></div>
+    ${assignToOptionsHtml(d.assignTo, 'practice')}
+    <div style="margin:14px 0;">${qHtml}</div>
+    <button class="qadd" type="button" onclick="prDraftAddQ()">+ Yangi savol qo'shish</button>
+    <div style="margin-top:20px;display:flex;gap:10px;"><button class="btn-primary" onclick="prDraftSave()">Saqlash</button><button class="btn-ghost" onclick="prAdminSwitch('list')">Bekor qilish</button></div>
+  </div>`;
+}
+function prDraftAddQ(){ window._draftPractice.questions.push({ id:prNewId('q_'), text:'', options:['','','',''], correct:0, explanation:'' }); prRenderEditor(); }
+function prDraftRemoveQ(qi){ window._draftPractice.questions.splice(qi,1); prRenderEditor(); }
+async function prDraftSave(){
+  const d = window._draftPractice; if(!d) return;
+  if(!d.name.trim()){ await customAlert("Mavzu nomini kiriting."); return; }
+  const out = [];
+  for(const [i,q] of d.questions.entries()){
+    const text = (q.text||'').trim(); const opts = q.options.map(o=>String(o||'').trim());
+    const blank = !text && opts.every(o=>!o);
+    if(blank) continue;
+    const real = opts.map((o,k)=>({o,k})).filter(x=>x.o);
+    if(!text || real.length<2){ await customAlert(`${i+1}-savol to'liq emas: savol matni va kamida 2 ta variant kerak.`); return; }
+    const ci = real.findIndex(x=>x.k===q.correct);
+    if(ci<0){ await customAlert(`${i+1}-savolda to'g'ri javob bo'sh variantga belgilangan. Matn yozilgan variantni belgilang.`); return; }
+    out.push({ id:q.id||prNewId('q_'), text, options:real.map(x=>x.o), correct:ci, explanation:(q.explanation||'').trim() });
+  }
+  if(!out.length){ await customAlert("Kamida bitta to'liq savol kiriting."); return; }
+  const t = { id:d.id, name:d.name.trim(), desc:(d.desc||'').trim(), active:!!d.active, assignTo:d.assignTo, questions:out, created:d.created||Date.now(), updated:Date.now() };
+  const prev = JSON.stringify(state.practiceCfg.topics);
+  const idx = state.practiceCfg.topics.findIndex(x=>x.id===t.id);
+  if(idx>=0) state.practiceCfg.topics[idx] = t; else state.practiceCfg.topics.push(t);
+  if(!(await savePracticeConfig(state.practiceCfg))){ state.practiceCfg.topics = JSON.parse(prev); return; }
+  showToast("Mavzu saqlandi ✓");
+  window._draftPractice = null; state.prAdminSub = 'list'; renderAdminPractice();
+}
+/* ---- talabalar faolligi ---- */
+async function prAdminActivity(){
+  const holder = document.getElementById('prActivityHolder'); if(!holder) return;
+  const rows = await storageGetObjects('progress:', {fresh:true});
+  if(!rows.length){ holder.innerHTML = `<div class="empty">Hali hech kim mashq qilmagan.</div>`; return; }
+  const wk = weekKey();
+  const data = rows.map(r=>{ const p = prNormalize(r); const mastered = Object.values(p.pq).filter(e=>prIsMastered(e)).length;
+    return { name:p.name||p.identity, group:p.group||'—', pts:p.pts, wk:(p.week.k===wk?p.week.pts:0), streak:prStreakNow(p), mastered, ans:p.stats.answered, acc:p.stats.answered?Math.round(100*p.stats.correct/p.stats.answered):null, prov:p.drill.answered, last:p.t||0 }; })
+    .sort((a,b)=> b.pts-a.pts);
+  holder.innerHTML = `<p class="desc">Talabalarning mashq faolligi (ball, seriya, o'zlashtirilgan savollar). Nazorat natijalariga aloqasi yo'q.</p>
+    <div class="tbl-wrap"><table><thead><tr><th>#</th><th>O'quvchi</th><th>Guruh</th><th>Ball</th><th>Shu hafta</th><th>Seriya</th><th>O'zlashtirgan</th><th>Javoblar</th><th>Aniqlik</th><th>Provodka</th><th>Oxirgi faollik</th></tr></thead><tbody>
+    ${data.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.group)}</td><td><b>${r.pts}</b></td><td>${r.wk}</td><td>${r.streak} kun</td><td>${r.mastered}</td><td>${r.ans}</td><td>${r.acc===null?'—':r.acc+'%'}</td><td>${r.prov}</td><td>${r.last?new Date(r.last).toLocaleDateString('uz-UZ'):'—'}</td></tr>`).join('')}
+    </tbody></table></div>`;
+}
+
+/* ============ QO'SHIMCHA: guruh nomi o'zgarsa/o'chsa yangi bo'limlar ham moslashadi ============ */
+async function extrasRenameGroup(oldName, newName){
+  const fix = item=>{ if(item.assignTo && item.assignTo.groups) item.assignTo.groups = item.assignTo.groups.map(n=> n===oldName ? newName : n); };
+  const pc = await loadPracticeConfig();
+  if(!pc._loadFailed && (pc.topics||[]).some(t=>t.assignTo && (t.assignTo.groups||[]).includes(oldName))){ pc.topics.forEach(fix); await savePracticeConfig(pc); }
+  const hc = await loadHwConfig();
+  if(!hc._loadFailed && (hc.items||[]).some(h=>h.assignTo && (h.assignTo.groups||[]).includes(oldName))){ hc.items.forEach(fix); await saveHwConfig(hc); }
+  // davomat tarixi yangi nom ostiga ko'chadi (talaba o'z davomatini yo'qotmasligi uchun)
+  const oldSlug = slugify(oldName), newSlug = slugify(newName);
+  if(oldSlug !== newSlug){
+    const rows = await storageGetRows(`attendance:${oldSlug}:`);
+    for(const r of rows){
+      let o; try{ o = JSON.parse(r.value); }catch(e){ continue; }
+      o.group = newName;
+      const nk = r.key.replace(`attendance:${oldSlug}:`, `attendance:${newSlug}:`);
+      if(await storageSet(nk, JSON.stringify(o))) await storageDelete(r.key);
+    }
+  }
+}
+async function extrasDropGroup(name, alsoResults){
+  const drop = item=>{ if(item.assignTo && item.assignTo.groups) item.assignTo.groups = item.assignTo.groups.filter(g=>g!==name); };
+  const pc = await loadPracticeConfig();
+  if(!pc._loadFailed && (pc.topics||[]).some(t=>t.assignTo && (t.assignTo.groups||[]).includes(name))){ pc.topics.forEach(drop); await savePracticeConfig(pc); }
+  const hc = await loadHwConfig();
+  if(!hc._loadFailed && (hc.items||[]).some(h=>h.assignTo && (h.assignTo.groups||[]).includes(name))){ hc.items.forEach(drop); await saveHwConfig(hc); }
+  if(alsoResults){
+    const keys = await storageListKeys(`attendance:${slugify(name)}:`);
+    for(const k of keys) await storageDelete(k);
+  }
+}
+
+
+
+/* ============ TELEFONGA ILOVA KABI O'RNATISH (PWA) ============ */
+function isStandalone(){ try{ return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }catch(e){ return false; } }
+function isIOSDevice(){ return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1); }
+function installDismissed(){ try{ return localStorage.getItem('ft-install-dismissed')==='1'; }catch(e){ return false; } }
+function installAvailable(){ return !isStandalone() && (!!state.installEvt || isIOSDevice()); }
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); state.installEvt = e; refreshInstallUi(); });
+window.addEventListener('appinstalled', ()=>{ state.installEvt = null; refreshInstallUi(); showToast("Ilova o'rnatildi ✓"); });
+async function installApp(){
+  if(state.installEvt){
+    const ev = state.installEvt; state.installEvt = null;
+    try{ ev.prompt(); await ev.userChoice; }catch(e){}
+    refreshInstallUi(); return;
+  }
+  if(isIOSDevice()){
+    showModalHtml(`<div class="lead" style="margin-bottom:8px;">iPhone / iPad'ga o'rnatish</div><ol style="margin:0;padding-left:20px;line-height:1.7;text-align:left;"><li>Saytni <b>Safari</b> brauzerida oching.</li><li>Pastdagi <b>Ulashish</b> tugmasini (kvadratdan yuqoriga chiqqan strelka) bosing.</li><li><b>«Bosh ekranga qo'shish»</b>ni tanlang.</li><li>«Qo'shish»ni bosing — ikonka telefon ekranida paydo bo'ladi.</li></ol>`);
+    return;
+  }
+  showModalHtml(`<div class="lead" style="margin-bottom:8px;">Telefonga o'rnatish</div><p style="text-align:left;line-height:1.6;margin:0;">Brauzer (Chrome) menyusini (⋮) oching va <b>«Ilovani o'rnatish»</b> yoki <b>«Bosh ekranga qo'shish»</b>ni tanlang.</p>`);
+}
+function installDismiss(){ try{ localStorage.setItem('ft-install-dismissed','1'); }catch(e){} refreshInstallUi(); }
+function installRowHtml(){
+  if(!installAvailable() || installDismissed()) return '';
+  return `<div class="row-item" id="installRow" style="margin-top:12px;"><span class="row-title">Telefonga o'rnatish<br><span class="row-meta">Sayt ilova kabi bosh ekranda turadi va tezroq ochiladi</span></span><button class="btn-primary btn-small" onclick="installApp()">O'rnatish</button><button class="btn-ghost btn-small" onclick="installDismiss()">Keyinroq</button></div>`;
+}
+function refreshInstallUi(){
+  const r = document.getElementById('installRow'); if(r && (!installAvailable() || installDismissed())) r.remove();
+  const l = document.getElementById('installLink'); if(l) l.classList.toggle('hidden', !installAvailable());
+}
+setTimeout(()=>{ try{ refreshInstallUi(); }catch(e){} }, 0);
+(function registerSW(){
+  if(!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
+  window.addEventListener('load', ()=>{ try{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){} });
+})();
+
 /* ============ NAV HELPERS ============ */
 function hideAll(){
   if(state.viewer){
@@ -1911,7 +3848,7 @@ function hideAll(){
     if(state.viewer.observer) state.viewer.observer.disconnect();
     state.viewer = null;
   }
-  ['screen-join','screen-test-list','screen-student-profile','screen-leaderboard','screen-chat','screen-materials','screen-viewer','screen-test-take','screen-test-result','screen-admin-login','screen-admin-dashboard','screen-live-student','screen-live-link','screen-live-host','screen-exam-intro','screen-exam-take','screen-exam-result']
+  ['screen-join','screen-test-list','screen-student-profile','screen-practice','screen-leaderboard','screen-chat','screen-materials','screen-viewer','screen-test-take','screen-test-result','screen-admin-login','screen-admin-dashboard','screen-live-student','screen-live-link','screen-live-host','screen-exam-intro','screen-exam-take','screen-exam-result']
     .forEach(id=>document.getElementById(id).classList.add('hidden'));
   clearInterval(state.livePollTimer);
   clearInterval(state.liveUiTimer);
@@ -1943,6 +3880,7 @@ function showJoin(){
   hideAll();
   showScreen('screen-join');
   document.getElementById('masthead-sub').textContent = "Talaba rejimi";
+  refreshInstallUi();
 }
 function showAdminLogin(){
   hideAll();
@@ -2140,6 +4078,7 @@ async function handleAccountLogin(){
 }
 function logoutStudent(){
   state.liveGuest = false; state.studentView = 'home'; state._lastStudentNew = 0;
+  prFlush(); state.progress = null; state.practiceCfg = null; state.provCfg = null; state._badgeExtra = null; state._hw = null; state._hwMemo = null; state._attMemo = null; state.prBoard = null; state.pr = null; state.prov = null;
   state.studentName=''; state.studentSlug=''; state.studentGroup=''; state.accountId=null;
   document.getElementById('studentFirstNameInput').value='';
   document.getElementById('studentLastNameInput').value='';
@@ -2202,12 +4141,13 @@ async function renderTestList(){
   await renderStudentView();
 }
 /* ---- Talaba rejimi: Bosh sahifa / Testlar / Imtihonlar ---- */
-const STUDENT_VIEW_TITLES = { home:'Bosh sahifa', tests:'Testlar', exams:'Imtihonlar' };
+const STUDENT_VIEW_TITLES = { home:'Bosh sahifa', tests:'Testlar', exams:'Imtihonlar', hw:'Uyga vazifa' };
 function studentNavHtml(){
   const v = state.studentView || 'home';
   const t = (id,label,badge)=> `<button class="tab ${v===id?'active':''}" onclick="switchStudentView('${id}')">${label}${badge?`<span class="count-badge hidden" id="${badge}" style="background:var(--gold,#C9A227);color:#1b1500;"></span>`:''}</button>`;
   return `<div class="tabs" style="margin-bottom:16px;">
-    ${t('home','Bosh sahifa')}${t('tests','Testlar','studentTestsBadge')}${t('exams','Imtihonlar','studentExamsBadge')}
+    ${t('home','Bosh sahifa')}${t('tests','Testlar','studentTestsBadge')}${t('exams','Imtihonlar','studentExamsBadge')}${t('hw','Vazifalar')}
+    <button class="tab" onclick="showPractice('topics')">Mashq</button>
     <button class="tab" onclick="renderStudentProfile()">Natijalarim</button>
     <button class="tab" onclick="showLeaderboard('group')">Reyting</button>
     <button class="tab" onclick="showStudentMaterials()">Materiallar<span class="count-badge" id="materialsCountBadge" style="background:var(--teal);color:#06231E;display:none;"></span></button>
@@ -2238,6 +4178,7 @@ async function renderStudentView(){
   await renderStudentNotifications(data);
   if(v==='tests') renderStudentTestsView(data);
   else if(v==='exams') renderStudentExamsView(data);
+  else if(v==='hw') await renderStudentHwView();
   else await renderStudentHome(data);
   refreshStudentChatBadge(false);
   updateMaterialsBadge();
@@ -2308,6 +4249,10 @@ function renderStudentExamsView(data){
   const sorted = list.slice().sort((a,b)=> (data.myExams[a.id]?1:0) - (data.myExams[b.id]?1:0));
   holder.innerHTML = sorted.map(ex=> examRowHtml(ex, data.myExams[ex.id])).join('');
 }
+async function homeOpenHw(id){ state.studentView = 'hw'; await renderStudentView(); hwOpen(id); }
+async function attProfileSection(){
+  try{ const a = await attLoadMine(); if(!a.total) return ''; return `<div class="lead" style="font-size:1.05rem;margin:18px 0 10px;">Davomat</div>` + attMineHtml(a); }catch(e){ return ''; }
+}
 async function renderStudentHome(data){
   const holder = document.getElementById('studentView');
   const tests = myTestsList(), exams = myExamsList();
@@ -2325,6 +4270,13 @@ async function renderStudentHome(data){
   const hour = new Date().getHours();
   const hello = hour<5 ? 'Xayrli tun' : hour<12 ? 'Xayrli tong' : hour<18 ? 'Xayrli kun' : 'Xayrli kech';
   const level = avg===null ? 'Birinchi testingizni topshiring' : avg>=90 ? "A'lo daraja!" : avg>=80 ? 'Juda yaxshi, shunday davom eting' : avg>=60 ? "Yaxshi, yana biroz harakat" : "Mashq qilsangiz, tez o'sasiz";
+  let extra = { p:null, att:null, hw:null };
+  try{
+    const [p, att, hw] = await Promise.all([ prLoad(false), attLoadMine().catch(()=>null), hwLoadMine().catch(()=>null) ]);
+    extra = { p, att, hw };
+    if(hw && !hw.failed) state._hw = hw;
+    state._badgeExtra = { att: att ? { counted:att.counted, pct:att.pct } : null, hw: hw ? hwSummaryOf(hw) : { submitted:0, onTime:0, best:0 } };
+  }catch(e){}
   const box = (num,lbl,sub)=> `<div class="stat-box"><div class="num">${num}</div><div class="lbl">${lbl}</div>${sub?`<div class="row-meta" style="margin-top:2px;">${sub}</div>`:''}</div>`;
   let html = `
     <div class="notify-banner" style="margin-bottom:16px;border-color:var(--teal);">
@@ -2336,12 +4288,23 @@ async function renderStudentHome(data){
       ${box(allRows.length, 'Topshirilgan', `${testRows.length} test · ${examRows.length} imtihon`)}
       ${box(ranks.group?('#'+ranks.group):'—', 'Guruhda', ranks.group?`${ranks.groupTotal} kishidan`:'')}
       ${box(ranks.center?('#'+ranks.center):'—', 'Markazda', ranks.center?`${ranks.centerTotal} kishidan`:'')}
+      ${(extra.att && extra.att.total) ? box(extra.att.pct===null?'—':extra.att.pct+'%', 'Davomat', `${extra.att.keldi} ta darsga kelgan`) : ''}
     </div>`;
   // navbatdagi vazifalar
   const todo = [];
   todoTests.slice(0,5).forEach(t=>{ const dl = deadlineInfo(t); todo.push(`<div class="row-item"><span class="row-title">${escapeHtml(t.topic)}<br><span class="row-meta">Test · ${t.questions.length} ta savol${dl.text?` · <span style="color:${dl.urgent?'var(--red)':'var(--ink-soft)'};font-weight:${dl.urgent?600:400};">${dl.text}</span>`:''}</span></span><button class="btn-primary btn-small" onclick="startTest('${t.id}')">Boshlash</button></div>`); });
   todoExams.slice(0,3).forEach(e=>{ todo.push(`<div class="row-item"><span class="row-title">${escapeHtml(e.title)}<br><span class="row-meta">Imtihon · ${e.sections.length} bo'lim</span></span><button class="btn-primary btn-small" onclick="startExam('${e.id}')">Boshlash</button></div>`); });
+  if(extra.hw && !extra.hw.failed){
+    extra.hw.items.filter(h=>{ const sb = extra.hw.subs[h.id]; return !sb || sb.status==='qayta'; })
+      .sort((a,b)=>(a.deadline||'9999').localeCompare(b.deadline||'9999')).slice(0,3)
+      .forEach(h=>{ const sb = extra.hw.subs[h.id]; const dtxt = hwDeadlineText(h);
+        todo.push(`<div class="row-item"><span class="row-title">${escapeHtml(h.title)}<br><span class="row-meta">${sb?'Uyga vazifa · qayta ishlang':'Uyga vazifa'}${dtxt?` · ${escapeHtml(dtxt)}`:''}</span></span><button class="btn-primary btn-small" onclick="homeOpenHw(${jsArg(h.id)})">${sb?'Ochish':'Topshirish'}</button></div>`); });
+  }
   html += `<div class="lead" style="font-size:1.05rem;margin:6px 0 10px;">Bajarilishi kerak</div>` + (todo.length ? todo.join('') : `<div class="empty">Hammasi bajarilgan. Yangi vazifa qo'shilsa, shu yerda ko'rinadi ✓</div>`);
+  if(extra.p && !extra.p._loadFailed){
+    const lv = prLevel(extra.p.pts), st = prStreakNow(extra.p), nb = Object.keys(extra.p.badges||{}).length;
+    html += `<div class="lead" style="font-size:1.05rem;margin:18px 0 10px;">Mashq</div><div class="row-item"><span class="row-title">${icon('star')}${escapeHtml(lv.name)} · ${extra.p.pts} ball<br><span class="row-meta">Seriya: ${st} kun · yutuqlar: ${nb} / ${BADGES.length}</span><div class="pr-bar" style="margin-top:6px;"><i style="width:${lv.pct}%"></i></div></span><button class="btn-primary btn-small" onclick="showPractice('topics')">Mashq qilish</button></div>`;
+  }
   // o'sish grafigi
   const chart = buildProgressChartHtml(allRows);
   if(chart) html += `<div class="lead" style="font-size:1.05rem;margin:18px 0 10px;">O'sishim</div>` + chart;
@@ -2357,11 +4320,13 @@ async function renderStudentHome(data){
   const pool = buildMistakePool(testRows);
   window._practicePool = pool;
   if(pool.length) html += `<div class="row-item" style="margin-top:12px;"><span class="row-title">Xatolar ustida ishlash<br><span class="row-meta">Oldin noto'g'ri javob bergan ${pool.length} ta savolni mashq qiling (natijaga ta'sir qilmaydi)</span></span><button class="btn-primary btn-small" onclick="startPractice()">Boshlash</button></div>`;
+  html += installRowHtml();
   // bildirishnoma ruxsati
   if('Notification' in window && Notification.permission==='default'){
     html += `<div class="row-item" style="margin-top:12px;"><span class="row-title">Bildirishnomalar<br><span class="row-meta">Yangi test yoki imtihon qo'shilsa, brauzer xabar bersin (sayt ochiq turganda ishlaydi)</span></span><button class="btn-ghost btn-small" onclick="enableStudentNotifications()">Yoqish</button></div>`;
   }
   holder.innerHTML = html;
+  badgesQuickCheck(true);
 }
 /* ---- Yangi test/imtihon bildirishnomalari (sayt ochiq turganda) ---- */
 function seenStore(kind){ return `ft-seen-${kind}:${state.studentSlug}`; }
@@ -2638,6 +4603,7 @@ async function renderStudentProfile(){
 
   if(allRows.length===0){
     body.innerHTML = `<div class="empty">Hali hech qanday test yoki imtihon topshirmagansiz — topshirganingizdan so'ng natijalaringiz shu yerda to'planadi.</div>`;
+    attProfileSection().then(h=>{ if(h) body.insertAdjacentHTML('beforeend', h); });
     return;
   }
 
@@ -2692,6 +4658,7 @@ async function renderStudentProfile(){
   html += sec('Testlar', testRows.length, testHtml) + sec('Imtihonlar', examRows.length, examHtml);
   window._profileRowsCache = allRows;
   body.innerHTML = html;
+  attProfileSection().then(h=>{ if(h) body.insertAdjacentHTML('beforeend', h); });
 }
 /* --- Talaba o'sishi grafigi (inline SVG, kutubxonasiz) --- */
 function buildProgressChartHtml(allRows){
@@ -2729,6 +4696,7 @@ function buildMistakePool(testRows){
   return pool;
 }
 function startPractice(){
+  hideAll(); showScreen('screen-student-profile');
   const pool = (window._practicePool||[]).slice();
   for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
   state.practice = { queue: pool, i:0, right:0, locked:false, wrong:[] };
@@ -2787,12 +4755,14 @@ async function startExam(examId){
   state.currentExamId = examId;
   state.currentSectionIdx = 0;
   state.examAnswers = {};
+  proctorStart('exam');
   showExamSectionIntro();
 }
 function showExamSectionIntro(){
   const ex = state.examConfig.exams.find(e=>e.id===state.currentExamId);
   const sec = ex.sections[state.currentSectionIdx];
   const labels = {open:"Ochiq savollar", mcq:"Test savollari", practical:"Amaliy (provodka)"};
+  proctorPause();
   hideAll();
   showScreen('screen-exam-intro');
   document.getElementById('examIntroBody').innerHTML = `
@@ -2809,6 +4779,7 @@ function beginExamSection(){
   hideAll();
   showScreen('screen-exam-take');
   document.getElementById('examTakeTitle').textContent = `${sec.title} (${state.currentSectionIdx+1}/${ex.sections.length})`;
+  proctorResume();
   if(!state.examAnswers[sec.id]) state.examAnswers[sec.id] = {};
   let html = '';
   sec.questions.forEach((q,qi)=>{
@@ -2883,6 +4854,7 @@ async function finishExamSection(){
    AI grading would require a server-side proxy, e.g. a Supabase Edge Function
    holding the Anthropic API key. */
 async function submitExamForGrading(){
+  const vio = proctorFinish();
   hideAll();
   showScreen('screen-exam-result');
   document.getElementById('examResultBody').innerHTML = `<div class="loading">Natijalar hisoblanmoqda, biroz kuting...</div>`;
@@ -2933,6 +4905,7 @@ async function submitExamForGrading(){
     overallPercentage,
     timestamp: new Date().toISOString()
   };
+  if(vio) record.violations = vio;
   const saved = await saveAttemptOnce('exam', ex.id, record);
   const ok = saved.status==='ok' || saved.status==='exists'; // 'exists' — shu imtihon allaqachon topshirilgan, takror yozilmadi
   document.getElementById('examResultBody').innerHTML = `
@@ -2990,6 +4963,76 @@ function buildShuffledQuestions(questions){
     };
   });
 }
+/* ============ NAZORAT: test/imtihon davomida qoidabuzarlikni qayd etish ============
+   Faqat QAYD etadi: natija bekor qilinmaydi va talaba chiqarib yuborilmaydi. Qaror o'qituvchida.
+   Sanaladi: boshqa varaq/ilova/oynaga o'tish (1,2 soniyadan uzoq), matnni nusxalash/kesish/qo'yish. */
+const PROCTOR_MIN_AWAY_MS = 1200;
+const PROCTOR_LABELS = { tab:"Boshqa varaq yoki ilovaga o'tdi", blur:"Oynadan chiqdi (boshqa oynaga o'tdi)", copy:"Matnni nusxaladi", cut:"Matnni kesib oldi", paste:"Matn qo'ydi (paste)" };
+function proctorStart(kind){
+  state.proctor = { kind, t0:Date.now(), active:true, events:[], count:0, awayMs:0, awayAt:0, awayType:'', lastNoteAt:0 };
+  proctorRender();
+}
+function proctorPause(){ const p = state.proctor; if(!p) return; proctorReturn(); p.active = false; }
+function proctorResume(){ const p = state.proctor; if(!p) return; p.active = true; p.awayAt = 0; proctorRender(); }
+function proctorFinish(){
+  const p = state.proctor; if(!p) return null;
+  proctorReturn(); p.active = false; state.proctor = null; proctorRender();
+  return p.count ? { count:p.count, awaySeconds:Math.round(p.awayMs/1000), events:p.events.slice(0,60) } : null;
+}
+function proctorLeave(type){
+  const p = state.proctor; if(!p || !p.active) return;
+  if(p.awayAt){ if(type==='tab') p.awayType = 'tab'; return; }
+  p.awayAt = Date.now(); p.awayType = type;
+}
+function proctorReturn(){
+  const p = state.proctor; if(!p || !p.awayAt) return;
+  const now = Date.now(), ms = now - p.awayAt, type = p.awayType;
+  p.awayAt = 0; p.awayType = '';
+  if(!p.active || ms < PROCTOR_MIN_AWAY_MS) return;
+  p.count++; p.awayMs += ms;
+  p.events.push({ t:Math.max(0, Math.round((now - ms - p.t0)/1000)), type, s:Math.round(ms/1000) });
+  proctorAfterEvent();
+}
+function proctorNote(type){
+  const p = state.proctor; if(!p || !p.active) return;
+  const now = Date.now(); if(now - p.lastNoteAt < 1500) return; p.lastNoteAt = now;
+  p.count++; p.events.push({ t:Math.round((now - p.t0)/1000), type, s:0 });
+  proctorAfterEvent();
+}
+function proctorAfterEvent(){
+  proctorRender();
+  const p = state.proctor; if(!p) return;
+  showToast(`Ogohlantirish: qoidabuzarlik qayd etildi (${p.count}). O'qituvchi buni ko'radi.`, true);
+}
+function proctorRender(){
+  const p = state.proctor;
+  ['proctorBarTest','proctorBarExam'].forEach(id=>{
+    const el = document.getElementById(id); if(!el) return;
+    el.innerHTML = p ? `${icon('shield')}<span>Nazorat yoqilgan: boshqa oynaga o'tish va nusxa olish qayd etiladi, o'qituvchi ko'radi.</span>${p.count?`<b class="proctor-cnt">Qayd etilgan: ${p.count}</b>`:''}` : '';
+  });
+}
+(function initProctor(){
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden) proctorLeave('tab'); else proctorReturn(); });
+  window.addEventListener('blur', ()=>{ if(!document.hidden) proctorLeave('blur'); });
+  window.addEventListener('focus', ()=>{ proctorReturn(); });
+  ['copy','cut','paste'].forEach(ev=> document.addEventListener(ev, ()=> proctorNote(ev)));
+})();
+/* Admin uchun: qoidabuzarlik belgisi va batafsil jurnal */
+let _vioSeq = 0; window._vioStore = {};
+function vioDur(sec){ return sec>=60 ? `${Math.floor(sec/60)} daq ${sec%60} s` : `${sec} s`; }
+function vioChip(v){
+  if(!v || !v.count) return `<span style="color:var(--ink-soft);">—</span>`;
+  const id = 'v' + (++_vioSeq); window._vioStore[id] = v;
+  return `<button class="vio-chip ${v.count>=3?'vio-hi':'vio-lo'}" onclick="showViolations('${id}')" title="Batafsil ko'rish">⚠ ${v.count}${v.awaySeconds?` · ${vioDur(v.awaySeconds)}`:''}</button>`;
+}
+function showViolations(id){
+  const v = window._vioStore[id]; if(!v) return;
+  const mmss = t=> String(Math.floor(t/60)).padStart(2,'0') + ':' + String(t%60).padStart(2,'0');
+  const rows = (v.events||[]).map(e=> `<div class="vio-row"><span class="mono">${mmss(e.t||0)}</span><span>${escapeHtml(PROCTOR_LABELS[e.type]||e.type)}</span><span style="color:var(--ink-soft);">${e.s?vioDur(e.s):''}</span></div>`).join('');
+  showModalHtml(`<div class="lead" style="font-size:1.1rem;margin-bottom:4px;">Qoidabuzarlik jurnali</div>
+    <p class="desc" style="margin:0 0 8px;">Jami <b>${v.count}</b> ta holat, sahifadan tashqarida <b>${vioDur(v.awaySeconds||0)}</b>. Vaqt — test boshlanganidan beri (daqiqa:soniya). Bu faqat qayd; natija o'zgarmagan.</p>
+    <div class="vio-list">${rows||'<div class="empty">Tafsilot yo\'q</div>'}</div>`);
+}
 async function startTest(testId){
   state.config = await loadConfig();
   const test = state.config.tests.find(t=>t.id===testId);
@@ -3009,6 +5052,7 @@ async function startTest(testId){
   hideAll();
   showScreen('screen-test-take');
   document.getElementById('takeTestTitle').textContent = `${test.topic} — ${test.title||''}`;
+  proctorStart('test');
   renderQuestion();
 }
 function renderQuestion(){
@@ -3104,9 +5148,10 @@ function lockAnswer(oIdx){
 async function exitTest(){
   if(!(await customConfirm("Testni yakunlamasdan chiqmoqchimisiz? Javoblaringiz saqlanmaydi."))) return;
   clearInterval(state.qTimer);
+  proctorFinish();
   renderTestList();
 }
-function backToList(){ clearInterval(state.qTimer); renderTestList(); }
+function backToList(){ clearInterval(state.qTimer); proctorFinish(); renderTestList(); }
 async function finishTest(){
   const test = state.config.tests.find(t=>t.id===state.currentTestId);
   const total = state.shuffledQuestions.length;
@@ -3127,6 +5172,7 @@ async function finishTest(){
     timestamp: new Date().toISOString(),
     detail: state.answers
   };
+  const vio = proctorFinish(); if(vio) record.violations = vio;
   const saved = await saveAttemptOnce('test', test.id, record);
   if(saved.status==='fail'){
     await customAlert("Diqqat: natijangizni saqlashda xatolik yuz berdi. Internetni tekshirib, administratorga xabar bering.");
@@ -3622,6 +5668,9 @@ const BASE_ADMIN_TABS = [
   {id:'home', label:'Bosh sahifa', ic:'home'},
   {id:'tests', label:'Testlar', ic:'book'},
   {id:'exams', label:'Imtihon', ic:'exam'},
+  {id:'practice', label:'Mashq', ic:'star'},
+  {id:'homework', label:'Uyga vazifa', ic:'upload'},
+  {id:'attendance', label:'Davomat', ic:'check'},
   {id:'materials', label:"O'quv materiallari", ic:'folder'},
   {id:'groups', label:'Guruhlar', ic:'users'},
   {id:'accounts', label:'Talaba loginlari', ic:'shield'},
@@ -3886,6 +5935,9 @@ function switchAdminTab(tab){
   if(tab==='block') renderAdminBlock();
   if(tab==='owner') renderOwnerPanel();
   if(tab==='exams') renderAdminExams();
+  if(tab==='practice') renderAdminPractice();
+  if(tab==='homework'){ state.hwAdmin = { view:'list', id:null }; window._draftHw = null; renderAdminHomework(); }
+  if(tab==='attendance') renderAdminAttendance();
   if(tab==='materials') renderAdminMaterials();
   if(tab==='groups') renderAdminGroups();
   if(tab==='accounts') renderAdminAccounts();
@@ -3928,6 +5980,31 @@ function renderAdminHelp(){
     {
       q: "Talaba testni faqat bir marta yecha oladimi?",
       a: `Ha — har bir talaba (ism-familiya-guruh bo'yicha) bitta testni faqat bir marta topshira oladi. Agar qayta topshirishga ruxsat bermoqchi bo'lsangiz, "Natijalar" bo'limida o'sha talabaning natijasi yonidagi "Qayta topshirishga ruxsat" tugmasini bosing.`
+
+    },
+    {
+      q: "Mashq bo'limi nima va nazorat testlaridan nimasi bilan farq qiladi?",
+      a: `«Mashq» — talabalar mustaqil shug'ullanishi uchun alohida bo'lim. Mavzular bo'yicha savollarni siz «Mashq» panelida yaratasiz (yoki Excel/matn orqali import qilasiz, yoki mavjud testdan ko'chirasiz). Talaba xohlagancha ishlaydi, savolning o'zlashtirilishiga qarab ball, seriya (ketma-ket kunlar) va nishon oladi. Mashq <b>nazorat testlari, imtihonlar, sertifikat va asosiy reytingga umuman ta'sir qilmaydi</b> — uning reytingi ham alohida. Kuniga yig'iladigan ball 100 bilan cheklangan, shuning uchun ball «urib olinmaydi».`
+    },
+    {
+      q: "Provodka trenajyori qanday ishlaydi?",
+      a: `Talabaga xo'jalik amaliyoti beriladi, u Debet va Kredit hisobvaraq raqamlarini (4 xonali) yozadi. Javob darrov tekshiriladi va to'g'ri javob izohi ko'rsatiladi. Tayyor to'plam (hisoblar rejasi va ${PROV_BUILTIN.length} ta amaliyot) 2026-yil hisobvaraqlar rejasiga tayyorlangan, lekin <b>albatta o'zingiz tekshirib chiqing</b>: «Mashq → Provodka» bo'limida har bir amaliyotni ko'rish, kerak bo'lmaganini o'chirib qo'yish va o'zingizniki qo'shish mumkin. Tekshirishda provodkalar tartibi muhim emas, summa faqat ma'lumot sifatida ko'rsatiladi.`
+    },
+    {
+      q: "Uyga vazifa qanday beriladi va tekshiriladi?",
+      a: `«Uyga vazifa» panelida «Yangi vazifa»ni bosing: sarlavha, matn, muddat va kimlarga ko'rinishini tanlang. Talaba vazifani rasm, PDF, Word yoki Excel fayl qilib yuklaydi (rasmlar avtomatik kichraytiriladi). «Topshirganlar» bo'limida har bir ishni ochib, holatini («Qabul qilindi» / «Qayta ishlang»), ballini va izohini yozasiz. Muddatdan keyin topshirilgani «kechikkan» deb belgilanadi, lekin topshirishga to'sqinlik qilinmaydi. Qabul qilingan vazifani talaba qayta topshira olmaydi. Natijalarni Excel'ga yuklab olish mumkin.`
+    },
+    {
+      q: "Davomat qanday belgilanadi?",
+      a: `«Davomat» panelida guruh va sanani tanlab, har bir talaba uchun «Keldi / Kelmadi / Sababli» tugmasini bosasiz va «Saqlash»ni bosasiz. Jonli seans tugaganda unga qo'shilgan talabalar o'sha kuni avtomatik «Keldi» deb belgilanadi (siz qo'lda belgilagan bo'lsangiz, o'zgarmaydi). Foiz = «Keldi» / («Keldi» + «Kelmadi»); «Sababli» foizga ta'sir qilmaydi. «Hisobot» bo'limida davr bo'yicha jadvalni ko'rib, Excel'ga yuklab olasiz. Talaba o'z davomatini bosh sahifada va «Natijalarim»da ko'radi.`
+    },
+    {
+      q: "Imtihon paytida qoidabuzarlik qanday qayd etiladi?",
+      a: `Talaba nazorat testi yoki imtihon paytida sahifadan chiqib ketsa (boshqa oyna/ilovaga o'tsa) yoki matnni nusxalasa/qo'ysa, tizim buni jimgina yozib boradi — <b>testni to'xtatmaydi va natijani bekor qilmaydi</b>. Natijalar jadvalidagi «Nazorat» ustunida ⚠ belgisi chiqadi, bosib, aniq vaqtlarini ko'rishingiz mumkin. «Faqat qoidabuzarlik» filtri va Excel hisobotidagi ustunlar ham bor. Qaror — sizniki: bu faqat ma'lumot.`
+    },
+    {
+      q: "Saytni telefonga ilova kabi qanday o'rnataman?",
+      a: `Android (Chrome)da sayt ochilganda pastda «O'rnatish» taklifi chiqadi yoki brauzer menyusidan «Ilovani o'rnatish» / «Bosh ekranga qo'shish»ni tanlang. iPhone (Safari)da «Ulashish» tugmasini bosib, «Bosh ekranga qo'shish»ni tanlang. Talaba bosh sahifada ham «Telefonga o'rnatish» tugmasini ko'radi. Sayt yangilanganda ilova ham avtomatik yangilanadi.`
     }
   ];
   el.innerHTML = `
@@ -4301,7 +6378,7 @@ async function buildExamResultsHtml(examId){
   let html = `<div class="toolbar"><div class="lead" style="margin:0;">${escapeHtml(ex.title)} — Natijalar (${results.length})</div><button class="btn-ghost btn-small" onclick="switchExamsSubTab('list')">Orqaga</button></div>`;
   if(results.length===0){ html += `<div class="empty">Hali hech kim topshirmagan — natijalar shu yerda avtomatik paydo bo'ladi.</div>`; return html; }
   const sorted = [...results].sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp));
-  html += `<div class="tbl-wrap"><table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Ochiq</th><th>Test</th><th>Amaliy</th><th>Umumiy</th><th>Sana</th><th></th></tr></thead><tbody>`;
+  html += `<div class="tbl-wrap"><table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Ochiq</th><th>Test</th><th>Amaliy</th><th>Umumiy</th><th>Nazorat</th><th>Sana</th><th></th></tr></thead><tbody>`;
   sorted.forEach(r=>{
     const slug = resultSlug(r);
     const openCell = r.openMax===0 ? '—' : (r.openGraded ? `${r.openScore}/${r.openMax}` : `<span style="color:var(--gold,#C9A227);">Kutilmoqda</span>`);
@@ -4313,6 +6390,7 @@ async function buildExamResultsHtml(examId){
       <td>${r.mcqScore}/${r.mcqMax}</td>
       <td>${r.practicalScore}/${r.practicalMax}</td>
       <td class="pct-cell ${r.overallPercentage<60?'pct-low':'pct-ok'}">${r.overallPercentage}%</td>
+      <td>${vioChip(r.violations)}</td>
       <td>${new Date(r.timestamp).toLocaleDateString('uz-UZ')}</td>
       <td>${gradeBtn}</td>
     </tr>`;
@@ -4613,15 +6691,16 @@ function assignToOptionsHtml(assignTo, kind){
         </label>`).join('')}
     </div>`;
 }
+function assignDraft(kind){ return kind==='test' ? window._draftTest : kind==='exam' ? window._draftExam : kind==='practice' ? window._draftPractice : kind==='hw' ? window._draftHw : null; }
 function setAssignType(kind, val){
-  const d = kind==='test' ? window._draftTest : window._draftExam;
+  const d = assignDraft(kind);
   if(!d.assignTo) d.assignTo = {type:'all', groups:[], accounts:[]};
   d.assignTo.type = val;
   document.getElementById(`${kind}AssignGroupsBox`).classList.toggle('hidden', val!=='groups');
   document.getElementById(`${kind}AssignAccountsBox`).classList.toggle('hidden', val!=='accounts');
 }
 function toggleAssignItem(kind, field, value, checked){
-  const d = kind==='test' ? window._draftTest : window._draftExam;
+  const d = assignDraft(kind);
   if(!d.assignTo) d.assignTo = {type:'all', groups:[], accounts:[]};
   if(!d.assignTo[field]) d.assignTo[field] = [];
   if(checked){ if(!d.assignTo[field].includes(value)) d.assignTo[field].push(value); }
@@ -5266,6 +7345,7 @@ async function hostEndSession(){
     listLivePlayers(live.sessionId),
     storageGetObjects(`live-answer:${live.sessionId}:`, {fresh:true})
   ]);
+  attAutoFromLive(players);
   const finalLb = await computeCumulativeLeaderboard(live.sessionId, live.testId, test.questions.length-1, players, allAnswers);
   document.getElementById('liveHostBody').innerHTML = `
     <div class="lead" style="text-align:center;margin-bottom:18px;">Yakuniy reyting — ${escapeHtml(test.topic)}</div>
@@ -5318,6 +7398,9 @@ async function renderAdminResults(){
     <select id="resultBandFilter" onchange="filterAdminResults()" style="flex:1 1 140px;">
       <option value="">Barcha natijalar</option><option value="low">60% dan past</option><option value="mid">60–79%</option><option value="high">80% va yuqori</option>
     </select>
+    <select id="resultVioFilter" onchange="filterAdminResults()" style="flex:1 1 150px;">
+      <option value="">Nazorat: hammasi</option><option value="vio">Faqat qoidabuzarlik qayd etilgan</option>
+    </select>
     <input type="date" id="resultFrom" onchange="filterAdminResults()" title="Boshlanish sanasi" style="flex:0 1 150px;">
     <input type="date" id="resultTo" onchange="filterAdminResults()" title="Tugash sanasi" style="flex:0 1 150px;">
     <button class="btn-ghost btn-small" onclick="resetResultFilters()">Tozalash</button>
@@ -5327,7 +7410,7 @@ async function renderAdminResults(){
 }
 function setResultsView(v){ state.resultsView = v; renderAdminResults(); }
 function resetResultFilters(){
-  ['resultSearch','resultGroupFilter','resultTopicFilter','resultBandFilter','resultFrom','resultTo'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+  ['resultSearch','resultGroupFilter','resultTopicFilter','resultBandFilter','resultVioFilter','resultFrom','resultTo'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
   filterAdminResults();
 }
 function filterAdminResults(){
@@ -5342,6 +7425,7 @@ function filterAdminResults(){
   if(band==='low') filtered = filtered.filter(r=>r.percentage<60);
   if(band==='mid') filtered = filtered.filter(r=>r.percentage>=60 && r.percentage<80);
   if(band==='high') filtered = filtered.filter(r=>r.percentage>=80);
+  if(g('resultVioFilter')==='vio') filtered = filtered.filter(r=>r.violations && r.violations.count>0);
   if(from!==null) filtered = filtered.filter(r=>new Date(r.timestamp).getTime()>=from);
   if(to!==null) filtered = filtered.filter(r=>new Date(r.timestamp).getTime()<=to);
   _filteredResultsCache = filtered;
@@ -5362,7 +7446,7 @@ function drawResultsView(results){
   if(!holder) return;
   const view = state.resultsView || 'attempts';
   if(view==='attempts'){
-    holder.innerHTML = `<div class="tbl-wrap"><table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Mavzu</th><th>Natija</th><th>Ball</th><th>Sana</th><th></th></tr></thead><tbody id="resultsTableBody"></tbody></table></div>`;
+    holder.innerHTML = `<div class="tbl-wrap"><table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Mavzu</th><th>Natija</th><th>Ball</th><th>Nazorat</th><th>Sana</th><th></th></tr></thead><tbody id="resultsTableBody"></tbody></table></div>`;
     drawResultsTable(results); return;
   }
   if(results.length===0){ holder.innerHTML = `<div class="empty">Natija topilmadi.</div>`; return; }
@@ -5389,9 +7473,9 @@ function drillResults(kind, value){
 function exportResultsToExcel(){
   const results = _filteredResultsCache || _allResultsCache || [];
   if(results.length===0){ showToast("Eksport qilish uchun natija yo'q.", true); return; }
-  const rows = [["Ism va Familiya","Guruh","Mavzu","Sarlavha","To'g'ri javob","Jami savol","Foiz","Ball","Sana"]];
+  const rows = [["Ism va Familiya","Guruh","Mavzu","Sarlavha","To'g'ri javob","Jami savol","Foiz","Ball","Sana","Qoidabuzarlik (soni)","Sahifadan tashqarida (soniya)"]];
   [...results].sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp)).forEach(r=>{
-    rows.push([r.studentName, r.studentGroup||'', r.topic, r.title||'', r.score, r.total, r.percentage, r.totalScore!==undefined?r.totalScore:'', new Date(r.timestamp).toLocaleString('uz-UZ')]);
+    rows.push([r.studentName, r.studentGroup||'', r.topic, r.title||'', r.score, r.total, r.percentage, r.totalScore!==undefined?r.totalScore:'', new Date(r.timestamp).toLocaleString('uz-UZ'), r.violations?r.violations.count:0, r.violations?(r.violations.awaySeconds||0):0]);
   });
   const ws = XLSX.utils.aoa_to_sheet(rows);
   const wb = XLSX.utils.book_new();
@@ -5402,7 +7486,7 @@ function exportResultsToExcel(){
 function drawResultsTable(results){
   _filteredResultsCache = results;
   const body = document.getElementById('resultsTableBody');
-  if(results.length===0){ body.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--ink-soft);padding:20px;">Natija topilmadi</td></tr>`; return; }
+  if(results.length===0){ body.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--ink-soft);padding:20px;">Natija topilmadi</td></tr>`; return; }
   const sorted = [...results].sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp));
   body.innerHTML = sorted.map(r=>`
     <tr>
@@ -5411,6 +7495,7 @@ function drawResultsTable(results){
       <td>${escapeHtml(r.topic)}</td>
       <td class="pct-cell ${r.percentage<60?'pct-low':'pct-ok'}">${r.score}/${r.total} (${r.percentage}%)</td>
       <td class="pct-cell pct-ok">${r.totalScore!==undefined ? r.totalScore : '—'}</td>
+      <td>${vioChip(r.violations)}</td>
       <td>${new Date(r.timestamp).toLocaleDateString('uz-UZ')}</td>
       <td><button class="btn-ghost btn-small" onclick="resetResult('${r.testId}','${resultSlug(r)}')">Qayta topshirishga ruxsat</button></td>
     </tr>`).join('');
@@ -5979,6 +8064,7 @@ async function renameGroupPrompt(id){
         await saveExamConfig(ec);
       }
     }catch(e){ console.error('exam assign rename', e); }
+    try{ await extrasRenameGroup(oldName, g.name); }catch(e){ console.error('extras rename', e); }
   }
   if(ok) showToast("Guruh nomi yangilandi ✓");
   else { state.config.groups = backupGroups; state.config.accessCodes = backupCodes; state.config.studentAccounts = backupAccounts; state.config.tests = backupTests; }
@@ -6024,6 +8110,7 @@ async function deleteGroupFully(name){
   if(!ok){ state.config.groups=backup.g; state.config.accessCodes=backup.c; state.config.studentAccounts=backup.a; state.config.tests=backup.t; renderAdminGroups(); return; }
   const ec = await loadExamConfig();
   if(!ec._loadFailed){ let changed=false; (ec.exams||[]).forEach(e=>{ if(e.assignTo && e.assignTo.groups && e.assignTo.groups.includes(name)){ dropGroup(e); changed=true; } }); if(changed) await saveExamConfig(ec); }
+  try{ await extrasDropGroup(name, alsoResults); }catch(e){ console.error('extras drop', e); }
   showToast("Guruh sozlamalari o'chirildi, ma'lumotlar tozalanmoqda...");
   const delKeys = [];
   (await storageGetRows('roster:')).forEach(r=>{ try{ if(JSON.parse(r.value).group===name) delKeys.push(r.key); }catch(e){} });
