@@ -411,6 +411,44 @@
   .pr-expl{margin-top:8px;font-size:0.9rem;color:var(--ink-soft);line-height:1.5;}
   :root[data-theme="light"] .pr-lvl,:root[data-theme="light"] .pr-chip,:root[data-theme="light"] .bdg-card,:root[data-theme="light"] .hw-file{background:#F4F8F6;}
   :root[data-theme="light"] .pr-bar{background:rgba(15,42,38,0.12);}
+  .badge-new{background:var(--gold,#C9A227);color:#1b1500;font-weight:700;margin-left:6px;}
+  .fv-root{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;}
+  .fv-root.hidden{display:none;}
+  body.fv-open{overflow:hidden;}
+  .fv-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--edge);background:var(--card);flex:0 0 auto;}
+  .fv-title{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1;}
+  .fv-actions{display:flex;gap:8px;flex:0 0 auto;}
+  .fv-body{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:10px 8px;display:flex;flex-direction:column;}
+  .fv-body .loading{margin:auto;}
+  .fv-msg{margin:auto;text-align:center;max-width:420px;padding:20px;}
+  .fv-msg p{margin:0 0 14px;line-height:1.5;}
+  .fv-img{margin:auto;display:flex;align-items:center;justify-content:center;max-width:100%;}
+  .fv-img img{max-width:100%;max-height:calc(100vh - 90px);object-fit:contain;cursor:zoom-in;border-radius:6px;}
+  .fv-img.zoom{display:block;margin:0;}
+  .fv-img.zoom img{max-width:none;max-height:none;cursor:zoom-out;}
+  .fv-pdf{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .fv-page{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.35);flex:0 0 auto;}
+  .fv-page canvas{display:block;}
+  .fv-frame{flex:1;width:100%;min-height:60vh;border:0;border-radius:8px;background:#fff;}
+  .fv-sheets{display:flex;gap:6px;overflow-x:auto;padding:0 2px 8px;flex:0 0 auto;}
+  .hw-fileitem{display:inline-flex;align-items:stretch;gap:4px;max-width:100%;}
+  .hw-fileitem .hw-file{cursor:pointer;font:inherit;font-size:0.85rem;}
+  .hw-save{display:inline-flex;align-items:center;justify-content:center;padding:0 10px;border:1px solid var(--edge);border-radius:10px;background:rgba(0,0,0,0.14);color:var(--ink);cursor:pointer;}
+  .hw-save .icon{width:16px;height:16px;}
+  .hw-thumbbtn{padding:0;border:0;background:none;cursor:pointer;}
+  @media (max-width:480px){ #studentNav .tab{padding:8px 8px;font-size:0.75rem;} #studentNav .tabs{gap:5px;} #studentNav .count-badge{margin-left:4px;min-width:16px;height:16px;font-size:0.62rem;} }
+  .remember{display:flex;gap:8px;align-items:center;margin:2px 0 14px;font-size:0.85rem;color:var(--ink-soft);cursor:pointer;line-height:1.35;}
+  .remember input{width:auto;margin:0;flex:0 0 auto;}
+  .quote-box{margin-top:12px;padding:10px 12px;border-left:3px solid var(--teal);background:rgba(47,199,174,0.07);border-radius:0 10px 10px 0;}
+  .quote-text{font-style:italic;line-height:1.5;font-size:0.95rem;}
+  .quote-by{margin-top:4px;font-size:0.8rem;color:var(--ink-soft);font-weight:600;}
+  :root[data-theme="light"] .quote-box{background:rgba(14,138,118,0.07);}
+  .prov-timer{display:flex;align-items:center;gap:10px;margin:0 0 12px;}
+  .prov-timer .bar{flex:1;height:7px;border-radius:99px;background:rgba(255,255,255,0.09);overflow:hidden;}
+  .prov-timer .bar>i{display:block;height:100%;width:100%;background:var(--teal);border-radius:99px;transition:width .2s linear;}
+  .prov-timer .sec{font-family:'IBM Plex Mono',monospace;font-weight:600;min-width:3.4em;text-align:right;color:var(--ink-soft);}
+  .prov-timer.low .bar>i{background:var(--red);} .prov-timer.low .sec{color:var(--red);}
+  :root[data-theme="light"] .prov-timer .bar{background:rgba(15,42,38,0.12);}
   .prov-cats{display:flex;flex-wrap:wrap;gap:8px;}
   .prov-row{display:grid;grid-template-columns:28px 1fr 1fr;gap:12px;margin-bottom:12px;align-items:start;}
   .prov-n{font-family:'IBM Plex Mono',monospace;color:var(--teal);font-weight:600;padding-top:30px;}
@@ -499,6 +537,7 @@
         <input type="text" id="studentAccessCodeInput" placeholder="O'qituvchingizdan olingan kod">
         <p class="desc" style="margin:6px 0 0;font-size:0.8rem;">Guruhingiz yoki shaxsingiz uchun berilgan kodni kiriting.</p>
       </div>
+      <label class="remember"><input type="checkbox" id="rememberCode" checked> Meni eslab qol — bu qurilmada qayta kirish shart bo'lmaydi</label>
       <button class="btn-primary" onclick="handleJoin()">Kirish</button>
     </div>
     <div id="joinMode-account" class="hidden">
@@ -511,10 +550,13 @@
         <label>Parol</label>
         <input type="password" id="studentPasswordInput" placeholder="Parolingiz">
       </div>
+      <label class="remember"><input type="checkbox" id="rememberAcct" checked> Meni eslab qol — parol o'zgartirilmaguncha qayta kirish shart emas</label>
       <button class="btn-primary" onclick="handleAccountLogin()">Kirish</button>
     </div>
     <div class="footer-link"><button class="toplink hidden" id="installLink" onclick="installApp()">Telefonga o'rnatish</button> <button class="toplink" onclick="showAdminLogin()">Boshqaruv paneli</button></div>
   </div>
+
+  <div id="bootSplash" class="card hidden"><div class="loading">Yuklanmoqda...</div></div>
 
   <!-- STUDENT: TEST LIST -->
   <div id="screen-test-list" class="card hidden">
@@ -713,13 +755,6 @@
     <div id="adminTab-owner" class="admin-tab card hidden owner-strip"></div>
   </div>
 
-</div>
-
-<div id="modalOverlay" class="modal-overlay hidden">
-  <div class="modal-box">
-    <div class="modal-message" id="modalMessage"></div>
-    <div class="modal-actions" id="modalActions"></div>
-  </div>
 </div>
 
 <script>
@@ -1315,6 +1350,7 @@ async function getResult(testId, slug){
   try{ return JSON.parse(raw); }catch(e){ return null; }
 }
 async function saveResult(testId, slug, data){
+  state._sdCache = null;
   return await storageSet(`result:${testId}:${slug}`, JSON.stringify(data));
 }
 async function deleteResultKey(testId, slug){
@@ -1397,6 +1433,7 @@ async function saveExamConfig(cfg){
   return ok;
 }
 async function saveExamResult(examId, slug, data){
+  state._sdCache = null;
   return await storageSet(`exam-result:${examId}:${slug}`, JSON.stringify(data));
 }
 async function getExamResult(examId, slug){
@@ -1987,16 +2024,27 @@ async function listLiveAnswersForQuestion(sessionId, qIndex){
 
 /* ============ INIT ============ */
 window.addEventListener('DOMContentLoaded', async ()=>{
+  navInit();
   const logoImg = document.querySelector('.brand img');
   const faviconLink = document.getElementById('faviconLink');
   if(logoImg && faviconLink) faviconLink.href = logoImg.src;
-  state.config = await loadConfig();
-  state.examConfig = await loadExamConfig();
   const urlParams = new URLSearchParams(window.location.search);
-  state.lockedTestId = urlParams.get('test') || null;
   const liveSid = urlParams.get('live'), liveCh = urlParams.get('ch');
+  const saved = (liveSid && liveCh) ? null : readStudentSession();
+  if(saved) bootSplash(true);                       // kirish oynasi bir lahza ko'rinib qolmasin
+  const [cfg, ec] = await Promise.all([ loadConfig(), loadExamConfig() ]);
+  state.config = cfg; state.examConfig = ec;
+  state.lockedTestId = urlParams.get('test') || null;
   if(liveSid && liveCh){ state.liveLink = { sessionId: liveSid, channel: liveCh }; await showLiveLink(); return; }
-  showJoin();
+  if(saved){
+    let r = { ok:false };
+    try{ r = await restoreStudentSession(); }catch(e){ console.error('restore', e); }
+    if(r.ok){
+      try{ await studentEnterAfterLogin(); return; }catch(e){ console.error('enter', e); }
+    }
+    showJoin();
+    if(r.msg) showToast(r.msg, !!r.keep);
+  } else showJoin();
   if(state.lockedTestId){
     const t = state.config.tests.find(x=>x.id===state.lockedTestId);
     const noteEl = document.getElementById('joinLockedNote');
@@ -2008,10 +2056,11 @@ window.addEventListener('DOMContentLoaded', async ()=>{
 });
 
 /* ============ PROVODKA TRENAJYORI: hisoblar rejasi va tayyor amaliyotlar ============
-   Hisoblar rejasi — buxgalter.uz (Hisobvaraqlar rejasi, 01.01.2026 tahriri) bo'yicha tekshirilgan 4 xonali hisobvaraqlar. */
+   Hisoblar rejasi — 21-son BHMS (Iqtisodiyot va moliya vazirligi buyrug'i, 14.11.2024, ro'yxat raqami 3593; 2025-yil tahriri) va buxgalter.uz bo'yicha 4 xonali hisobvaraqlar. */
 const PROV_ACCOUNTS_RAW = `
 0110|Yer
 0111|Yerni obodonlashtirish
+0112|Moliyaviy ijaraga olingan asosiy vositalarni obodonlashtirish
 0120|Binolar, inshootlar va uzatuvchi moslamalar
 0130|Mashina va asbob-uskunalar
 0140|Mebel va ofis jihozlari
@@ -2022,6 +2071,7 @@ const PROV_ACCOUNTS_RAW = `
 0190|Boshqa asosiy vositalar
 0199|Konservatsiya qilingan asosiy vositalar
 0211|Yerni obodonlashtirishning eskirishi
+0212|Moliyaviy ijaraga olingan asosiy vositalarni obodonlashtirishning eskirishi
 0220|Bino, inshoot va uzatuvchi moslamalarning eskirishi
 0230|Mashina va asbob-uskunalarning eskirishi
 0240|Mebel va ofis jihozlarining eskirishi
@@ -2031,6 +2081,7 @@ const PROV_ACCOUNTS_RAW = `
 0280|Ko'p yillik o'simliklarning eskirishi
 0290|Boshqa asosiy vositalarning eskirishi
 0299|Moliyaviy ijaraga olingan asosiy vositalarning eskirishi
+0310|Moliyaviy ijaraga olingan asosiy vositalar
 0410|Patentlar, litsenziyalar va nou-xau
 0420|Savdo markalari, tovar belgilari va sanoat namunalari
 0430|Dasturiy ta'minot
@@ -2046,6 +2097,13 @@ const PROV_ACCOUNTS_RAW = `
 0560|Franchayzing amortizatsiyasi
 0570|Mualliflik huquqlarining amortizatsiyasi
 0590|Boshqa nomoddiy aktivlarning amortizatsiyasi
+0610|Qimmatli qog'ozlar (uzoq muddatli investitsiyalar)
+0620|Sho''ba xo'jalik jamiyatlariga investitsiyalar
+0630|Qaram xo'jalik jamiyatlariga investitsiyalar
+0640|Chet el kapitali ishtirokidagi tashkilotlarga investitsiyalar
+0690|Boshqa uzoq muddatli investitsiyalar
+0710|O'rnatiladigan asbob-uskunalar — mahalliy
+0720|O'rnatiladigan asbob-uskunalar — xorijiy
 0810|Tugallanmagan qurilish
 0820|Asosiy vositalarni xarid qilish
 0830|Nomoddiy aktivlarni xarid qilish
@@ -2054,6 +2112,13 @@ const PROV_ACCOUNTS_RAW = `
 0860|Moliyaviy ijaraga olingan asosiy vositalarga kapital qo'yilmalar
 0870|Operativ ijaraga olingan asosiy vositalarga kapital qo'yilmalar
 0890|Boshqa kapital qo'yilmalar
+0910|Olingan veksellar (uzoq muddatli)
+0920|Moliyaviy ijara bo'yicha olinadigan to'lovlar (uzoq muddatli)
+0930|Xodimlarning uzoq muddatli qarzlari
+0940|Boshqa uzoq muddatli debitorlik qarzlar
+0950|Vaqtinchalik farqlar bo'yicha kechiktirilgan foyda solig'i
+0960|Diskont (chegirma)lar bo'yicha uzoq muddatli kechiktirilgan xarajatlar
+0990|Boshqa uzoq muddatli kechiktirilgan xarajatlar
 1010|Xom ashyo va materiallar
 1020|Sotib olingan yarim tayyor mahsulotlar va butlovchi buyumlar
 1030|Yoqilg'ilar
@@ -2063,9 +2128,16 @@ const PROV_ACCOUNTS_RAW = `
 1070|Chetga qayta ishlash uchun berilgan materiallar
 1080|Inventar va xo'jalik jihozlari
 1090|Boshqa materiallar
+1110|O'stirishdagi hayvonlar
+1120|Bo'rdoqidagi hayvonlar
 1510|Materiallarni tayyorlash va xarid qilish
+1610|Materiallar qiymatidagi farqlar
 2010|Asosiy ishlab chiqarish
+2110|O'zida ishlab chiqarilgan yarim tayyor mahsulotlar
+2310|Yordamchi ishlab chiqarish
 2510|Umumiy ishlab chiqarish xarajatlari
+2610|Ishlab chiqarishdagi yaroqsiz mahsulotlar
+2710|Xizmat ko'rsatuvchi xo'jaliklar
 2810|Ombordagi tayyor mahsulotlar
 2820|Ko'rgazmadagi tayyor mahsulotlar
 2830|Vositachilik shartnomasi bo'yicha berilgan tayyor mahsulotlar
@@ -2079,8 +2151,15 @@ const PROV_ACCOUNTS_RAW = `
 2980|Savdo ustamasi
 2990|Boshqa tovarlar
 3110|Oldindan to'langan operativ ijara haqi
+3120|Oldindan to'langan xizmat haqi
+3190|Boshqa kelgusi davr xarajatlari
+3210|Vaqtinchalik farqlar bo'yicha kechiktirilgan foyda solig'i (joriy qism)
+3220|Diskont (chegirma)lar bo'yicha kechiktirilgan xarajatlar
+3290|Boshqa kechiktirilgan xarajatlar
 4010|Xaridorlar va buyurtmachilardan olinadigan hisobvaraqlar
 4020|Olingan veksellar
+4110|Ajratilgan bo'linmalardan olinadigan to'lovlar
+4120|Sho''ba va qaram xo'jalik jamiyatlaridan olinadigan to'lovlar
 4210|Ish haqi bo'yicha berilgan bo'naklar
 4220|Xizmat safarlariga berilgan bo'naklar
 4230|Umumxo'jalik xarajatlari uchun berilgan bo'naklar
@@ -2089,6 +2168,8 @@ const PROV_ACCOUNTS_RAW = `
 4320|Uzoq muddatli aktivlar uchun mol yetkazib beruvchilar va pudratchilarga berilgan bo'naklar
 4330|Boshqa berilgan bo'naklar
 4410|Byudjetga soliqlar va yig'imlar bo'yicha bo'nak to'lovlari
+4510|Sug'urtalar bo'yicha bo'nak to'lovlari
+4520|Davlat maqsadli jamg'armalariga bo'nak to'lovlari
 4610|Ustav kapitaliga ta'sischilarning ulushlari bo'yicha qarzi
 4710|Kreditga sotilgan tovarlar bo'yicha xodimlarning qarzi
 4720|Berilgan qarzlar bo'yicha xodimlarning qarzi
@@ -2105,8 +2186,22 @@ const PROV_ACCOUNTS_RAW = `
 5010|Milliy valyutadagi pul mablag'lari (kassa)
 5020|Chet el valyutasidagi pul mablag'lari (kassa)
 5110|Hisob-kitob hisobvarag'i
+5210|Mamlakat ichidagi chet el valyutasi hisobvaraqlari
+5220|Chet eldagi valyuta hisobvaraqlari
+5510|Akkreditivlar
+5520|Chek daftarchalari
+5530|Boshqa maxsus hisobvaraqlar
+5610|Pul ekvivalentlari (turlari bo'yicha)
+5710|Yo'ldagi pul mablag'(o'tkazma)lari
+5810|Qisqa muddatli investitsiyalar: qimmatli qog'ozlar
+5830|Berilgan qisqa muddatli qarzlar
+5890|Boshqa joriy investitsiyalar
+5910|Kamomadlar va qiymatliklarning buzilishidan yo'qotishlar
+5920|Boshqa joriy aktivlar
 6010|Mol yetkazib beruvchilar va pudratchilarga to'lovlar
 6020|Berilgan veksellar
+6110|Ajratilgan bo'linmalarga to'lovlar
+6120|Sho''ba va qaram xo'jalik jamiyatlariga to'lovlar
 6210|Diskont (chegirma)lar ko'rinishidagi kechiktirilgan daromadlar
 6220|Mukofot (ustama)lar ko'rinishidagi kechiktirilgan daromadlar
 6230|Boshqa kechiktirilgan daromadlar
@@ -2136,10 +2231,23 @@ const PROV_ACCOUNTS_RAW = `
 6960|Da'volar bo'yicha to'lovlar
 6970|Hisobdor shaxslarga bo'lgan qarzlar
 6990|Boshqa majburiyatlar
+7010|Mol yetkazib beruvchilar va pudratchilarga uzoq muddatli to'lovlar
+7020|Berilgan uzoq muddatli veksellar
+7110|Ajratilgan bo'linmalarga bo'lgan uzoq muddatli qarzlar
+7120|Sho''ba va qaram xo'jalik jamiyatlariga bo'lgan uzoq muddatli qarzlar
+7210|Diskont (chegirma)lar ko'rinishidagi uzoq muddatli kechiktirilgan daromadlar
+7220|Mukofot (ustama)lar ko'rinishidagi uzoq muddatli kechiktirilgan daromadlar
+7230|Boshqa uzoq muddatli kechiktirilgan daromadlar
+7240|Soliqlar va yig'imlar bo'yicha uzoq muddatli kechiktirilgan majburiyatlar
+7250|Vaqtinchalik farqlar bo'yicha kechiktirilgan foyda solig'i uzoq muddatli majburiyatlari
+7290|Boshqa uzoq muddatli kechiktirilgan majburiyatlar
+7310|Xaridorlar va buyurtmachilardan olingan bo'naklar — uzoq muddatli qismi
 7810|Uzoq muddatli kreditlar
 7820|Uzoq muddatli qarzlar
 7830|To'lanadigan uzoq muddatli obligatsiyalar
 7840|To'lanadigan uzoq muddatli veksellar
+7910|To'lanadigan moliyaviy ijara
+7920|Kreditorlarga bo'lgan boshqa uzoq muddatli qarzlar
 8310|Oddiy aksiyalar
 8320|Imtiyozli aksiyalar
 8330|Pay va ulushlar
@@ -2148,8 +2256,15 @@ const PROV_ACCOUNTS_RAW = `
 8510|Uzoq muddatli aktivlarni qayta baholash bo'yicha tuzatishlar
 8520|Rezerv kapitali (fondi)
 8530|Tekinga olingan mol-mulk
+8610|Sotib olingan xususiy aksiyalar — oddiy
+8620|Sotib olingan xususiy aksiyalar — imtiyozli
 8710|Hisobot davrining taqsimlanmagan foydasi (qoplanmagan zarari)
 8720|Jamg'arilgan foyda (qoplanmagan zarar)
+8810|Grantlar
+8820|Subsidiyalar
+8830|A'zolik badallari
+8840|Maqsadli foydalaniladigan soliq imtiyozlari
+8890|Boshqa maqsadli tushumlar
 8910|Kelgusi xarajatlar va to'lovlar zaxiralari
 9010|Tayyor mahsulotlarni sotishdan daromadlar
 9020|Tovarlarni sotishdan daromadlar
@@ -2159,6 +2274,8 @@ const PROV_ACCOUNTS_RAW = `
 9110|Sotilgan tayyor mahsulotlarning tannarxi
 9120|Sotilgan tovarlarning tannarxi
 9130|Bajarilgan ish va ko'rsatilgan xizmatlarning tannarxi
+9140|Davriy hisobda tovar-moddiy zaxiralarni sotib olish/xarid qilish
+9150|Davriy hisobda tovar-moddiy zaxiralar bo'yicha tuzatishlar
 9210|Asosiy vositalarning chiqib ketishi
 9220|Boshqa aktivlarning chiqib ketishi
 9310|Asosiy vositalarning chiqib ketishidan foyda
@@ -2184,6 +2301,8 @@ const PROV_ACCOUNTS_RAW = `
 9620|Valyutalar kursi farqidan zararlar
 9630|Qimmatli qog'ozlarni chiqarish va tarqatish bo'yicha xarajatlar
 9690|Moliyaviy faoliyat bo'yicha boshqa xarajatlar
+9710|Favqulodda vaziyatlardan olingan foydalar
+9720|Favqulodda vaziyatlardan ko'rilgan zararlar
 9810|Foyda solig'i bo'yicha xarajatlar
 9820|Foydadan hisoblangan boshqa soliq majburiyatlari bo'yicha xarajatlar
 9910|Yakuniy moliyaviy natija (foyda yoki zarar)
@@ -2195,7 +2314,7 @@ const PROV_SECTIONS = [
   ['4',"Debitorlik qarzlari (olinadigan hisobvaraqlar)"], ['5',"Pul mablag'lari"], ['6',"Joriy majburiyatlar"], ['7',"Uzoq muddatli majburiyatlar"],
   ['8',"Kapital"], ['9',"Daromad va xarajatlar"]
 ];
-const PROV_LEVELS = { 1:"Oson: 1 ta provodka", 2:"O'rta: 2 ta provodka yoki QQS", 3:"Murakkab: 3 ta provodka" };
+const PROV_LEVELS = { 1:"Oson: 1 ta provodka (15 soniya)", 2:"O'rta: 2 ta provodka (20 soniya)", 3:"Murakkab: 3–4 ta provodka (25–30 soniya)" };
 /* Tayyor amaliyotlar: [id, daraja, bo'lim, matn, "dt>kt>summa;..." , izoh]. Summalar faqat misol uchun (tekshirilmaydi). */
 const PROV_OPS_RAW = [
  ['b01',1,"Kapital va pul","Ta'sischilar ustav kapitaliga 50 000 000 so'm ulush qo'shishni e'lon qildi (pul hali kiritilmagan).","4610>8330>50000000","Ta'sischining qarzi (aktiv) paydo bo'ldi: Dt 4610. Ustav kapitali (passiv) ko'paydi: Kt 8330."],
@@ -2268,7 +2387,438 @@ const PROV_OPS_RAW = [
  ['d03',3,"Mehnat haqi","Ma'muriy xodimlarga 9 000 000 so'm ish haqi hisoblandi, JShDS 1 080 000 so'm ushlab qolindi va 4 000 000 so'm kassadan berildi.","9420>6710>9000000;6710>6410>1080000;6710>5010>4000000","Hisoblash: Dt 9420 Kt 6710. JShDS: Dt 6710 Kt 6410. Berish: Dt 6710 Kt 5010."],
  ['d04',3,"QQS","Materiallar (10 000 000 so'm + QQS 1 200 000 so'm) olindi va hisob-kitob schyotidan to'liq to'landi.","1010>6010>10000000;4410>6010>1200000;6010>5110>11200000","Material: Dt 1010 Kt 6010. Kirim QQS: Dt 4410 Kt 6010. To'lov (QQS bilan): Dt 6010 Kt 5110."],
  ['d05',3,"Asosiy vositalar","Kompyuter 8 000 000 so'mga olinib ishga tushirildi; keyin ma'muriy foydalanishdagi shu kompyuterga 200 000 so'm amortizatsiya hisoblandi.","0820>6010>8000000;0150>0820>8000000;9420>0250>200000","Xarid: Dt 0820 Kt 6010. Ishga tushirish: Dt 0150 Kt 0820. Amortizatsiya: Dt 9420 Kt 0250."],
- ['d06',3,"Yakuniy natija","Yil oxirida (soddalashtirilgan misol): daromad 30 000 000 va tannarx 18 000 000 so'm yakuniy natijaga yopildi, sof foyda taqsimlanmagan foydaga o'tkazildi.","9010>9910>30000000;9910>9110>18000000;9910>8710>12000000","Daromad: Dt 9010 Kt 9910. Tannarx: Dt 9910 Kt 9110. Foyda: Dt 9910 Kt 8710."]
+ ['d06',3,"Yakuniy natija","Yil oxirida (soddalashtirilgan misol): daromad 30 000 000 va tannarx 18 000 000 so'm yakuniy natijaga yopildi, sof foyda taqsimlanmagan foydaga o'tkazildi.","9010>9910>30000000;9910>9110>18000000;9910>8710>12000000","Daromad: Dt 9010 Kt 9910. Tannarx: Dt 9910 Kt 9110. Foyda: Dt 9910 Kt 8710."],
+ ["n001",1,"Kapital va pul","Ta'sischi ustav kapitaliga ulushini 12 000 000 so'mlik kompyuter jihozlari bilan kiritdi.","0150>4610>12000000","Kompyuter jihozlari (asosiy vosita) kirim bo'ldi: Dt 0150. Ta'sischining ulush bo'yicha qarzi so'ndi: Kt 4610."],
+ ["n002",1,"Kapital va pul","Ta'sischi ulushini 6 000 000 so'mlik xom ashyo va materiallar bilan kiritdi.","1010>4610>6000000","Materiallar kirim bo'ldi: Dt 1010. Ta'sischining qarzi so'ndi: Kt 4610."],
+ ["n003",1,"Kapital va pul","Ta'sischi ulushini 5 000 000 so'm naqd pul bilan kassaga kiritdi.","5010>4610>5000000","Kassaga pul kirdi: Dt 5010. Ta'sischining qarzi so'ndi: Kt 4610."],
+ ["n004",1,"Kapital va pul","Ta'sischi ulushini 9 000 000 so'mlik tovarlar bilan kiritdi.","2910>4610>9000000","Ombordagi tovarlar kirim bo'ldi: Dt 2910. Ta'sischining qarzi so'ndi: Kt 4610."],
+ ["n005",1,"Kapital va pul","Ta'sischi ulushini 4 000 000 so'mlik dasturiy ta'minot (nomoddiy aktiv) bilan kiritdi.","0430>4610>4000000","Dasturiy ta'minot nomoddiy aktiv sifatida kirim bo'ldi: Dt 0430. Ta'sischining qarzi so'ndi: Kt 4610."],
+ ["n006",1,"Kapital va pul","Aksiyadorlik jamiyati qo'shimcha 100 000 000 so'mlik oddiy aksiya chiqardi; obunachilarning qarzi e'tirof etildi.","4610>8310>100000000","Obunachilarning qarzi (aktiv): Dt 4610. Ustav kapitali (oddiy aksiyalar) ko'paydi: Kt 8310."],
+ ["n007",1,"Kapital va pul","30 000 000 so'm nominal qiymatdagi imtiyozli aksiyalar chiqarildi (obuna bo'yicha qarz paydo bo'ldi).","4610>8320>30000000","Obunachilarning qarzi: Dt 4610. Imtiyozli aksiyalar bo'yicha ustav kapitali: Kt 8320."],
+ ["n008",2,"Kapital va pul","Nominal qiymati 10 000 000 so'm bo'lgan oddiy aksiyalar 12 000 000 so'mga sotildi, pul hisob-kitob schyotiga tushdi. Ikki provodkani yozing (nominal qiymat va emissiya daromadi).","5110>8310>10000000;5110>8410>2000000","Nominal qismi ustav kapitaliga: Dt 5110 Kt 8310. Nominaldan oshgan 2 000 000 so'm — emissiya daromadi: Dt 5110 Kt 8410."],
+ ["n009",1,"Kapital va pul","Jamiyat o'z aksiyalarini 8 000 000 so'mga qaytarib sotib oldi (hisob-kitob schyotidan).","8610>5110>8000000","Sotib olingan xususiy aksiyalar (kapitalni kamaytiruvchi schyot): Dt 8610. Pul chiqdi: Kt 5110."],
+ ["n010",1,"Kapital va pul","Sotib olingan xususiy oddiy aksiyalar (nominal 8 000 000 so'm) bekor qilindi.","8310>8610>8000000","Ustav kapitali kamaydi: Dt 8310. Sotib olingan xususiy aksiyalar so'ndi: Kt 8610."],
+ ["n011",1,"Kapital va pul","Chiqib ketayotgan ta'sischining 15 000 000 so'mlik ulushi bo'yicha qarz e'tirof etildi.","8330>6620>15000000","Ustav kapitali (pay va ulushlar) kamaydi: Dt 8330. Chiqib ketayotgan ta'sischiga qarz paydo bo'ldi: Kt 6620."],
+ ["n012",1,"Kapital va pul","Chiqib ketgan ta'sischiga ulushi (15 000 000 so'm) hisob-kitob schyotidan to'landi.","6620>5110>15000000","Qarz so'ndi: Dt 6620. Pul chiqdi: Kt 5110."],
+ ["n013",1,"Kapital va pul","Hisobot davri foydasidan 3 000 000 so'm rezerv kapitaliga ajratildi.","8710>8520>3000000","Taqsimlanmagan foyda kamaydi: Dt 8710. Rezerv kapitali (fondi) ko'paydi: Kt 8520."],
+ ["n014",1,"Kapital va pul","Tekinga olingan 5 000 000 so'mlik mebel asosiy vositalar hisobiga kirim qilindi.","0140>8530>5000000","Mebel (asosiy vosita) kirim bo'ldi: Dt 0140. Tekinga olingan mol-mulk (kapital): Kt 8530."],
+ ["n015",2,"Kapital va pul","Bino qayta baholanib, boshlang'ich qiymati 20 000 000 so'mga, eskirishi 4 000 000 so'mga oshirildi. Ikki provodkani yozing.","0120>8510>20000000;8510>0220>4000000","Qiymat oshishi: Dt 0120 Kt 8510. Eskirishning mos oshishi: Dt 8510 Kt 0220 (qayta baholash tuzatishi kamayadi)."],
+ ["n016",1,"Kapital va pul","Qayta baholash natijasida mashina va uskunalar qiymati 6 000 000 so'mga kamaytirildi.","8510>0130>6000000","Qayta baholash bo'yicha tuzatish kamaydi: Dt 8510. Mashina va uskunalar qiymati kamaydi: Kt 0130."],
+ ["n017",1,"Kapital va pul","Ta'sischiga hisoblangan dividend 4 800 000 so'm; undan 240 000 so'm JShDS ushlab qolindi.","6610>6410>240000","Dividend bo'yicha qarz kamaydi: Dt 6610. Byudjetga qarz paydo bo'ldi: Kt 6410."],
+ ["n018",1,"Kapital va pul","Dividend (4 560 000 so'm) ta'sischiga kassadan naqd berildi.","6610>5010>4560000","To'lanadigan dividend so'ndi: Dt 6610. Kassadan pul chiqdi: Kt 5010."],
+ ["n019",1,"Kapital va pul","O'tgan yillar jamg'arilgan foydasidan 7 000 000 so'm dividend hisoblandi.","8720>6610>7000000","Jamg'arilgan foyda kamaydi: Dt 8720. To'lanadigan dividend: Kt 6610."],
+ ["n020",1,"Kapital va pul","Grant sifatida 20 000 000 so'm hisob-kitob schyotiga tushdi.","5110>8810>20000000","Pul keldi: Dt 5110. Maqsadli tushum (grant): Kt 8810."],
+ ["n021",1,"Kapital va pul","Subsidiya sifatida 15 000 000 so'm hisob-kitob schyotiga tushdi.","5110>8820>15000000","Pul keldi: Dt 5110. Maqsadli tushum (subsidiya): Kt 8820."],
+ ["n022",1,"Kapital va pul","Ta'sischilar ustav kapitalini oshirish uchun 25 000 000 so'mni hisob-kitob schyotiga kiritdilar (o'zgarish hali ro'yxatdan o'tmagan).","5110>6630>25000000","Pul keldi: Dt 5110. Ro'yxatdan o'tgunga qadar bu ta'sischilar oldidagi majburiyat: Kt 6630."],
+ ["n023",1,"Kapital va pul","Ustav kapitalini oshirish ro'yxatdan o'tdi: 25 000 000 so'm ustav kapitaliga o'tkazildi.","6630>8330>25000000","Majburiyat so'ndi: Dt 6630. Ustav kapitali (pay va ulushlar) ko'paydi: Kt 8330."],
+ ["n024",1,"Kapital va pul","Hisobot yili zarari (7 000 000 so'm) yakuniy moliyaviy natijadan yopildi.","8710>9910>7000000","Qoplanmagan zarar: Dt 8710. Yakuniy natija hisobvarag'i yopildi: Kt 9910."],
+ ["n025",1,"Kassa va bank","Kassadan mol yetkazib beruvchiga 800 000 so'm to'landi.","6010>5010>800000","Yetkazib beruvchiga qarz kamaydi: Dt 6010. Kassadan pul chiqdi: Kt 5010."],
+ ["n026",1,"Kassa va bank","Mol yetkazib beruvchiga hisob-kitob schyotidan 5 500 000 so'm o'tkazildi.","6010>5110>5500000","Qarz kamaydi: Dt 6010. Hisob-kitob schyotidan pul chiqdi: Kt 5110."],
+ ["n027",1,"Kassa va bank","Xodimga ish haqiga bo'nak sifatida kassadan 500 000 so'm berildi.","4210>5010>500000","Ish haqi bo'yicha berilgan bo'nak (aktiv): Dt 4210. Kassadan pul chiqdi: Kt 5010."],
+ ["n028",1,"Kassa va bank","Hisobdor shaxsga xo'jalik xarajatlari uchun kassadan 600 000 so'm berildi.","4230>5010>600000","Umumxo'jalik xarajatlari uchun berilgan bo'nak: Dt 4230. Kassadan pul chiqdi: Kt 5010."],
+ ["n029",1,"Kassa va bank","Xodimga 2 000 000 so'm qarz (ssuda) kassadan berildi.","4720>5010>2000000","Xodimning qarzi (aktiv): Dt 4720. Kassadan pul chiqdi: Kt 5010."],
+ ["n030",1,"Kassa va bank","Xodim olgan qarzining 1 000 000 so'mini kassaga qaytardi.","5010>4720>1000000","Kassaga pul keldi: Dt 5010. Xodimning qarzi kamaydi: Kt 4720."],
+ ["n031",1,"Kassa va bank","Xodim yetkazgan moddiy zararni qoplash uchun kassaga 300 000 so'm kiritdi.","5010>4730>300000","Kassaga pul keldi: Dt 5010. Moddiy zarar bo'yicha xodimning qarzi kamaydi: Kt 4730."],
+ ["n032",1,"Kassa va bank","Xodim kreditga olgan tovarining qarzidan 400 000 so'mni kassaga to'ladi.","5010>4710>400000","Kassaga pul keldi: Dt 5010. Kreditga sotilgan tovar bo'yicha xodim qarzi kamaydi: Kt 4710."],
+ ["n033",1,"Kassa va bank","Ta'sischi korxonaga qisqa muddatli qarz sifatida kassaga 10 000 000 so'm naqd pul kiritdi.","5010>6820>10000000","Kassaga pul keldi: Dt 5010. Qisqa muddatli qarz majburiyati paydo bo'ldi: Kt 6820."],
+ ["n034",1,"Kassa va bank","Olingan qisqa muddatli qarzning 10 000 000 so'mi kassadan qaytarildi.","6820>5010>10000000","Qarz so'ndi: Dt 6820. Kassadan pul chiqdi: Kt 5010."],
+ ["n035",1,"Kassa va bank","Chet el valyutasidagi hisob-kitob schyotidan valyuta kassasiga 12 700 000 so'mga ekvivalent (1 000 AQSH dollari) olindi.","5020>5210>12700000","Valyuta kassasiga pul keldi: Dt 5020. Valyuta schyotidan pul chiqdi: Kt 5210."],
+ ["n036",1,"Kassa va bank","Xaridordan valyuta schyotiga 20 000 000 so'mga ekvivalent to'lov tushdi.","5210>4010>20000000","Valyuta schyotiga pul keldi: Dt 5210. Xaridorning qarzi so'ndi: Kt 4010."],
+ ["n037",1,"Kassa va bank","Mol yetkazib beruvchiga valyuta schyotidan 8 000 000 so'mga ekvivalent to'lov o'tkazildi.","6010>5210>8000000","Qarz kamaydi: Dt 6010. Valyuta schyotidan pul chiqdi: Kt 5210."],
+ ["n038",1,"Kassa va bank","Hisob-kitob schyotidan valyuta schyotiga 10 000 000 so'm o'tkazildi (konvertatsiya).","5210>5110>10000000","Valyuta schyotida pul ko'paydi: Dt 5210. So'm schyotidan pul chiqdi: Kt 5110."],
+ ["n039",2,"Kassa va bank","Kassadan bankka topshirilgan 4 000 000 so'm hali bankka kirib kelmadi (yo'lda). Keyin pul bankka kirib keldi. Ikki provodkani yozing.","5710>5010>4000000;5110>5710>4000000","Pul yo'lda: Dt 5710 Kt 5010. Bankka kirdi: Dt 5110 Kt 5710."],
+ ["n040",1,"Kassa va bank","Bank akkreditivi ochildi: hisob-kitob schyotidan 30 000 000 so'm ajratildi.","5510>5110>30000000","Akkreditivdagi pul (maxsus schyot): Dt 5510. Hisob-kitob schyotidan pul chiqdi: Kt 5110."],
+ ["n041",1,"Kassa va bank","Akkreditivdan yetkazib beruvchiga 30 000 000 so'm to'landi.","6010>5510>30000000","Yetkazib beruvchiga qarz so'ndi: Dt 6010. Akkreditivdagi pul kamaydi: Kt 5510."],
+ ["n042",1,"Kassa va bank","Chek daftarchasi uchun hisob-kitob schyotidan 2 000 000 so'm ajratildi.","5520>5110>2000000","Chek daftarchalaridagi pul: Dt 5520. Hisob-kitob schyotidan pul chiqdi: Kt 5110."],
+ ["n043",1,"Kassa va bank","Hisob-kitob schyotidan qisqa muddatli depozitga (pul ekvivalenti) 20 000 000 so'm joylashtirildi.","5610>5110>20000000","Pul ekvivalentlari ko'paydi: Dt 5610. Hisob-kitob schyotidan pul chiqdi: Kt 5110."],
+ ["n044",1,"Kassa va bank","Boshqa tashkilotga 10 000 000 so'm qisqa muddatli qarz berildi (hisob-kitob schyotidan).","5830>5110>10000000","Berilgan qisqa muddatli qarz (aktiv): Dt 5830. Pul chiqdi: Kt 5110."],
+ ["n045",1,"Kassa va bank","Berilgan qisqa muddatli qarz (10 000 000 so'm) hisob-kitob schyotimizga qaytarildi.","5110>5830>10000000","Pul keldi: Dt 5110. Berilgan qarz so'ndi: Kt 5830."],
+ ["n046",1,"Kassa va bank","Qisqa muddatli qimmatli qog'ozlar 5 000 000 so'mga sotib olindi (hisob-kitob schyotidan).","5810>5110>5000000","Qisqa muddatli investitsiya (qimmatli qog'ozlar): Dt 5810. Pul chiqdi: Kt 5110."],
+ ["n047",1,"Kassa va bank","Bank depoziti bo'yicha 400 000 so'm foiz hisoblandi.","4830>9530>400000","Olinadigan foiz (debitorlik): Dt 4830. Foiz ko'rinishidagi daromad: Kt 9530."],
+ ["n048",1,"Kassa va bank","Hisoblangan foiz (400 000 so'm) hisob-kitob schyotimizga tushdi.","5110>4830>400000","Pul keldi: Dt 5110. Olinadigan foiz so'ndi: Kt 4830."],
+ ["n049",1,"Kassa va bank","Bank xizmati (komissiya) uchun hisob-kitob schyotidan 150 000 so'm yechib olindi.","9430>5110>150000","Boshqa operatsion xarajat: Dt 9430. Hisob-kitob schyotidan pul chiqdi: Kt 5110."],
+ ["n050",1,"Kassa va bank","Inventarizatsiyada kassada 200 000 so'm kamomad aniqlandi.","5910>5010>200000","Kamomad (aktiv schyoti): Dt 5910. Kassadagi pul kamaydi: Kt 5010."],
+ ["n051",1,"Kassa va bank","Kassadagi kamomad (200 000 so'm) aybdor kassirdan undirilishi belgilandi.","4730>5910>200000","Moddiy zarar bo'yicha xodimning qarzi: Dt 4730. Kamomad hisobdan chiqdi: Kt 5910."],
+ ["n052",1,"Kassa va bank","Xodimning 900 000 so'm ish haqi belgilangan muddatda olinmadi (deponentlandi).","6710>6720>900000","Ish haqi bo'yicha qarz kamaydi: Dt 6710. Deponentlangan ish haqi: Kt 6720."],
+ ["n053",1,"Kassa va bank","Deponentlangan ish haqi (900 000 so'm) kassadan to'landi.","6720>5010>900000","Deponent qarz so'ndi: Dt 6720. Kassadan pul chiqdi: Kt 5010."],
+ ["n054",1,"Kassa va bank","Deponentlangan ish haqining talab qilish muddati o'tdi: 900 000 so'm daromadga olindi.","6720>9360>900000","Deponent qarz hisobdan chiqdi: Dt 6720. Kreditor va deponent qarzlarni hisobdan chiqarishdan daromad: Kt 9360."],
+ ["n055",1,"Xaridlar","Sotib olingan yarim tayyor mahsulotlar va butlovchi buyumlar 6 000 000 so'mga olindi (QQSsiz).","1020>6010>6000000","Yarim tayyor mahsulotlar kirim bo'ldi: Dt 1020. Yetkazib beruvchiga qarz: Kt 6010."],
+ ["n056",1,"Xaridlar","Qurilish materiallari 3 500 000 so'mga sotib olindi (QQSsiz).","1050>6010>3500000","Qurilish materiallari — 1050. Qarz: Kt 6010."],
+ ["n057",1,"Xaridlar","Tara 400 000 so'mga sotib olindi (QQSsiz).","1060>6010>400000","Tara — 1060. Qarz: Kt 6010."],
+ ["n058",1,"Xaridlar","Kantselyariya buyumlari (boshqa materiallar) 300 000 so'mga sotib olindi (QQSsiz).","1090>6010>300000","Boshqa materiallar — 1090. Qarz: Kt 6010."],
+ ["n059",1,"Xaridlar","Xom ashyo shartnoma bahosida 8 000 000 so'mga keldi (materiallarni tayyorlash va xarid qilish hisobvarag'i orqali).","1510>6010>8000000","Xarid jarayonidagi materiallar: Dt 1510. Yetkazib beruvchiga qarz: Kt 6010."],
+ ["n060",1,"Xaridlar","1510 hisobvarag'i orqali kelgan materiallar (8 000 000 so'm) omborga kirim qilindi.","1010>1510>8000000","Materiallar omborga kirdi: Dt 1010. 1510 hisobvarag'i yopildi: Kt 1510."],
+ ["n061",1,"Xaridlar","Materiallarni yetkazib berish uchun transport xizmati 300 000 so'm (QQSsiz) hisoblandi; xarajat xarid qiymatiga qo'shildi.","1510>6010>300000","Transport xarajati material qiymatiga qo'shiladi: Dt 1510. Transport tashkilotiga qarz: Kt 6010."],
+ ["n062",1,"Xaridlar","Import qilingan materiallar uchun bojxona to'lovi 1 500 000 so'm hisoblandi (material xarid qiymatiga qo'shiladi).","1510>6410>1500000","Xarid qiymatiga qo'shiladi: Dt 1510. Byudjetga qarz: Kt 6410."],
+ ["n063",1,"Xaridlar","Sotish uchun do'konga 7 000 000 so'mlik tovarlar to'g'ridan-to'g'ri kelib tushdi (QQSsiz).","2920>6010>7000000","Chakana savdodagi tovarlar: Dt 2920. Yetkazib beruvchiga qarz: Kt 6010."],
+ ["n064",1,"Xaridlar","Yo'lda ketayotgan 5 000 000 so'mlik tovarlar hisobga olindi (QQSsiz).","2970>6010>5000000","Yo'ldagi tovarlar: Dt 2970. Yetkazib beruvchiga qarz: Kt 6010."],
+ ["n065",1,"Xaridlar","Yo'ldagi tovarlar (5 000 000 so'm) omborga kelib kirim qilindi.","2910>2970>5000000","Ombordagi tovarlar ko'paydi: Dt 2910. Yo'ldagi tovarlar kamaydi: Kt 2970."],
+ ["n066",1,"Xaridlar","Ombordan chakana savdo do'koniga 3 000 000 so'mlik tovar berildi.","2920>2910>3000000","Chakana savdodagi tovarlar: Dt 2920. Ombordagi tovarlar kamaydi: Kt 2910."],
+ ["n067",1,"Xaridlar","Ombordan ko'rgazmaga 2 000 000 so'mlik tovar chiqarildi.","2930>2910>2000000","Ko'rgazmadagi tovarlar: Dt 2930. Ombordagi tovarlar kamaydi: Kt 2910."],
+ ["n068",1,"Xaridlar","Vositachilik shartnomasi bo'yicha komissionerga 4 000 000 so'mlik tovar berildi.","2960>2910>4000000","Vositachilikka berilgan tovarlar: Dt 2960. Ombordagi tovarlar kamaydi: Kt 2910."],
+ ["n069",1,"Xaridlar","Mol yetkazib beruvchiga qarz uchun 10 000 000 so'mlik veksel berildi.","6010>6020>10000000","Yetkazib beruvchiga qarz so'ndi: Dt 6010. Berilgan veksellar bo'yicha majburiyat paydo bo'ldi: Kt 6020."],
+ ["n070",1,"Xaridlar","Berilgan veksel (10 000 000 so'm) hisob-kitob schyotidan to'landi.","6020>5110>10000000","Veksel majburiyati so'ndi: Dt 6020. Pul chiqdi: Kt 5110."],
+ ["n071",1,"Xaridlar","Bankdan qarz olish uchun 20 000 000 so'mlik veksel berildi, pul hisob-kitob schyotiga tushdi.","5110>6840>20000000","Pul keldi: Dt 5110. To'lanadigan veksel majburiyati: Kt 6840."],
+ ["n072",1,"Xaridlar","Hisobdor shaxs avans hisobotiga ko'ra 700 000 so'mlik kantselyariya buyumlari sotib oldi (berilgan bo'nak hisobidan).","1090>4230>700000","Materiallar kirim bo'ldi: Dt 1090. Berilgan bo'nak yopildi: Kt 4230."],
+ ["n073",1,"Xaridlar","Yetkazib beruvchiga 1 000 000 so'mlik sifatsiz materiallar qaytarildi (QQSsiz).","6010>1010>1000000","Qarz kamaydi: Dt 6010. Materiallar kamaydi: Kt 1010."],
+ ["n074",1,"Xaridlar","Ishlab chiqarishga 3 000 000 so'mlik yarim tayyor mahsulotlar sarflandi.","2010>1020>3000000","Ishlab chiqarish xarajati: Dt 2010. Yarim tayyor mahsulotlar kamaydi: Kt 1020."],
+ ["n075",1,"Xaridlar","Yordamchi ishlab chiqarishga 2 000 000 so'mlik materiallar sarflandi.","2310>1010>2000000","Yordamchi ishlab chiqarish xarajati: Dt 2310. Materiallar kamaydi: Kt 1010."],
+ ["n076",1,"Xaridlar","Umumiy ishlab chiqarish ehtiyojlari uchun 600 000 so'mlik yoqilg'i sarflandi.","2510>1030>600000","Umumiy ishlab chiqarish xarajatlari: Dt 2510. Yoqilg'i kamaydi: Kt 1030."],
+ ["n077",1,"Xaridlar","Ma'muriy avtomobil uchun 400 000 so'mlik yoqilg'i sarflandi.","9420>1030>400000","Ma'muriy xarajat: Dt 9420. Yoqilg'i kamaydi: Kt 1030."],
+ ["n078",1,"Xaridlar","Sotish bo'limi ehtiyojlari uchun 250 000 so'mlik boshqa materiallar sarflandi.","9410>1090>250000","Sotish xarajatlari: Dt 9410. Boshqa materiallar kamaydi: Kt 1090."],
+ ["n079",1,"Xaridlar","Ofis uchun 300 000 so'mlik kantselyariya buyumlari sarflandi.","9420>1090>300000","Ma'muriy xarajat: Dt 9420. Boshqa materiallar kamaydi: Kt 1090."],
+ ["n080",1,"Xaridlar","Tovarlarni qadoqlash uchun 200 000 so'mlik tara sarflandi (sotish xarajati).","9410>1060>200000","Sotish xarajatlari: Dt 9410. Tara kamaydi: Kt 1060."],
+ ["n081",1,"Xaridlar","Ishlab chiqarishda mahsulotni qadoqlash uchun 1 500 000 so'mlik tara sarflandi.","2010>1060>1500000","Ishlab chiqarish xarajati: Dt 2010. Tara kamaydi: Kt 1060."],
+ ["n082",1,"Xaridlar","Bino qurilishi uchun 4 000 000 so'mlik qurilish materiallari sarflandi.","0810>1050>4000000","Tugallanmagan qurilish xarajati: Dt 0810. Qurilish materiallari kamaydi: Kt 1050."],
+ ["n083",1,"Xaridlar","Ma'muriy binoni joriy ta'mirlash uchun 800 000 so'mlik ehtiyot qismlar sarflandi.","9420>1040>800000","Ma'muriy xarajat: Dt 9420. Ehtiyot qismlar kamaydi: Kt 1040."],
+ ["n084",1,"Xaridlar","Chetga qayta ishlash uchun 3 000 000 so'mlik materiallar berildi.","1070>1010>3000000","Chetga berilgan materiallar: Dt 1070. Omborda materiallar kamaydi: Kt 1010."],
+ ["n085",1,"Xaridlar","Materiallarni chetda qayta ishlash xizmati uchun 500 000 so'm hisoblandi (QQSsiz).","1070>6010>500000","Qayta ishlash xarajati materialga qo'shiladi: Dt 1070. Pudratchiga qarz: Kt 6010."],
+ ["n086",1,"Xaridlar","Qayta ishlangan materiallar (3 500 000 so'm) omborga qaytib kirim qilindi.","1010>1070>3500000","Materiallar omborga qaytdi: Dt 1010. Chetga berilgan materiallar yopildi: Kt 1070."],
+ ["n087",1,"Xaridlar","Foydalanishga berilgan inventar va xo'jalik jihozlari (700 000 so'm) ma'muriy xarajatga o'tkazildi.","9420>1080>700000","Ma'muriy xarajat: Dt 9420. Inventar va xo'jalik jihozlari kamaydi: Kt 1080."],
+ ["n088",2,"Xaridlar","Xom ashyo shartnoma bahosida 8 000 000 so'mga keldi (1510 orqali) va darhol omborga kirim qilindi. Ikkala provodkani yozing.","1510>6010>8000000;1010>1510>8000000","Xarid: Dt 1510 Kt 6010. Omborga kirim: Dt 1010 Kt 1510."],
+ ["n089",2,"Xaridlar","Yo'ldagi 5 000 000 so'mlik tovar hisobga olindi, keyin omborga kelib kirim qilindi. Ikkala provodkani yozing.","2970>6010>5000000;2910>2970>5000000","Yo'lda: Dt 2970 Kt 6010. Omborga kirdi: Dt 2910 Kt 2970."],
+ ["n090",2,"Xaridlar","Yetkazib beruvchiga qarz uchun 10 000 000 so'mlik veksel berildi va u hisob-kitob schyotidan to'landi. Ikkala provodkani yozing.","6010>6020>10000000;6020>5110>10000000","Veksel berish: Dt 6010 Kt 6020. Veksel to'lovi: Dt 6020 Kt 5110."],
+ ["n091",2,"Xaridlar","Hisobdor shaxsga 800 000 so'm kassadan berildi, u shu pulga kantselyariya buyumlari olib, hisobot topshirdi. Ikkala provodkani yozing.","4230>5010>800000;1090>4230>800000","Bo'nak berish: Dt 4230 Kt 5010. Hisobot: Dt 1090 Kt 4230."],
+ ["n092",3,"Xaridlar","3 000 000 so'mlik material qayta ishlashga berildi, qayta ishlash xizmati 500 000 so'm bo'ldi va qayta ishlangan material (3 500 000 so'm) omborga kirim qilindi. Uchala provodkani yozing.","1070>1010>3000000;1070>6010>500000;1010>1070>3500000","Berish: Dt 1070 Kt 1010. Xizmat: Dt 1070 Kt 6010. Qaytib kirim: Dt 1010 Kt 1070."],
+ ["n093",2,"QQS","5 000 000 so'mlik materiallar olindi; hisob-fakturada QQS 12% (600 000 so'm) alohida ko'rsatilgan. Ikkala provodkani yozing.","1010>6010>5000000;4410>6010>600000","Material: Dt 1010 Kt 6010. Kirim QQS: Dt 4410 Kt 6010."],
+ ["n094",2,"QQS","Tovarlar 20 000 000 so'mga olindi; hisob-fakturada QQS 12% (2 400 000 so'm). Ikkala provodkani yozing.","2910>6010>20000000;4410>6010>2400000","Tovar: Dt 2910 Kt 6010. Kirim QQS: Dt 4410 Kt 6010."],
+ ["n095",2,"QQS","Reklama xizmati uchun 2 000 000 so'm + QQS 12% (240 000 so'm) hisob keldi (sotish xarajati). Ikkala provodkani yozing.","9410>6010>2000000;4410>6010>240000","Xarajat: Dt 9410 Kt 6010. Kirim QQS: Dt 4410 Kt 6010."],
+ ["n096",2,"QQS","Uskuna 40 000 000 so'mga, QQS 12% (4 800 000 so'm) bilan sotib olindi. Ikkala provodkani yozing.","0820>6010>40000000;4410>6010>4800000","Uskuna xaridi: Dt 0820 Kt 6010. Kirim QQS: Dt 4410 Kt 6010."],
+ ["n097",2,"QQS","Tovarlar 12 000 000 so'mga QQS 12% (1 440 000 so'm) bilan xaridorga sotildi. Daromad va QQS provodkalarini yozing.","4010>9020>12000000;4010>6410>1440000","Daromad: Dt 4010 Kt 9020. Hisoblangan QQS byudjetga qarz: Dt 4010 Kt 6410."],
+ ["n098",2,"QQS","Xaridorga 5 000 000 so'm + QQS 12% (600 000 so'm) miqdorida xizmat ko'rsatildi. Daromad va QQS provodkalarini yozing.","4010>9030>5000000;4010>6410>600000","Daromad: Dt 4010 Kt 9030. QQS: Dt 4010 Kt 6410."],
+ ["n099",1,"QQS","Hisob-kitob schyotidan byudjetga QQS bo'yicha 1 800 000 so'm to'landi.","6410>5110>1800000","Byudjetga qarz so'ndi: Dt 6410. Pul chiqdi: Kt 5110."],
+ ["n100",2,"QQS","Yetkazib beruvchiga 2 000 000 so'mlik tovar qaytarildi (QQS 240 000 so'm). Ikkala provodkani yozing.","6010>2910>2000000;6010>4410>240000","Qarz kamaydi, tovar kamaydi: Dt 6010 Kt 2910. QQS bekor qilindi: Dt 6010 Kt 4410."],
+ ["n101",2,"QQS","Xaridor 1 000 000 so'mlik tovarni qaytardi; shu tovarga hisoblangan QQS 120 000 so'm. Ikkala provodkani yozing.","9040>4010>1000000;6410>4010>120000","Sotuv qaytishi: Dt 9040 Kt 4010. QQS kamaydi: Dt 6410 Kt 4010."],
+ ["n102",1,"QQS","Tovar eksport qilindi: 50 000 000 so'm (QQS stavkasi 0%, QQS hisoblanmaydi).","4010>9020>50000000","Faqat daromad: Dt 4010 Kt 9020. QQS yozilmaydi."],
+ ["n103",2,"QQS","Do'konda 8 000 000 so'mlik tovar naqd sotildi; tushum kassaga kirdi, QQS 12% (960 000 so'm) alohida ajratildi. Ikkala provodkani yozing.","5010>9020>8000000;5010>6410>960000","Daromad: Dt 5010 Kt 9020. QQS byudjetga qarz: Dt 5010 Kt 6410."],
+ ["n104",2,"QQS","Ma'muriy telefon xizmati uchun 1 000 000 so'm + QQS 12% (120 000 so'm) hisob keldi. Ikkala provodkani yozing.","9420>6010>1000000;4410>6010>120000","Xarajat: Dt 9420 Kt 6010. Kirim QQS: Dt 4410 Kt 6010."],
+ ["n105",2,"QQS","Materiallarni yetkazish uchun transport xizmati 300 000 so'm + QQS 12% (36 000 so'm) hisoblandi (xarid qiymatiga). Ikkala provodkani yozing.","1510>6010>300000;4410>6010>36000","Xarajat: Dt 1510 Kt 6010. Kirim QQS: Dt 4410 Kt 6010."],
+ ["n106",2,"QQS","Hisobot davrida hisoblangan QQS dan 3 200 000 so'm kirim QQS hisobiga o'tkazildi, qolgani 1 800 000 so'm hisob-kitob schyotidan to'landi. Ikkala provodkani yozing.","6410>4410>3200000;6410>5110>1800000","Zachyot: Dt 6410 Kt 4410. To'lov: Dt 6410 Kt 5110."],
+ ["n107",3,"QQS","Ofis mebeli 6 000 000 so'mga + QQS 12% (720 000 so'm) sotib olindi va darhol foydalanishga topshirildi. Uchala provodkani yozing.","0820>6010>6000000;4410>6010>720000;0140>0820>6000000","Xarid: Dt 0820 Kt 6010. Kirim QQS: Dt 4410 Kt 6010. Foydalanishga topshirish: Dt 0140 Kt 0820."],
+ ["n108",1,"Sotuvlar","Tovarlar 8 000 000 so'mga naqd pulga sotildi (QQSsiz); tushum kassaga kirdi.","5010>9020>8000000","Kassaga pul kirdi: Dt 5010. Tovarlarni sotishdan daromad: Kt 9020."],
+ ["n109",1,"Sotuvlar","Xizmat 2 500 000 so'mga naqd to'lov bilan ko'rsatildi (QQSsiz).","5010>9030>2500000","Kassaga pul kirdi: Dt 5010. Xizmatlardan daromad: Kt 9030."],
+ ["n110",1,"Sotuvlar","Xaridor 1 500 000 so'mlik tovarni qaytardi (sotuv qaytishi).","9040>4010>1500000","Sotilgan tovarlarning qaytishi: Dt 9040. Xaridorning qarzi kamaydi: Kt 4010."],
+ ["n111",1,"Sotuvlar","Xaridorga 500 000 so'm chegirma berildi.","9050>4010>500000","Berilgan chegirma: Dt 9050. Xaridorning qarzi kamaydi: Kt 4010."],
+ ["n112",1,"Sotuvlar","Qaytgan tovar (tannarxi 1 000 000 so'm) omborga qayta kirim qilindi.","2910>9120>1000000","Tovar omborga qaytdi: Dt 2910. Sotilgan tovar tannarxi kamaydi: Kt 9120."],
+ ["n113",1,"Sotuvlar","Qaytgan tayyor mahsulot (tannarxi 2 000 000 so'm) omborga qayta kirim qilindi.","2810>9110>2000000","Mahsulot omborga qaytdi: Dt 2810. Tannarx kamaydi: Kt 9110."],
+ ["n114",1,"Sotuvlar","Ko'rsatilgan xizmatning tannarxi (3 000 000 so'm) hisobdan chiqarildi.","9130>2010>3000000","Bajarilgan ish va xizmatlar tannarxi: Dt 9130. Ishlab chiqarish xarajatlari kamaydi: Kt 2010."],
+ ["n115",1,"Sotuvlar","Operativ ijaraga berilgan uskuna uchun oylik 2 000 000 so'm ijara haqi hisoblandi (QQSsiz).","4820>9350>2000000","Olinadigan ijara to'lovi: Dt 4820. Operativ ijaradan daromad: Kt 9350."],
+ ["n116",1,"Sotuvlar","Moliyaviy ijara bo'yicha ijaraga beruvchi sifatida 600 000 so'm foiz daromadi hisoblandi.","4830>9550>600000","Olinadigan foiz: Dt 4830. Moliyaviy ijaradan daromad: Kt 9550."],
+ ["n117",1,"Sotuvlar","Xaridorga shartnoma jarimasi 700 000 so'm hisoblandi (undirilishi lozim).","4860>9330>700000","Da'volar bo'yicha olinadigan to'lov: Dt 4860. Undirilgan jarima va penya (daromad): Kt 9330."],
+ ["n118",1,"Sotuvlar","Jarima (700 000 so'm) xaridordan hisob-kitob schyotimizga tushdi.","5110>4860>700000","Pul keldi: Dt 5110. Da'vo bo'yicha qarz so'ndi: Kt 4860."],
+ ["n119",1,"Sotuvlar","Ombordagi tayyor mahsulotdan 3 000 000 so'mligi ko'rgazmaga chiqarildi.","2820>2810>3000000","Ko'rgazmadagi tayyor mahsulot: Dt 2820. Ombordagi tayyor mahsulot kamaydi: Kt 2810."],
+ ["n120",1,"Sotuvlar","Komissionerga sotish uchun 5 000 000 so'mlik tayyor mahsulot berildi.","2830>2810>5000000","Vositachilikka berilgan tayyor mahsulot: Dt 2830. Ombordagi tayyor mahsulot kamaydi: Kt 2810."],
+ ["n121",1,"Sotuvlar","Xaridor sotilgan tovar uchun 10 000 000 so'mlik veksel berdi.","4020>4010>10000000","Olingan veksellar: Dt 4020. Xaridorning oddiy qarzi so'ndi: Kt 4010."],
+ ["n122",1,"Sotuvlar","Xaridorning veksel bo'yicha qarzi (10 000 000 so'm) hisob-kitob schyotimizga tushdi.","5110>4020>10000000","Pul keldi: Dt 5110. Olingan veksel so'ndi: Kt 4020."],
+ ["n123",1,"Sotuvlar","Xaridor bo'nak sifatida 4 000 000 so'mni kassaga naqd to'ladi.","5010>6310>4000000","Kassaga pul keldi: Dt 5010. Xaridordan olingan bo'nak (majburiyat): Kt 6310."],
+ ["n124",1,"Sotuvlar","Olingan bo'nak (4 000 000 so'm) xaridorga hisob-kitob schyotidan qaytarildi.","6310>5110>4000000","Bo'nak majburiyati so'ndi: Dt 6310. Pul chiqdi: Kt 5110."],
+ ["n125",1,"Sotuvlar","Xodimga 800 000 so'mlik tovar nasiyaga sotildi (QQSsiz).","4710>9020>800000","Xodimning qarzi (kreditga sotilgan tovar): Dt 4710. Tovarni sotishdan daromad: Kt 9020."],
+ ["n126",1,"Sotuvlar","Korxonaning o'z oshxonasi (xizmat ko'rsatuvchi xo'jalik) tushumi 1 500 000 so'm kassaga kirdi.","5010>9370>1500000","Kassaga pul keldi: Dt 5010. Xizmat ko'rsatuvchi xo'jaliklar daromadi: Kt 9370."],
+ ["n127",1,"Sotuvlar","Boshqa tashkilotdan 2 000 000 so'm qaytarilmaydigan moliyaviy yordam hisob-kitob schyotiga tushdi.","5110>9380>2000000","Pul keldi: Dt 5110. Qaytarilmaydigan moliyaviy yordam (daromad): Kt 9380."],
+ ["n128",1,"Sotuvlar","O'tgan yilga tegishli 1 000 000 so'mlik daromad aniqlandi (xaridor qarzi sifatida).","4010>9340>1000000","Xaridor qarzi: Dt 4010. O'tgan yillar foydalari: Kt 9340."],
+ ["n129",2,"Sotuvlar","Tayyor mahsulot 20 000 000 so'mga naqd sotildi (QQSsiz), tannarxi 12 000 000 so'm. Ikkala provodkani yozing.","5010>9010>20000000;9110>2810>12000000","Daromad: Dt 5010 Kt 9010. Tannarx: Dt 9110 Kt 2810."],
+ ["n130",2,"Sotuvlar","Xizmat 6 000 000 so'mga ko'rsatildi (QQSsiz), uning tannarxi 4 000 000 so'm. Ikkala provodkani yozing.","4010>9030>6000000;9130>2010>4000000","Daromad: Dt 4010 Kt 9030. Tannarx: Dt 9130 Kt 2010."],
+ ["n131",2,"Sotuvlar","Tovarlar 15 000 000 so'mga sotildi (QQSsiz), xaridorga 1 000 000 so'm chegirma berildi. Ikkala provodkani yozing.","4010>9020>15000000;9050>4010>1000000","Daromad: Dt 4010 Kt 9020. Chegirma: Dt 9050 Kt 4010."],
+ ["n132",2,"Sotuvlar","Xaridor 3 000 000 so'mlik mahsulotni qaytardi; mahsulotning tannarxi (2 000 000 so'm) omborga qaytib kirim qilindi. Ikkala provodkani yozing.","9040>4010>3000000;2810>9110>2000000","Sotuv qaytishi: Dt 9040 Kt 4010. Tannarx qaytdi: Dt 2810 Kt 9110."],
+ ["n133",3,"Sotuvlar","Xaridordan 6 000 000 so'm bo'nak tushdi; keyin 20 000 000 so'mlik mahsulot sotildi (QQSsiz) va bo'nak hisobga olindi. Uchala provodkani yozing.","5110>6310>6000000;4010>9010>20000000;6310>4010>6000000","Bo'nak: Dt 5110 Kt 6310. Sotuv: Dt 4010 Kt 9010. Bo'nakni hisobga olish: Dt 6310 Kt 4010."],
+ ["n134",3,"Sotuvlar","Tayyor mahsulot 25 000 000 so'mga sotildi (QQSsiz), tannarxi 15 000 000 so'm hisobdan chiqarildi va xaridor 25 000 000 so'mni hisob-kitob schyotimizga o'tkazdi. Uchala provodkani yozing.","4010>9010>25000000;9110>2810>15000000;5110>4010>25000000","Daromad: Dt 4010 Kt 9010. Tannarx: Dt 9110 Kt 2810. To'lov: Dt 5110 Kt 4010."],
+ ["n135",3,"Sotuvlar","Xizmat 4 000 000 so'mga ko'rsatildi (QQSsiz), tannarxi 2 500 000 so'm; xaridor kassaga naqd to'ladi. Uchala provodkani yozing.","4010>9030>4000000;9130>2010>2500000;5010>4010>4000000","Daromad: Dt 4010 Kt 9030. Tannarx: Dt 9130 Kt 2010. To'lov: Dt 5010 Kt 4010."],
+ ["n136",3,"Sotuvlar","Tovar 10 000 000 so'mga QQS 12% (1 200 000 so'm) bilan nasiyaga sotildi, tannarxi 7 000 000 so'm; xaridor 11 200 000 so'mni hisob-kitob schyotimizga o'tkazdi. To'rtala provodkani yozing.","4010>9020>10000000;4010>6410>1200000;9120>2910>7000000;5110>4010>11200000","Daromad: Dt 4010 Kt 9020. QQS: Dt 4010 Kt 6410. Tannarx: Dt 9120 Kt 2910. To'lov: Dt 5110 Kt 4010."],
+ ["n137",1,"Ishlab chiqarish","Asosiy ishlab chiqarishdagi uskunaga 1 800 000 so'm amortizatsiya (eskirish) hisoblandi.","2010>0230>1800000","Ishlab chiqarish xarajati: Dt 2010. Mashina va asbob-uskunalarning eskirishi: Kt 0230."],
+ ["n138",1,"Ishlab chiqarish","Yordamchi ishlab chiqarishdagi uskunaga 500 000 so'm amortizatsiya hisoblandi.","2310>0230>500000","Yordamchi ishlab chiqarish xarajati: Dt 2310. Uskunalarning eskirishi: Kt 0230."],
+ ["n139",1,"Ishlab chiqarish","Sex binosiga 700 000 so'm amortizatsiya hisoblandi (umumiy ishlab chiqarish).","2510>0220>700000","Umumiy ishlab chiqarish xarajatlari: Dt 2510. Bino va inshootlarning eskirishi: Kt 0220."],
+ ["n140",1,"Ishlab chiqarish","Yordamchi ishlab chiqarish xodimlariga 3 000 000 so'm ish haqi hisoblandi.","2310>6710>3000000","Yordamchi ishlab chiqarish xarajati: Dt 2310. Xodimlar oldidagi majburiyat: Kt 6710."],
+ ["n141",1,"Ishlab chiqarish","Sex boshliqlari va umumiy ishlab chiqarish xodimlariga 4 000 000 so'm ish haqi hisoblandi.","2510>6710>4000000","Umumiy ishlab chiqarish xarajatlari: Dt 2510. Majburiyat: Kt 6710."],
+ ["n142",1,"Ishlab chiqarish","Xizmat ko'rsatuvchi xo'jalik xodimlariga 1 200 000 so'm ish haqi hisoblandi.","2710>6710>1200000","Xizmat ko'rsatuvchi xo'jaliklar xarajati: Dt 2710. Majburiyat: Kt 6710."],
+ ["n143",1,"Ishlab chiqarish","Yordamchi ishlab chiqarish xarajatlari (2 500 000 so'm) asosiy ishlab chiqarishga yuklandi.","2010>2310>2500000","Asosiy ishlab chiqarish xarajati ko'paydi: Dt 2010. Yordamchi ishlab chiqarish yopildi: Kt 2310."],
+ ["n144",1,"Ishlab chiqarish","Xizmat ko'rsatuvchi xo'jaliklar xarajatlari (900 000 so'm) asosiy ishlab chiqarishga yuklandi.","2010>2710>900000","Asosiy ishlab chiqarishga: Dt 2010. Xizmat ko'rsatuvchi xo'jaliklar yopildi: Kt 2710."],
+ ["n145",1,"Ishlab chiqarish","O'zida ishlab chiqarilgan yarim tayyor mahsulot (5 000 000 so'm) omborga kirim qilindi.","2110>2010>5000000","Yarim tayyor mahsulot ko'paydi: Dt 2110. Ishlab chiqarish xarajatlari kamaydi: Kt 2010."],
+ ["n146",1,"Ishlab chiqarish","Yarim tayyor mahsulot (2 000 000 so'm) qayta ishlab chiqarishga topshirildi.","2010>2110>2000000","Ishlab chiqarish xarajati: Dt 2010. Yarim tayyor mahsulot kamaydi: Kt 2110."],
+ ["n147",1,"Ishlab chiqarish","Ishlab chiqarilgan tayyor mahsulot (28 000 000 so'm) omborga kirim qilindi.","2810>2010>28000000","Tayyor mahsulot ko'paydi: Dt 2810. Ishlab chiqarish xarajatlari yopildi: Kt 2010."],
+ ["n148",1,"Ishlab chiqarish","Ishlab chiqarishda yaroqsiz mahsulot (brak) aniqlandi: tannarxi 800 000 so'm.","2610>2010>800000","Yaroqsiz mahsulot: Dt 2610. Ishlab chiqarish xarajatlari kamaydi: Kt 2010."],
+ ["n149",1,"Ishlab chiqarish","Yaroqsiz mahsulot uchun 300 000 so'm aybdor ishchiga yuklatildi.","4730>2610>300000","Moddiy zarar bo'yicha xodimning qarzi: Dt 4730. Yaroqsiz mahsulot hisobdan chiqdi: Kt 2610."],
+ ["n150",1,"Ishlab chiqarish","Sexda iste'mol qilingan elektr energiyasi uchun 1 100 000 so'm hisob keldi (QQSsiz).","2510>6010>1100000","Umumiy ishlab chiqarish xarajatlari: Dt 2510. Yetkazib beruvchiga qarz: Kt 6010."],
+ ["n151",2,"Ishlab chiqarish","Ishlab chiqarishga 4 000 000 so'mlik materiallar sarflandi va ishchilarga 6 000 000 so'm ish haqi hisoblandi. Ikkala provodkani yozing.","2010>1010>4000000;2010>6710>6000000","Materiallar: Dt 2010 Kt 1010. Ish haqi: Dt 2010 Kt 6710."],
+ ["n152",2,"Ishlab chiqarish","Ishlab chiqarishda yaroqsiz mahsulot (800 000 so'm) aniqlandi; 300 000 so'mi aybdor ishchiga yuklandi. Ikkala provodkani yozing.","2610>2010>800000;4730>2610>300000","Brak: Dt 2610 Kt 2010. Aybdorga yuklash: Dt 4730 Kt 2610."],
+ ["n153",3,"Ishlab chiqarish","Ishlab chiqarishga 7 000 000 so'mlik material sarflandi, 12 000 000 so'm ish haqi hisoblandi va 19 000 000 so'mlik tayyor mahsulot omborga kirim qilindi. Uchala provodkani yozing.","2010>1010>7000000;2010>6710>12000000;2810>2010>19000000","Material: Dt 2010 Kt 1010. Ish haqi: Dt 2010 Kt 6710. Tayyor mahsulot: Dt 2810 Kt 2010."],
+ ["n154",3,"Ishlab chiqarish","Yordamchi ishlab chiqarishga 2 000 000 so'mlik material sarflandi, 1 000 000 so'm ish haqi hisoblandi va jami xarajat (3 000 000 so'm) asosiy ishlab chiqarishga yuklandi. Uchala provodkani yozing.","2310>1010>2000000;2310>6710>1000000;2010>2310>3000000","Material: Dt 2310 Kt 1010. Ish haqi: Dt 2310 Kt 6710. Yuklash: Dt 2010 Kt 2310."],
+ ["n155",3,"Ishlab chiqarish","Umumiy ishlab chiqarishda 500 000 so'm amortizatsiya va 1 500 000 so'm ish haqi hisoblandi, jami 2 000 000 so'm asosiy ishlab chiqarishga yuklandi. Uchala provodkani yozing.","2510>0220>500000;2510>6710>1500000;2010>2510>2000000","Amortizatsiya: Dt 2510 Kt 0220. Ish haqi: Dt 2510 Kt 6710. Yuklash: Dt 2010 Kt 2510."],
+ ["n156",3,"Ishlab chiqarish","Yaroqsiz mahsulot (800 000 so'm) aniqlandi, 300 000 so'mi aybdorga yuklandi, qolgan 500 000 so'm yo'qotish ishlab chiqarish tannarxiga qo'shildi. Uchala provodkani yozing.","2610>2010>800000;4730>2610>300000;2010>2610>500000","Brak: Dt 2610 Kt 2010. Aybdorga: Dt 4730 Kt 2610. Qolgani tannarxga: Dt 2010 Kt 2610."],
+ ["n157",1,"Mehnat haqi","Qurilishdagi ishchilarga 5 000 000 so'm ish haqi hisoblandi (xarajat qurilish qiymatiga qo'shiladi).","0810>6710>5000000","Tugallanmagan qurilish xarajati: Dt 0810. Majburiyat: Kt 6710."],
+ ["n158",1,"Mehnat haqi","Xodimning ish haqidan avans (1 000 000 so'm) ushlab qolinib, hisobga olindi.","6710>4210>1000000","Ish haqi bo'yicha qarz kamaydi: Dt 6710. Berilgan bo'nak yopildi: Kt 4210."],
+ ["n159",1,"Mehnat haqi","Xodimning ish haqidan olgan qarzi (400 000 so'm) ushlab qolindi.","6710>4720>400000","Ish haqi bo'yicha majburiyat kamaydi: Dt 6710. Xodimning qarzi so'ndi: Kt 4720."],
+ ["n160",1,"Mehnat haqi","Xodimning ish haqidan moddiy zarar (300 000 so'm) ushlab qolindi.","6710>4730>300000","Majburiyat kamaydi: Dt 6710. Moddiy zarar bo'yicha qarz so'ndi: Kt 4730."],
+ ["n161",1,"Mehnat haqi","Xodimning ish haqidan kreditga olgan tovari uchun 200 000 so'm ushlab qolindi.","6710>4710>200000","Majburiyat kamaydi: Dt 6710. Kreditga sotilgan tovar qarzi so'ndi: Kt 4710."],
+ ["n162",1,"Mehnat haqi","Sud qaroriga ko'ra xodimning ish haqidan aliment (500 000 so'm) ushlab qolindi.","6710>6990>500000","Xodim oldidagi majburiyat kamaydi: Dt 6710. Uchinchi shaxs oldidagi majburiyat: Kt 6990."],
+ ["n163",1,"Mehnat haqi","Ma'muriy xodimlarning 8 000 000 so'mlik ish haqiga 12% ijtimoiy soliq (960 000 so'm) hisoblandi.","9420>6410>960000","Ma'muriy xarajat: Dt 9420. Byudjetga qarz: Kt 6410."],
+ ["n164",1,"Mehnat haqi","Sotuv xodimlariga 600 000 so'm ijtimoiy soliq hisoblandi.","9410>6410>600000","Sotish xarajatlari: Dt 9410. Byudjetga qarz: Kt 6410."],
+ ["n165",1,"Mehnat haqi","Asosiy ishlab chiqarish ishchilariga 1 440 000 so'm ijtimoiy soliq hisoblandi.","2010>6410>1440000","Ishlab chiqarish xarajati: Dt 2010. Byudjetga qarz: Kt 6410."],
+ ["n166",1,"Mehnat haqi","JShDS byudjetga hisob-kitob schyotidan 1 080 000 so'm to'landi.","6410>5110>1080000","Byudjetga qarz so'ndi: Dt 6410. Pul chiqdi: Kt 5110."],
+ ["n167",1,"Mehnat haqi","JShDS (1 200 000 so'm) va ijtimoiy soliq (1 200 000 so'm) birgalikda byudjetga hisob-kitob schyotidan to'landi.","6410>5110>2400000","Byudjetga jami qarz so'ndi: Dt 6410. Pul chiqdi: Kt 5110."],
+ ["n168",1,"Mehnat haqi","Ta'til to'lovlari uchun zaxira ajratildi: 1 500 000 so'm (ma'muriy xodimlar).","9420>8910>1500000","Ma'muriy xarajat: Dt 9420. Kelgusi xarajatlar va to'lovlar zaxirasi: Kt 8910."],
+ ["n169",1,"Mehnat haqi","Ta'til puli 1 500 000 so'm zaxira hisobidan hisoblandi.","8910>6710>1500000","Zaxira ishlatildi: Dt 8910. Xodim oldidagi majburiyat: Kt 6710."],
+ ["n170",1,"Mehnat haqi","Ma'muriy xodimlarga ta'til puli (zaxirasiz) 1 200 000 so'm hisoblandi.","9420>6710>1200000","Ma'muriy xarajat: Dt 9420. Majburiyat: Kt 6710."],
+ ["n171",1,"Mehnat haqi","Ma'muriy xodimlarga 1 000 000 so'm mukofot (premiya) hisoblandi.","9420>6710>1000000","Ma'muriy xarajat: Dt 9420. Majburiyat: Kt 6710."],
+ ["n172",1,"Mehnat haqi","Sotuv xodimlariga 800 000 so'm mukofot hisoblandi.","9410>6710>800000","Sotish xarajatlari: Dt 9410. Majburiyat: Kt 6710."],
+ ["n173",1,"Mehnat haqi","Ish haqiga bo'nak sifatida xodimning plastik kartasiga hisob-kitob schyotidan 2 000 000 so'm o'tkazildi.","4210>5110>2000000","Berilgan bo'nak (aktiv): Dt 4210. Hisob-kitob schyotidan pul chiqdi: Kt 5110."],
+ ["n174",2,"Mehnat haqi","Sotuv xodimlariga 6 000 000 so'm ish haqi hisoblandi va undan JShDS 720 000 so'm ushlab qolindi. Ikkala provodkani yozing.","9410>6710>6000000;6710>6410>720000","Hisoblash: Dt 9410 Kt 6710. JShDS: Dt 6710 Kt 6410."],
+ ["n175",2,"Mehnat haqi","Asosiy ishlab chiqarish ishchilariga 10 000 000 so'm ish haqi hisoblandi, JShDS 1 200 000 so'm ushlandi. Ikkala provodkani yozing.","2010>6710>10000000;6710>6410>1200000","Hisoblash: Dt 2010 Kt 6710. JShDS: Dt 6710 Kt 6410."],
+ ["n176",2,"Mehnat haqi","Ma'muriy xodimlarga 8 000 000 so'm ish haqi hisoblandi va shu ish haqiga 12% ijtimoiy soliq (960 000 so'm) hisoblandi. Ikkala provodkani yozing.","9420>6710>8000000;9420>6410>960000","Ish haqi: Dt 9420 Kt 6710. Ijtimoiy soliq: Dt 9420 Kt 6410."],
+ ["n177",2,"Mehnat haqi","Xodimga 5 000 000 so'm ish haqi to'lanadi: oldin berilgan avans (1 000 000 so'm) hisobga olindi, qolgan 4 000 000 so'm kassadan berildi. Ikkala provodkani yozing.","6710>4210>1000000;6710>5010>4000000","Avansni hisobga olish: Dt 6710 Kt 4210. Qolganini berish: Dt 6710 Kt 5010."],
+ ["n178",2,"Mehnat haqi","Ma'muriy xodimlarga 7 000 000 so'm ish haqi hisoblandi, JShDS 840 000 so'm ushlandi. Ikkala provodkani yozing.","9420>6710>7000000;6710>6410>840000","Hisoblash: Dt 9420 Kt 6710. JShDS: Dt 6710 Kt 6410."],
+ ["n179",3,"Mehnat haqi","Ma'muriy xodimlarga 10 000 000 so'm ish haqi hisoblandi, JShDS 1 200 000 so'm ushlandi va 8 800 000 so'm xodimlarning plastik kartalariga o'tkazildi. Uchala provodkani yozing.","9420>6710>10000000;6710>6410>1200000;6710>5110>8800000","Hisoblash: Dt 9420 Kt 6710. JShDS: Dt 6710 Kt 6410. Kartaga o'tkazish: Dt 6710 Kt 5110."],
+ ["n180",3,"Mehnat haqi","Ishlab chiqarish ishchilariga 10 000 000 so'm ish haqi hisoblandi; undan avans (3 000 000 so'm) hisobga olindi va JShDS 1 200 000 so'm ushlandi. Uchala provodkani yozing.","2010>6710>10000000;6710>4210>3000000;6710>6410>1200000","Hisoblash: Dt 2010 Kt 6710. Avans: Dt 6710 Kt 4210. JShDS: Dt 6710 Kt 6410."],
+ ["n181",3,"Mehnat haqi","Sotuv xodimlariga 6 000 000 so'm ish haqi hisoblandi, JShDS 720 000 so'm ushlandi va 5 280 000 so'm kassadan berildi. Uchala provodkani yozing.","9410>6710>6000000;6710>6410>720000;6710>5010>5280000","Hisoblash: Dt 9410 Kt 6710. JShDS: Dt 6710 Kt 6410. Kassadan berish: Dt 6710 Kt 5010."],
+ ["n182",3,"Mehnat haqi","Ma'muriy xodimlarga 8 000 000 so'm ish haqi hisoblandi; undan moddiy zarar (300 000 so'm) va xodim qarzi (200 000 so'm) ushlab qolindi. Uchala provodkani yozing.","9420>6710>8000000;6710>4730>300000;6710>4720>200000","Hisoblash: Dt 9420 Kt 6710. Zarar: Dt 6710 Kt 4730. Qarz: Dt 6710 Kt 4720."],
+ ["n183",3,"Mehnat haqi","Ma'muriy xodimlarga 10 000 000 so'm ish haqi hisoblandi, JShDS 1 200 000 so'm ushlandi, 1 200 000 so'm ijtimoiy soliq hisoblandi va 8 800 000 so'm kartalarga o'tkazildi. To'rtala provodkani yozing.","9420>6710>10000000;6710>6410>1200000;9420>6410>1200000;6710>5110>8800000","Ish haqi: Dt 9420 Kt 6710. JShDS: Dt 6710 Kt 6410. Ijtimoiy soliq: Dt 9420 Kt 6410. Kartaga: Dt 6710 Kt 5110."],
+ ["n184",1,"Bo'naklar va hisobdorlar","Hisobdor shaxsga boshqa maqsadlar uchun 300 000 so'm bo'nak kassadan berildi.","4290>5010>300000","Xodimlarga berilgan boshqa bo'naklar: Dt 4290. Kassadan pul chiqdi: Kt 5010."],
+ ["n185",1,"Bo'naklar va hisobdorlar","Sotish bo'limi xodimining xizmat safari xarajatlari (1 200 000 so'm) hisobot bo'yicha tasdiqlandi.","9410>4220>1200000","Sotish xarajatlari: Dt 9410. Berilgan bo'nak yopildi: Kt 4220."],
+ ["n186",1,"Bo'naklar va hisobdorlar","Hisobdor shaxsning xo'jalik xarajatlari bo'yicha hisoboti (400 000 so'm) tasdiqlandi — ma'muriy xarajatga o'tkazildi.","9420>4230>400000","Ma'muriy xarajat: Dt 9420. Berilgan bo'nak yopildi: Kt 4230."],
+ ["n187",1,"Bo'naklar va hisobdorlar","Hisobdor shaxs ishlatilmagan bo'nak qoldig'ini (300 000 so'm) kassaga qaytardi.","5010>4220>300000","Kassaga pul keldi: Dt 5010. Berilgan bo'nak kamaydi: Kt 4220."],
+ ["n188",1,"Bo'naklar va hisobdorlar","Hisobdor shaxsga ortiqcha sarf (400 000 so'm) kassadan to'landi.","6970>5010>400000","Hisobdor shaxs oldidagi qarz so'ndi: Dt 6970. Kassadan pul chiqdi: Kt 5010."],
+ ["n189",1,"Bo'naklar va hisobdorlar","Xodimga berilgan bo'nak qoldig'i (200 000 so'm) uning ish haqidan ushlab qolindi.","6710>4220>200000","Ish haqi bo'yicha qarz kamaydi: Dt 6710. Berilgan bo'nak so'ndi: Kt 4220."],
+ ["n190",1,"Bo'naklar va hisobdorlar","Mol yetkazib beruvchiga kassadan 500 000 so'm bo'nak berildi.","4310>5010>500000","Tovar-moddiy zaxiralar uchun berilgan bo'nak: Dt 4310. Kassadan pul chiqdi: Kt 5010."],
+ ["n191",1,"Bo'naklar va hisobdorlar","Pudratchiga berilgan bo'nak (10 000 000 so'm) qurilish uchun olingan xizmat qarziga hisobga olindi.","6010>4320>10000000","Pudratchiga qarz kamaydi: Dt 6010. Berilgan bo'nak yopildi: Kt 4320."],
+ ["n192",1,"Bo'naklar va hisobdorlar","Byudjetga soliq bo'yicha bo'nak to'lovi sifatida hisob-kitob schyotidan 2 000 000 so'm o'tkazildi.","4410>5110>2000000","Byudjetga bo'nak to'lovi (aktiv): Dt 4410. Pul chiqdi: Kt 5110."],
+ ["n193",1,"Bo'naklar va hisobdorlar","Aksiyaga obunachidan 5 000 000 so'm bo'nak hisob-kitob schyotiga tushdi.","5110>6320>5000000","Pul keldi: Dt 5110. Aksiyaga obunachilardan olingan bo'nak: Kt 6320."],
+ ["n194",1,"Bo'naklar va hisobdorlar","Boshqa tashkilotdan 2 000 000 so'm boshqa bo'nak hisob-kitob schyotiga tushdi.","5110>6390>2000000","Pul keldi: Dt 5110. Boshqa olingan bo'naklar: Kt 6390."],
+ ["n195",1,"Bo'naklar va hisobdorlar","Ajratilgan bo'linmaga hisob-kitob schyotidan 8 000 000 so'm o'tkazildi.","4110>5110>8000000","Ajratilgan bo'linmadan olinadigan to'lov: Dt 4110. Pul chiqdi: Kt 5110."],
+ ["n196",2,"Bo'naklar va hisobdorlar","Xizmat safari uchun berilgan 1 000 000 so'm bo'nakka nisbatan hisobotga ko'ra 1 400 000 so'm sarflangan. Hisobotni tasdiqlash (ma'muriy xarajat) va ortiqcha sarf qarzini ikkala provodka bilan yozing.","9420>4220>1000000;9420>6970>400000","Bo'nak hisobiga: Dt 9420 Kt 4220. Ortiqcha 400 000 so'm — korxona xodim oldida qarzdor: Dt 9420 Kt 6970."],
+ ["n197",3,"Bo'naklar va hisobdorlar","Xizmat safari uchun 2 000 000 so'm bo'nak kassadan berildi; hisobotga ko'ra 1 600 000 so'm sarflangan (ma'muriy), qoldiq 400 000 so'm kassaga qaytarildi. Uchala provodkani yozing.","4220>5010>2000000;9420>4220>1600000;5010>4220>400000","Bo'nak: Dt 4220 Kt 5010. Hisobot: Dt 9420 Kt 4220. Qoldiq: Dt 5010 Kt 4220."],
+ ["n198",3,"Bo'naklar va hisobdorlar","Xizmat safari uchun 800 000 so'm bo'nak berildi; hisobotga ko'ra 1 100 000 so'm sarflangan (ma'muriy). Uchala provodkani yozing (bo'nak berish, hisobot va ortiqcha sarf).","4220>5010>800000;9420>4220>800000;9420>6970>300000","Bo'nak: Dt 4220 Kt 5010. Hisobot: Dt 9420 Kt 4220. Ortiqcha 300 000: Dt 9420 Kt 6970."],
+ ["n199",1,"Asosiy vositalar","Sotib olingan avtomobil (80 000 000 so'm) foydalanishga topshirildi.","0160>0820>80000000","Transport vositasi hisobga olindi: Dt 0160. Asosiy vositalarni xarid qilish yopildi: Kt 0820."],
+ ["n200",1,"Asosiy vositalar","Sotib olingan bino (150 000 000 so'm) asosiy vositalar hisobiga kirim qilindi.","0120>0820>150000000","Bino hisobga olindi: Dt 0120. Xarid hisobvarag'i yopildi: Kt 0820."],
+ ["n201",1,"Asosiy vositalar","Sotib olingan ofis mebeli (6 000 000 so'm) foydalanishga topshirildi.","0140>0820>6000000","Mebel hisobga olindi: Dt 0140. Xarid hisobvarag'i yopildi: Kt 0820."],
+ ["n202",1,"Asosiy vositalar","Sotib olingan yer uchastkasi (100 000 000 so'm) hisobga olindi.","0110>0820>100000000","Yer — 0110. Xarid hisobvarag'i yopildi: Kt 0820."],
+ ["n203",1,"Asosiy vositalar","Ishchi hayvonlar (asosiy poda, 12 000 000 so'm) asosiy vositalar hisobiga olindi.","0170>0840>12000000","Ishchi va mahsuldor hayvonlar: Dt 0170. Asosiy podani tashkil qilish yopildi: Kt 0840."],
+ ["n204",1,"Asosiy vositalar","Asosiy podani tashkil qilish uchun hayvonlar 12 000 000 so'mga sotib olindi (QQSsiz).","0840>6010>12000000","Poda tashkil qilish xarajati: Dt 0840. Yetkazib beruvchiga qarz: Kt 6010."],
+ ["n205",1,"Asosiy vositalar","Ishlab chiqarish uskunasi uchun yetkazib beruvchining hisobi 40 000 000 so'm (QQSsiz) keldi.","0820>6010>40000000","Asosiy vositalarni xarid qilish: Dt 0820. Yetkazib beruvchiga qarz: Kt 6010."],
+ ["n206",1,"Asosiy vositalar","Bino qurilishi bo'yicha pudratchi 30 000 000 so'mlik ish bajargani (QQSsiz) hisob taqdim etdi.","0810>6010>30000000","Tugallanmagan qurilish: Dt 0810. Pudratchiga qarz: Kt 6010."],
+ ["n207",1,"Asosiy vositalar","Qurilishi tugagan bino (55 000 000 so'm) foydalanishga topshirildi.","0120>0810>55000000","Bino asosiy vosita bo'ldi: Dt 0120. Tugallanmagan qurilish yopildi: Kt 0810."],
+ ["n208",1,"Asosiy vositalar","Uskunani modernizatsiya qilish xarajatlari 5 000 000 so'm (QQSsiz) hisoblandi.","0890>6010>5000000","Boshqa kapital qo'yilmalar: Dt 0890. Pudratchiga qarz: Kt 6010."],
+ ["n209",1,"Asosiy vositalar","Modernizatsiya xarajatlari (5 000 000 so'm) uskuna qiymatiga qo'shildi.","0130>0890>5000000","Uskuna qiymati oshdi: Dt 0130. Kapital qo'yilmalar yopildi: Kt 0890."],
+ ["n210",1,"Asosiy vositalar","Yerni obodonlashtirish xarajatlari 3 000 000 so'm (QQSsiz) hisoblandi.","0850>6010>3000000","Yerni obodonlashtirishga kapital qo'yilma: Dt 0850. Pudratchiga qarz: Kt 6010."],
+ ["n211",1,"Asosiy vositalar","Obodonlashtirish xarajatlari (3 000 000 so'm) yerni obodonlashtirish qiymatiga o'tkazildi.","0111>0850>3000000","Yerni obodonlashtirish (asosiy vosita): Dt 0111. Kapital qo'yilma yopildi: Kt 0850."],
+ ["n212",1,"Asosiy vositalar","Sho''ba korxonadan 9 000 000 so'mlik uskuna olindi.","0130>6120>9000000","Uskuna hisobga olindi: Dt 0130. Sho''ba korxonaga to'lov bo'yicha majburiyat: Kt 6120."],
+ ["n213",1,"Asosiy vositalar","Ajratilgan bo'linmaga 12 000 000 so'm qiymatdagi uskuna topshirildi.","4110>0130>12000000","Ajratilgan bo'linmadan olinadigan to'lov: Dt 4110. Uskuna hisobdan chiqdi: Kt 0130."],
+ ["n214",1,"Asosiy vositalar","Inventarizatsiyada hisobga olinmagan kompyuter aniqlandi (qiymati 3 000 000 so'm).","0150>9390>3000000","Kompyuter jihozlari hisobga olindi: Dt 0150. Boshqa operatsion daromad: Kt 9390."],
+ ["n215",1,"Asosiy vositalar","Ishlatilmayotgan uskuna (boshlang'ich qiymati 15 000 000 so'm) konservatsiyaga qo'yildi.","0199>0130>15000000","Konservatsiya qilingan asosiy vositalar: Dt 0199. Uskunalar guruhidan chiqdi: Kt 0130."],
+ ["n216",1,"Asosiy vositalar","Ma'muriy binoga 900 000 so'm amortizatsiya hisoblandi.","9420>0220>900000","Ma'muriy xarajat: Dt 9420. Bino va inshootlarning eskirishi: Kt 0220."],
+ ["n217",1,"Asosiy vositalar","Ma'muriy avtomobilga 1 100 000 so'm amortizatsiya hisoblandi.","9420>0260>1100000","Ma'muriy xarajat: Dt 9420. Transport vositalarining eskirishi: Kt 0260."],
+ ["n218",1,"Asosiy vositalar","Savdo do'koni binosiga 600 000 so'm amortizatsiya hisoblandi.","9410>0220>600000","Sotish xarajatlari: Dt 9410. Bino va inshootlarning eskirishi: Kt 0220."],
+ ["n219",1,"Asosiy vositalar","Sotuv bo'limi avtomobiliga 700 000 so'm amortizatsiya hisoblandi.","9410>0260>700000","Sotish xarajatlari: Dt 9410. Transport vositalarining eskirishi: Kt 0260."],
+ ["n220",1,"Asosiy vositalar","Savdo zalidagi mebelga 200 000 so'm amortizatsiya hisoblandi.","9410>0240>200000","Sotish xarajatlari: Dt 9410. Mebelning eskirishi: Kt 0240."],
+ ["n221",1,"Asosiy vositalar","Operativ ijaraga berilgan uskunaga 800 000 so'm eskirish hisoblandi (ijaraga beruvchi).","9430>0230>800000","Boshqa operatsion xarajat: Dt 9430. Uskunalarning eskirishi: Kt 0230."],
+ ["n222",1,"Asosiy vositalar","Eskirgan uskunaning boshlang'ich qiymati (20 000 000 so'm) hisobdan chiqarildi.","9210>0130>20000000","Asosiy vositaning chiqib ketishi: Dt 9210. Uskuna qiymati kamaydi: Kt 0130."],
+ ["n223",1,"Asosiy vositalar","Hisobdan chiqarilayotgan uskunaning eskirishi (20 000 000 so'm) hisobdan chiqarildi.","0230>9210>20000000","Eskirish summasi yopildi: Dt 0230. Asosiy vositaning chiqib ketishi: Kt 9210."],
+ ["n224",2,"Asosiy vositalar","Eski uskuna (boshlang'ich qiymati 20 000 000 so'm, to'liq eskirgan) tugatildi. Ikki provodkani yozing.","9210>0130>20000000;0230>9210>20000000","Boshlang'ich qiymat: Dt 9210 Kt 0130. Eskirish: Dt 0230 Kt 9210."],
+ ["n225",2,"Asosiy vositalar","Avtomobil sotish uchun hisobdan chiqarildi: boshlang'ich qiymati 50 000 000 so'm, eskirishi 30 000 000 so'm. Ikki provodkani yozing.","9210>0160>50000000;0260>9210>30000000","Boshlang'ich qiymat: Dt 9210 Kt 0160. Eskirish: Dt 0260 Kt 9210."],
+ ["n226",2,"Asosiy vositalar","Kompyuter yo'qolgani aniqlandi: boshlang'ich qiymati 6 000 000 so'm, eskirishi 2 000 000 so'm. Ikki provodkani yozing.","9210>0150>6000000;0250>9210>2000000","Boshlang'ich qiymat: Dt 9210 Kt 0150. Eskirish: Dt 0250 Kt 9210."],
+ ["n227",2,"Asosiy vositalar","Mebel tekinga berildi: boshlang'ich qiymati 4 000 000 so'm, eskirishi 1 000 000 so'm. Ikki provodkani yozing.","9210>0140>4000000;0240>9210>1000000","Boshlang'ich qiymat: Dt 9210 Kt 0140. Eskirish: Dt 0240 Kt 9210."],
+ ["n228",2,"Asosiy vositalar","Avtomobil 80 000 000 so'mga (QQSsiz) sotib olinib, foydalanishga topshirildi. Ikki provodkani yozing.","0820>6010>80000000;0160>0820>80000000","Xarid: Dt 0820 Kt 6010. Foydalanishga topshirish: Dt 0160 Kt 0820."],
+ ["n229",2,"Asosiy vositalar","Yer uchastkasi 100 000 000 so'mga (QQSsiz) sotib olinib, hisobga olindi. Ikki provodkani yozing.","0820>6010>100000000;0110>0820>100000000","Xarid: Dt 0820 Kt 6010. Hisobga olish: Dt 0110 Kt 0820."],
+ ["n230",2,"Asosiy vositalar","Uskunani modernizatsiya qilish xarajatlari 5 000 000 so'm (QQSsiz) hisoblandi va uskuna qiymatiga qo'shildi. Ikki provodkani yozing.","0890>6010>5000000;0130>0890>5000000","Xarajat: Dt 0890 Kt 6010. Qiymatga qo'shish: Dt 0130 Kt 0890."],
+ ["n231",2,"Asosiy vositalar","Yerni obodonlashtirish xarajatlari 3 000 000 so'm (QQSsiz) hisoblandi va yer qiymatiga o'tkazildi. Ikki provodkani yozing.","0850>6010>3000000;0111>0850>3000000","Xarajat: Dt 0850 Kt 6010. O'tkazish: Dt 0111 Kt 0850."],
+ ["n232",2,"Asosiy vositalar","Moliyaviy ijara bo'yicha uskuna 60 000 000 so'm qiymatda olindi: joriy qismi 12 000 000, uzoq muddatli qismi 48 000 000 so'm. Ikki provodkani yozing.","0310>6950>12000000;0310>7910>48000000","Joriy qism: Dt 0310 Kt 6950. Uzoq muddatli qism: Dt 0310 Kt 7910."],
+ ["n233",1,"Asosiy vositalar","Moliyaviy ijara bo'yicha joriy to'lov 3 000 000 so'm hisob-kitob schyotidan to'landi.","6950>5110>3000000","Majburiyatning joriy qismi kamaydi: Dt 6950. Pul chiqdi: Kt 5110."],
+ ["n234",1,"Asosiy vositalar","Moliyaviy ijara bo'yicha ijaraga oluvchi sifatida 500 000 so'm foiz hisoblandi.","9610>6920>500000","Foiz ko'rinishidagi xarajat: Dt 9610. Hisoblangan foizlar bo'yicha qarz: Kt 6920."],
+ ["n235",1,"Asosiy vositalar","Moliyaviy ijaraga olingan uskunaga 1 000 000 so'm eskirish hisoblandi (ma'muriy foydalanish).","9420>0299>1000000","Ma'muriy xarajat: Dt 9420. Moliyaviy ijaraga olingan asosiy vositalarning eskirishi: Kt 0299."],
+ ["n236",2,"Asosiy vositalar","Moliyaviy ijara tugadi: uskuna (60 000 000 so'm) ijaraga oluvchining mulkiga o'tdi, uning eskirishi (10 000 000 so'm) ham o'tkazildi. Ikki provodkani yozing.","0130>0310>60000000;0299>0230>10000000","Uskuna: Dt 0130 Kt 0310. Eskirish: Dt 0299 Kt 0230."],
+ ["n237",3,"Asosiy vositalar","Qurilish uchun 4 000 000 so'mlik materiallar, 5 000 000 so'm ish haqi sarflandi va tayyor bino (9 000 000 so'm) foydalanishga topshirildi. Uchala provodkani yozing.","0810>1050>4000000;0810>6710>5000000;0120>0810>9000000","Materiallar: Dt 0810 Kt 1050. Ish haqi: Dt 0810 Kt 6710. Foydalanishga topshirish: Dt 0120 Kt 0810."],
+ ["n238",2,"Asosiy vositalar","Mashina va uskunaning qiymati qayta baholanib, 8 000 000 so'mga oshirildi; eskirishi 2 000 000 so'mga oshirildi. Ikki provodkani yozing.","0130>8510>8000000;8510>0230>2000000","Qiymat oshishi: Dt 0130 Kt 8510. Eskirish oshishi: Dt 8510 Kt 0230."],
+ ["n239",1,"Nomoddiy aktivlar","Dasturiy ta'minot litsenziyasi 12 000 000 so'mga (QQSsiz) sotib olindi.","0830>6010>12000000","Nomoddiy aktivlarni xarid qilish: Dt 0830. Yetkazib beruvchiga qarz: Kt 6010."],
+ ["n240",1,"Nomoddiy aktivlar","Sotib olingan dasturiy ta'minot (12 000 000 so'm) nomoddiy aktivlar hisobiga kirim qilindi.","0430>0830>12000000","Dasturiy ta'minot: Dt 0430. Xarid hisobvarag'i yopildi: Kt 0830."],
+ ["n241",1,"Nomoddiy aktivlar","Patent 8 000 000 so'mga nomoddiy aktivlar hisobiga olindi.","0410>0830>8000000","Patentlar, litsenziyalar va nou-xau: Dt 0410. Kt 0830."],
+ ["n242",1,"Nomoddiy aktivlar","Savdo markasi (tovar belgisi) 5 000 000 so'mga nomoddiy aktivlar hisobiga olindi.","0420>0830>5000000","Savdo markalari va tovar belgilari: Dt 0420. Kt 0830."],
+ ["n243",1,"Nomoddiy aktivlar","Franshiza huquqi 20 000 000 so'mga nomoddiy aktivlar hisobiga olindi.","0460>0830>20000000","Franshizing: Dt 0460. Kt 0830."],
+ ["n244",1,"Nomoddiy aktivlar","Mualliflik huquqi 3 000 000 so'mga nomoddiy aktivlar hisobiga olindi.","0470>0830>3000000","Mualliflik huquqlari: Dt 0470. Kt 0830."],
+ ["n245",1,"Nomoddiy aktivlar","Yer va tabiiy resurslardan foydalanish huquqi 15 000 000 so'mga hisobga olindi.","0440>0830>15000000","Yerdan va tabiat resurslaridan foydalanish huquqlari: Dt 0440. Kt 0830."],
+ ["n246",1,"Nomoddiy aktivlar","Tekinga olingan dasturiy ta'minot (2 000 000 so'm) kirim qilindi.","0430>8530>2000000","Dasturiy ta'minot: Dt 0430. Tekinga olingan mol-mulk: Kt 8530."],
+ ["n247",1,"Nomoddiy aktivlar","Inventarizatsiyada hisobga olinmagan patent aniqlandi (qiymati 1 000 000 so'm).","0410>9390>1000000","Patent hisobga olindi: Dt 0410. Boshqa operatsion daromad: Kt 9390."],
+ ["n248",1,"Nomoddiy aktivlar","Ishlab chiqarishda foydalaniladigan patentga 200 000 so'm amortizatsiya hisoblandi.","2010>0510>200000","Ishlab chiqarish xarajati: Dt 2010. Patentlar amortizatsiyasi: Kt 0510."],
+ ["n249",1,"Nomoddiy aktivlar","Savdo markasiga 150 000 so'm amortizatsiya hisoblandi (ma'muriy foydalanish).","9420>0520>150000","Ma'muriy xarajat: Dt 9420. Savdo markalari amortizatsiyasi: Kt 0520."],
+ ["n250",1,"Nomoddiy aktivlar","Franshiza huquqiga 400 000 so'm amortizatsiya hisoblandi (savdo faoliyati).","9410>0560>400000","Sotish xarajatlari: Dt 9410. Franshizing amortizatsiyasi: Kt 0560."],
+ ["n251",1,"Nomoddiy aktivlar","Mualliflik huquqiga 100 000 so'm amortizatsiya hisoblandi (ma'muriy foydalanish).","9420>0570>100000","Ma'muriy xarajat: Dt 9420. Mualliflik huquqlari amortizatsiyasi: Kt 0570."],
+ ["n252",1,"Nomoddiy aktivlar","Yerdan foydalanish huquqiga 250 000 so'm amortizatsiya hisoblandi (ma'muriy foydalanish).","9420>0540>250000","Ma'muriy xarajat: Dt 9420. Yer va tabiat resurslaridan foydalanish huquqlari amortizatsiyasi: Kt 0540."],
+ ["n253",1,"Nomoddiy aktivlar","Boshqa nomoddiy aktivga 80 000 so'm amortizatsiya hisoblandi (ma'muriy foydalanish).","9420>0590>80000","Ma'muriy xarajat: Dt 9420. Boshqa nomoddiy aktivlar amortizatsiyasi: Kt 0590."],
+ ["n254",1,"Nomoddiy aktivlar","Savdo bo'limida foydalaniladigan dasturiy ta'minotga 180 000 so'm amortizatsiya hisoblandi.","9410>0530>180000","Sotish xarajatlari: Dt 9410. Dasturiy ta'minot amortizatsiyasi: Kt 0530."],
+ ["n255",1,"Nomoddiy aktivlar","Qurilishda foydalanilgan dasturiy ta'minotga 120 000 so'm amortizatsiya hisoblandi (qurilish xarajatiga qo'shiladi).","0810>0530>120000","Tugallanmagan qurilish xarajati: Dt 0810. Dasturiy ta'minot amortizatsiyasi: Kt 0530."],
+ ["n256",2,"Nomoddiy aktivlar","Dasturiy ta'minot litsenziyasi 12 000 000 so'mga (QQSsiz) sotib olinib, hisobga olindi. Ikki provodkani yozing.","0830>6010>12000000;0430>0830>12000000","Xarid: Dt 0830 Kt 6010. Hisobga olish: Dt 0430 Kt 0830."],
+ ["n257",2,"Nomoddiy aktivlar","Patent hisobdan chiqarildi: boshlang'ich qiymati 10 000 000 so'm, amortizatsiyasi 4 000 000 so'm. Ikki provodkani yozing.","9220>0410>10000000;0510>9220>4000000","Boshlang'ich qiymat: Dt 9220 Kt 0410. Amortizatsiya: Dt 0510 Kt 9220."],
+ ["n258",3,"Nomoddiy aktivlar","Patent 8 000 000 so'mga (QQSsiz) sotib olindi, hisobga olindi va ma'muriy foydalanishdagi shu patentga 100 000 so'm amortizatsiya hisoblandi. Uchala provodkani yozing.","0830>6010>8000000;0410>0830>8000000;9420>0510>100000","Xarid: Dt 0830 Kt 6010. Hisobga olish: Dt 0410 Kt 0830. Amortizatsiya: Dt 9420 Kt 0510."],
+ ["n259",1,"Ijara","Ofis uchun oylik ijara haqi 3 000 000 so'm hisoblandi (operativ ijara, QQSsiz).","9420>6910>3000000","Ma'muriy xarajat: Dt 9420. To'lanadigan operativ ijara: Kt 6910."],
+ ["n260",1,"Ijara","Hisoblangan operativ ijara haqi (3 000 000 so'm) hisob-kitob schyotidan to'landi.","6910>5110>3000000","Ijara bo'yicha qarz so'ndi: Dt 6910. Pul chiqdi: Kt 5110."],
+ ["n261",1,"Ijara","Ofis uchun 3 oylik ijara haqi 9 000 000 so'm oldindan to'landi.","3110>5110>9000000","Oldindan to'langan operativ ijara haqi (kelgusi davr xarajati): Dt 3110. Pul chiqdi: Kt 5110."],
+ ["n262",1,"Ijara","Oldindan to'langan ijara haqining bir oylik qismi (3 000 000 so'm) xarajatga o'tkazildi.","9420>3110>3000000","Ma'muriy xarajat: Dt 9420. Oldindan to'langan ijara kamaydi: Kt 3110."],
+ ["n263",1,"Ijara","Ijaraga oluvchidan operativ ijara haqi (2 000 000 so'm) hisob-kitob schyotimizga tushdi.","5110>4820>2000000","Pul keldi: Dt 5110. Olinadigan ijara to'lovi so'ndi: Kt 4820."],
+ ["n264",1,"Ijara","Moliyaviy ijara bo'yicha ijaraga oluvchidan 3 000 000 so'm hisob-kitob schyotimizga tushdi (ijaraga beruvchi sifatida).","5110>4810>3000000","Pul keldi: Dt 5110. Moliyaviy ijara bo'yicha olinadigan joriy to'lov so'ndi: Kt 4810."],
+ ["n265",2,"Ijara","Do'kon ijarasi uchun 4 000 000 so'm + QQS 12% (480 000 so'm) hisoblandi (sotish xarajati). Ikkala provodkani yozing.","9410>6910>4000000;4410>6910>480000","Ijara xarajati: Dt 9410 Kt 6910. Kirim QQS: Dt 4410 Kt 6910."],
+ ["n266",2,"Ijara","Zalni operativ ijaraga berish: 5 000 000 so'm ijara haqi + QQS 12% (600 000 so'm) hisoblandi. Ikkala provodkani yozing.","4820>9350>5000000;4820>6410>600000","Daromad: Dt 4820 Kt 9350. QQS: Dt 4820 Kt 6410."],
+ ["n267",2,"Ijara","Ijara haqi 3 000 000 so'm hisoblandi va hisob-kitob schyotidan to'landi (ma'muriy, QQSsiz). Ikkala provodkani yozing.","9420>6910>3000000;6910>5110>3000000","Hisoblash: Dt 9420 Kt 6910. To'lash: Dt 6910 Kt 5110."],
+ ["n268",2,"Ijara","Ofis uchun 3 oylik ijara haqi (9 000 000 so'm) oldindan to'landi, birinchi oy (3 000 000 so'm) xarajatga o'tkazildi. Ikkala provodkani yozing.","3110>5110>9000000;9420>3110>3000000","Oldindan to'lov: Dt 3110 Kt 5110. Xarajatga o'tkazish: Dt 9420 Kt 3110."],
+ ["n269",1,"Ijara","Moliyaviy ijaraning uzoq muddatli to'lovlaridan 2 000 000 so'mi joriy qismga o'tkazildi (ijaraga beruvchi).","4810>0920>2000000","Joriy to'lov: Dt 4810. Uzoq muddatli to'lov kamaydi: Kt 0920."],
+ ["n270",1,"Investitsiyalar","Uzoq muddatli qimmatli qog'ozlar 10 000 000 so'mga sotib olindi (hisob-kitob schyotidan).","0610>5110>10000000","Uzoq muddatli investitsiya (qimmatli qog'ozlar): Dt 0610. Pul chiqdi: Kt 5110."],
+ ["n271",1,"Investitsiyalar","Sho''ba xo'jalik jamiyatiga 25 000 000 so'm investitsiya kiritildi.","0620>5110>25000000","Sho''ba jamiyatga investitsiya: Dt 0620. Pul chiqdi: Kt 5110."],
+ ["n272",1,"Investitsiyalar","Qaram xo'jalik jamiyatiga 15 000 000 so'm investitsiya kiritildi.","0630>5110>15000000","Qaram jamiyatga investitsiya: Dt 0630. Pul chiqdi: Kt 5110."],
+ ["n273",1,"Investitsiyalar","Chet el kapitali ishtirokidagi tashkilotga 20 000 000 so'm investitsiya kiritildi.","0640>5110>20000000","Chet el kapitali ishtirokidagi tashkilotga investitsiya: Dt 0640. Pul chiqdi: Kt 5110."],
+ ["n274",1,"Investitsiyalar","Boshqa uzoq muddatli investitsiya sifatida 5 000 000 so'm joylashtirildi.","0690>5110>5000000","Boshqa uzoq muddatli investitsiyalar: Dt 0690. Pul chiqdi: Kt 5110."],
+ ["n275",1,"Investitsiyalar","Xodimga 3 yil muddatga 12 000 000 so'm qarz berildi (hisob-kitob schyotidan).","0930>5110>12000000","Xodimlarning uzoq muddatli qarzi: Dt 0930. Pul chiqdi: Kt 5110."],
+ ["n276",1,"Investitsiyalar","Investitsiya kiritilgan jamiyatdan olinadigan dividend 1 000 000 so'm hisoblandi.","4840>9520>1000000","Olinadigan dividend: Dt 4840. Dividend ko'rinishidagi daromad: Kt 9520."],
+ ["n277",1,"Investitsiyalar","Dividend (1 000 000 so'm) hisob-kitob schyotimizga tushdi.","5110>4840>1000000","Pul keldi: Dt 5110. Olinadigan dividend so'ndi: Kt 4840."],
+ ["n278",1,"Investitsiyalar","Royalti bo'yicha daromad 1 500 000 so'm hisoblandi.","4850>9510>1500000","Olinadigan royalti: Dt 4850. Royalti ko'rinishidagi daromad: Kt 9510."],
+ ["n279",1,"Investitsiyalar","Qisqa muddatli qimmatli qog'ozlar qayta baholanib, 300 000 so'm daromad olindi.","5810>9560>300000","Qimmatli qog'ozlar qiymati oshdi: Dt 5810. Qayta baholashdan daromad: Kt 9560."],
+ ["n280",1,"Investitsiyalar","Qisqa muddatli qimmatli qog'ozlar (5 000 000 so'm) tannarxida sotildi, pul hisob-kitob schyotiga tushdi.","5110>5810>5000000","Pul keldi: Dt 5110. Qimmatli qog'ozlar kamaydi: Kt 5810."],
+ ["n281",1,"Investitsiyalar","Qimmatli qog'ozlarni chiqarish xarajatlari (400 000 so'm) hisob-kitob schyotidan to'landi.","9630>5110>400000","Qimmatli qog'ozlarni chiqarish xarajatlari: Dt 9630. Pul chiqdi: Kt 5110."],
+ ["n282",1,"Investitsiyalar","O'rnatiladigan mahalliy uskuna 9 000 000 so'mga (QQSsiz) keldi.","0710>6010>9000000","O'rnatiladigan asbob-uskuna (mahalliy): Dt 0710. Yetkazib beruvchiga qarz: Kt 6010."],
+ ["n283",1,"Investitsiyalar","O'rnatiladigan xorijiy uskuna 18 000 000 so'mga (QQSsiz) keldi.","0720>6010>18000000","O'rnatiladigan asbob-uskuna (xorijiy): Dt 0720. Yetkazib beruvchiga qarz: Kt 6010."],
+ ["n284",1,"Investitsiyalar","Montaj uchun topshirilgan uskuna (9 000 000 so'm) qurilish xarajatlariga o'tkazildi.","0810>0710>9000000","Tugallanmagan qurilish: Dt 0810. O'rnatiladigan uskuna kamaydi: Kt 0710."],
+ ["n285",2,"Investitsiyalar","Uzoq muddatli qimmatli qog'ozlar 10 000 000 so'mga sotib olindi va ulardan 500 000 so'm dividend hisoblandi. Ikkala provodkani yozing.","0610>5110>10000000;4840>9520>500000","Xarid: Dt 0610 Kt 5110. Dividend: Dt 4840 Kt 9520."],
+ ["n286",1,"Xarajatlar va kredit","Telefon va internet xizmati uchun 700 000 so'mlik hisob keldi (QQSsiz) — ma'muriy xarajat.","9420>6010>700000","Ma'muriy xarajat: Dt 9420. Xizmat ko'rsatuvchiga qarz: Kt 6010."],
+ ["n287",1,"Xarajatlar va kredit","Audit xizmati uchun 3 000 000 so'mlik hisob keldi (QQSsiz).","9420>6010>3000000","Ma'muriy xarajat: Dt 9420. Qarz: Kt 6010."],
+ ["n288",1,"Xarajatlar va kredit","Tovarlarni mijozlarga yetkazish uchun transport xizmati 900 000 so'm (QQSsiz) hisoblandi.","9410>6010>900000","Sotish xarajatlari: Dt 9410. Transport tashkilotiga qarz: Kt 6010."],
+ ["n289",1,"Xarajatlar va kredit","Sexning suv ta'minoti uchun 400 000 so'mlik hisob keldi (QQSsiz).","2510>6010>400000","Umumiy ishlab chiqarish xarajatlari: Dt 2510. Qarz: Kt 6010."],
+ ["n290",1,"Xarajatlar va kredit","Vakillik xarajatlari uchun 500 000 so'm kassadan to'landi (ma'muriy).","9420>5010>500000","Ma'muriy xarajat: Dt 9420. Kassadan pul chiqdi: Kt 5010."],
+ ["n291",1,"Xarajatlar va kredit","Reklama uchun 1 200 000 so'm kassadan to'landi.","9410>5010>1200000","Sotish xarajatlari: Dt 9410. Kassadan pul chiqdi: Kt 5010."],
+ ["n292",1,"Xarajatlar va kredit","Ofisning suv va elektr energiyasi uchun 600 000 so'm hisob-kitob schyotidan to'g'ridan-to'g'ri to'landi.","9420>5110>600000","Ma'muriy xarajat: Dt 9420. Pul chiqdi: Kt 5110."],
+ ["n293",1,"Xarajatlar va kredit","Shartnomani buzgani uchun jarima 800 000 so'm hisob-kitob schyotidan to'landi.","9430>5110>800000","Boshqa operatsion xarajat: Dt 9430. Pul chiqdi: Kt 5110."],
+ ["n294",1,"Xarajatlar va kredit","Soliq bo'yicha penya 150 000 so'm hisoblandi.","9430>6410>150000","Boshqa operatsion xarajat: Dt 9430. Byudjetga qarz: Kt 6410."],
+ ["n295",1,"Xarajatlar va kredit","Sud xarajatlari (davlat boji) 300 000 so'm kassadan to'landi.","9430>5010>300000","Boshqa operatsion xarajat: Dt 9430. Kassadan pul chiqdi: Kt 5010."],
+ ["n296",1,"Xarajatlar va kredit","Xodimlarni o'qitish (trening) uchun 1 000 000 so'mlik hisob keldi (QQSsiz).","9420>6010>1000000","Ma'muriy xarajat: Dt 9420. Qarz: Kt 6010."],
+ ["n297",1,"Xarajatlar va kredit","Ofisni joriy ta'mirlash uchun pudratchi 2 000 000 so'mlik hisob taqdim etdi (QQSsiz).","9420>6010>2000000","Joriy ta'mir — davr xarajati: Dt 9420. Pudratchiga qarz: Kt 6010."],
+ ["n298",2,"Xarajatlar va kredit","Reklama xizmati uchun 2 000 000 so'mlik hisob keldi (sotish xarajati) va hisob-kitob schyotidan to'landi. Ikkala provodkani yozing.","9410>6010>2000000;6010>5110>2000000","Xarajat: Dt 9410 Kt 6010. To'lov: Dt 6010 Kt 5110."],
+ ["n299",2,"Xarajatlar va kredit","Audit xizmati 3 000 000 so'm hisoblandi va hisob-kitob schyotidan to'landi (QQSsiz). Ikkala provodkani yozing.","9420>6010>3000000;6010>5110>3000000","Xarajat: Dt 9420 Kt 6010. To'lov: Dt 6010 Kt 5110."],
+ ["n300",2,"Xarajatlar va kredit","Soliq penyasi 150 000 so'm hisoblandi va byudjetga to'landi. Ikkala provodkani yozing.","9430>6410>150000;6410>5110>150000","Hisoblash: Dt 9430 Kt 6410. To'lash: Dt 6410 Kt 5110."],
+ ["n301",3,"Xarajatlar va kredit","Sotish bo'limiga transport xizmati 900 000 so'm (QQSsiz) hisoblandi va hisob-kitob schyotidan to'landi; shuningdek 1 200 000 so'mlik reklama kassadan to'landi. Uchala provodkani yozing.","9410>6010>900000;6010>5110>900000;9410>5010>1200000","Transport: Dt 9410 Kt 6010. To'lov: Dt 6010 Kt 5110. Reklama: Dt 9410 Kt 5010."],
+ ["n302",1,"Kredit va qarzlar","Uzoq muddatli bank krediti 100 000 000 so'm hisob-kitob schyotiga tushdi.","5110>7810>100000000","Pul keldi: Dt 5110. Uzoq muddatli kredit majburiyati: Kt 7810."],
+ ["n303",1,"Kredit va qarzlar","Uzoq muddatli kreditning bir yil ichida to'lanadigan qismi (20 000 000 so'm) joriy qismga o'tkazildi.","7810>6950>20000000","Uzoq muddatli kredit kamaydi: Dt 7810. Uzoq muddatli majburiyatning joriy qismi: Kt 6950."],
+ ["n304",1,"Kredit va qarzlar","Boshqa tashkilotdan 15 000 000 so'm qisqa muddatli qarz hisob-kitob schyotiga tushdi.","5110>6820>15000000","Pul keldi: Dt 5110. Qisqa muddatli qarz: Kt 6820."],
+ ["n305",1,"Kredit va qarzlar","Olingan qisqa muddatli qarz (15 000 000 so'm) hisob-kitob schyotidan qaytarildi.","6820>5110>15000000","Qarz so'ndi: Dt 6820. Pul chiqdi: Kt 5110."],
+ ["n306",1,"Kredit va qarzlar","Uzoq muddatli qarz sifatida 30 000 000 so'm hisob-kitob schyotiga tushdi.","5110>7820>30000000","Pul keldi: Dt 5110. Uzoq muddatli qarz: Kt 7820."],
+ ["n307",1,"Kredit va qarzlar","Uzoq muddatli kredit bo'yicha 2 000 000 so'm foiz hisoblandi.","9610>6920>2000000","Foiz xarajati: Dt 9610. Hisoblangan foizlar bo'yicha qarz: Kt 6920."],
+ ["n308",1,"Kredit va qarzlar","Hisoblangan foizlar (2 000 000 so'm) hisob-kitob schyotidan to'landi.","6920>5110>2000000","Foiz qarzi so'ndi: Dt 6920. Pul chiqdi: Kt 5110."],
+ ["n309",1,"Kredit va qarzlar","Qisqa muddatli obligatsiyalar chiqarilib, 10 000 000 so'm pul hisob-kitob schyotiga tushdi.","5110>6830>10000000","Pul keldi: Dt 5110. To'lanadigan obligatsiyalar: Kt 6830."],
+ ["n310",1,"Kredit va qarzlar","Uzoq muddatli obligatsiyalar chiqarilib, 40 000 000 so'm pul hisob-kitob schyotiga tushdi.","5110>7830>40000000","Pul keldi: Dt 5110. To'lanadigan uzoq muddatli obligatsiyalar: Kt 7830."],
+ ["n311",1,"Kredit va qarzlar","Qisqa muddatli obligatsiyalar (10 000 000 so'm) qaytarildi.","6830>5110>10000000","Obligatsiya majburiyati so'ndi: Dt 6830. Pul chiqdi: Kt 5110."],
+ ["n312",1,"Kredit va qarzlar","Uzoq muddatli veksel evaziga 25 000 000 so'm qarz olindi.","5110>7840>25000000","Pul keldi: Dt 5110. To'lanadigan uzoq muddatli veksel: Kt 7840."],
+ ["n313",1,"Kredit va qarzlar","Moliyaviy ijara majburiyatining uzoq muddatli qismidan 3 000 000 so'mi joriy qismga o'tkazildi.","7910>6950>3000000","Uzoq muddatli ijara majburiyati kamaydi: Dt 7910. Joriy qism: Kt 6950."],
+ ["n314",1,"Kredit va qarzlar","Uzoq muddatli kreditning 10 000 000 so'mi muddatidan oldin qaytarildi.","7810>5110>10000000","Kredit majburiyati so'ndi: Dt 7810. Pul chiqdi: Kt 5110."],
+ ["n315",2,"Kredit va qarzlar","Qisqa muddatli bank krediti 50 000 000 so'm olindi va undan yetkazib beruvchiga 30 000 000 so'm to'landi. Ikkala provodkani yozing.","5110>6810>50000000;6010>5110>30000000","Kredit: Dt 5110 Kt 6810. To'lov: Dt 6010 Kt 5110."],
+ ["n316",2,"Kredit va qarzlar","Qisqa muddatli kredit 50 000 000 so'm olindi va uning bo'yicha 1 000 000 so'm foiz hisoblandi. Ikkala provodkani yozing.","5110>6810>50000000;9610>6920>1000000","Kredit: Dt 5110 Kt 6810. Foiz: Dt 9610 Kt 6920."],
+ ["n317",3,"Kredit va qarzlar","Kredit 50 000 000 so'm olindi, 1 000 000 so'm foiz hisoblandi, kredit va foiz hisob-kitob schyotidan to'liq qaytarildi. To'rtala provodkani yozing.","5110>6810>50000000;9610>6920>1000000;6810>5110>50000000;6920>5110>1000000","Kredit olish: Dt 5110 Kt 6810. Foiz: Dt 9610 Kt 6920. Kreditni qaytarish: Dt 6810 Kt 5110. Foizni to'lash: Dt 6920 Kt 5110."],
+ ["n318",1,"Soliqlar","Mol-mulk solig'i 1 200 000 so'm hisoblandi.","9430>6410>1200000","Soliq xarajati — boshqa operatsion xarajat: Dt 9430. Byudjetga qarz: Kt 6410."],
+ ["n319",1,"Soliqlar","Yer solig'i 500 000 so'm hisoblandi.","9430>6410>500000","Soliq xarajati: Dt 9430. Byudjetga qarz: Kt 6410."],
+ ["n320",1,"Soliqlar","Foyda solig'i bo'yicha oldindan to'langan bo'nak (3 000 000 so'm) hisoblangan foyda solig'iga hisobga olindi.","6410>4410>3000000","Byudjetga qarz kamaydi: Dt 6410. Bo'nak to'lovi ishlatildi: Kt 4410."],
+ ["n321",1,"Soliqlar","Hisobot yili foyda solig'i (5 400 000 so'm) hisoblandi.","9810>6410>5400000","Foyda solig'i bo'yicha xarajat: Dt 9810. Byudjetga qarz: Kt 6410."],
+ ["n322",1,"Soliqlar","Foydadan hisoblangan boshqa soliq majburiyati 400 000 so'm e'tirof etildi.","9820>6410>400000","Boshqa soliq xarajati: Dt 9820. Byudjetga qarz: Kt 6410."],
+ ["n323",1,"Soliqlar","Vaqtinchalik farq tufayli kechiktirilgan foyda solig'i majburiyati 600 000 so'm e'tirof etildi.","9810>6250>600000","Foyda solig'i xarajati: Dt 9810. Kechiktirilgan foyda solig'i majburiyati: Kt 6250."],
+ ["n324",1,"Soliqlar","Vaqtinchalik farq tufayli kechiktirilgan foyda solig'i aktivi (joriy qismi) 500 000 so'm e'tirof etildi.","3210>9810>500000","Kechiktirilgan foyda solig'i aktivi: Dt 3210. Foyda solig'i xarajati kamaydi: Kt 9810."],
+ ["n325",1,"Soliqlar","Hisob-kitob schyotidan byudjetga turli soliqlar bo'yicha 2 000 000 so'm to'landi.","6410>5110>2000000","Byudjetga qarz so'ndi: Dt 6410. Pul chiqdi: Kt 5110."],
+ ["n326",3,"Soliqlar","Foyda solig'i 5 400 000 so'm hisoblandi; undan 3 000 000 so'm bo'nak to'lovlari hisobga olindi va qolgan 2 400 000 so'm to'landi. Uchala provodkani yozing.","9810>6410>5400000;6410>4410>3000000;6410>5110>2400000","Hisoblash: Dt 9810 Kt 6410. Bo'nakni hisobga olish: Dt 6410 Kt 4410. To'lash: Dt 6410 Kt 5110."],
+ ["n327",2,"Soliqlar","Mol-mulk solig'i 1 200 000 so'm hisoblandi va byudjetga to'landi. Ikkala provodkani yozing.","9430>6410>1200000;6410>5110>1200000","Hisoblash: Dt 9430 Kt 6410. To'lash: Dt 6410 Kt 5110."],
+ ["n328",1,"Inventarizatsiya","Inventarizatsiyada materiallar ortiqchasi aniqlandi: 900 000 so'm.","1010>9390>900000","Materiallar hisobga olindi: Dt 1010. Boshqa operatsion daromad: Kt 9390."],
+ ["n329",1,"Inventarizatsiya","Inventarizatsiyada tovarlar ortiqchasi aniqlandi: 600 000 so'm.","2910>9390>600000","Tovarlar hisobga olindi: Dt 2910. Boshqa operatsion daromad: Kt 9390."],
+ ["n330",1,"Inventarizatsiya","Inventarizatsiyada materiallar kamomadi aniqlandi: 700 000 so'm.","5910>1010>700000","Kamomad: Dt 5910. Materiallar kamaydi: Kt 1010."],
+ ["n331",1,"Inventarizatsiya","Inventarizatsiyada tovarlar kamomadi aniqlandi: 500 000 so'm.","5910>2910>500000","Kamomad: Dt 5910. Tovarlar kamaydi: Kt 2910."],
+ ["n332",1,"Inventarizatsiya","Inventarizatsiyada tayyor mahsulot kamomadi aniqlandi: 400 000 so'm.","5910>2810>400000","Kamomad: Dt 5910. Tayyor mahsulot kamaydi: Kt 2810."],
+ ["n333",1,"Inventarizatsiya","Material kamomadi (700 000 so'm) aybdor xodimga yuklatildi.","4730>5910>700000","Moddiy zarar bo'yicha xodimning qarzi: Dt 4730. Kamomad hisobdan chiqdi: Kt 5910."],
+ ["n334",1,"Inventarizatsiya","Tovarlarning tabiiy kamayishi normasi doirasida 150 000 so'm hisobdan chiqarildi.","9410>2910>150000","Sotish xarajatlari: Dt 9410. Ombordagi tovarlar kamaydi: Kt 2910."],
+ ["n335",1,"Inventarizatsiya","Aybdori topilmagan kamomad (200 000 so'm) boshqa operatsion xarajatga o'tkazildi.","9430>5910>200000","Boshqa operatsion xarajat: Dt 9430. Kamomad hisobdan chiqdi: Kt 5910."],
+ ["n336",1,"Inventarizatsiya","Yong'in natijasida 4 000 000 so'mlik materiallar yo'qoldi (favqulodda holat).","9720>1010>4000000","Favqulodda vaziyatdan zarar: Dt 9720. Materiallar kamaydi: Kt 1010."],
+ ["n337",2,"Inventarizatsiya","Tovar kamomadi (500 000 so'm) aniqlandi va aybdorga yuklatildi. Ikkala provodkani yozing.","5910>2910>500000;4730>5910>500000","Kamomad: Dt 5910 Kt 2910. Aybdorga: Dt 4730 Kt 5910."],
+ ["n338",2,"Inventarizatsiya","Material kamomadi (700 000 so'm) aniqlandi va aybdorga yuklatildi. Ikkala provodkani yozing.","5910>1010>700000;4730>5910>700000","Kamomad: Dt 5910 Kt 1010. Aybdorga: Dt 4730 Kt 5910."],
+ ["n339",3,"Inventarizatsiya","Kassadagi kamomad (200 000 so'm) aniqlandi, aybdor kassirga yuklatildi va u summani kassaga kiritdi. Uchala provodkani yozing.","5910>5010>200000;4730>5910>200000;5010>4730>200000","Kamomad: Dt 5910 Kt 5010. Aybdorga: Dt 4730 Kt 5910. Qoplash: Dt 5010 Kt 4730."],
+ ["n340",1,"Kelgusi davr xarajatlari","Yillik dasturiy xizmat (obuna) uchun 6 000 000 so'm oldindan to'landi.","3120>5110>6000000","Oldindan to'langan xizmat haqi: Dt 3120. Pul chiqdi: Kt 5110."],
+ ["n341",1,"Kelgusi davr xarajatlari","Sug'urta polisi uchun 2 400 000 so'm oldindan to'landi.","3190>5110>2400000","Boshqa kelgusi davr xarajatlari: Dt 3190. Pul chiqdi: Kt 5110."],
+ ["n342",1,"Kelgusi davr xarajatlari","Oldindan to'langan xizmat haqining bir oylik qismi (500 000 so'm) ma'muriy xarajatga o'tkazildi.","9420>3120>500000","Ma'muriy xarajat: Dt 9420. Oldindan to'langan xizmat haqi kamaydi: Kt 3120."],
+ ["n343",1,"Kelgusi davr xarajatlari","Sug'urta polisining bir oylik qismi (200 000 so'm) ma'muriy xarajatga o'tkazildi.","9420>3190>200000","Ma'muriy xarajat: Dt 9420. Kelgusi davr xarajati kamaydi: Kt 3190."],
+ ["n344",1,"Kelgusi davr xarajatlari","Oldindan to'langan reklamaning bir oylik qismi (1 000 000 so'm) sotish xarajatiga o'tkazildi.","9410>3190>1000000","Sotish xarajatlari: Dt 9410. Kelgusi davr xarajati kamaydi: Kt 3190."],
+ ["n345",1,"Kelgusi davr xarajatlari","Gazeta-jurnallarga yillik obuna (480 000 so'm) kassadan oldindan to'landi.","3190>5010>480000","Boshqa kelgusi davr xarajatlari: Dt 3190. Kassadan pul chiqdi: Kt 5010."],
+ ["n346",2,"Kelgusi davr xarajatlari","Yillik xizmat haqi (6 000 000 so'm) oldindan to'landi va birinchi oyning 500 000 so'mi xarajatga o'tkazildi. Ikkala provodkani yozing.","3120>5110>6000000;9420>3120>500000","Oldindan to'lov: Dt 3120 Kt 5110. Xarajatga o'tkazish: Dt 9420 Kt 3120."],
+ ["n347",2,"Kelgusi davr xarajatlari","Sug'urta polisi (2 400 000 so'm) oldindan to'landi va birinchi oyning 200 000 so'mi xarajatga o'tkazildi. Ikkala provodkani yozing.","3190>5110>2400000;9420>3190>200000","Oldindan to'lov: Dt 3190 Kt 5110. Xarajatga o'tkazish: Dt 9420 Kt 3190."],
+ ["n348",1,"Zaxiralar va qarzlar","Shubhali qarzlar bo'yicha zaxira 1 500 000 so'm ajratildi.","9430>4910>1500000","Boshqa operatsion xarajat: Dt 9430. Shubhali qarzlar bo'yicha zaxira: Kt 4910."],
+ ["n349",1,"Zaxiralar va qarzlar","Umidsiz qarz (800 000 so'm) shubhali qarzlar zaxirasi hisobiga hisobdan chiqarildi.","4910>4010>800000","Zaxira ishlatildi: Dt 4910. Xaridorning qarzi hisobdan chiqdi: Kt 4010."],
+ ["n350",1,"Zaxiralar va qarzlar","Shubhali qarzlar zaxirasining ortiqcha qismi (300 000 so'm) daromadga qaytarildi.","4910>9390>300000","Zaxira kamaydi: Dt 4910. Boshqa operatsion daromad: Kt 9390."],
+ ["n351",1,"Zaxiralar va qarzlar","Mahsulotga kafolat xizmati uchun zaxira 600 000 so'm ajratildi (sotish xarajati).","9410>8910>600000","Sotish xarajatlari: Dt 9410. Kelgusi xarajatlar zaxirasi: Kt 8910."],
+ ["n352",1,"Zaxiralar va qarzlar","Kafolat xizmati bajarilib, zaxira hisobidan 200 000 so'mlik materiallar sarflandi.","8910>1010>200000","Zaxira ishlatildi: Dt 8910. Materiallar kamaydi: Kt 1010."],
+ ["n353",1,"Zaxiralar va qarzlar","Muddati o'tgan kreditor qarz (yetkazib beruvchiga 1 000 000 so'm) hisobdan chiqarilib, daromadga olindi.","6010>9360>1000000","Qarz so'ndi: Dt 6010. Kreditor qarzni hisobdan chiqarishdan daromad: Kt 9360."],
+ ["n354",1,"Zaxiralar va qarzlar","Zaxirasiz umidsiz debitor qarz (500 000 so'm) hisobdan chiqarildi.","9430>4010>500000","Boshqa operatsion xarajat: Dt 9430. Xaridorning qarzi hisobdan chiqdi: Kt 4010."],
+ ["n355",2,"Zaxiralar va qarzlar","Shubhali qarzlar zaxirasi 1 500 000 so'm ajratildi va 800 000 so'mlik umidsiz qarz zaxira hisobiga hisobdan chiqarildi. Ikkala provodkani yozing.","9430>4910>1500000;4910>4010>800000","Zaxira ajratish: Dt 9430 Kt 4910. Qarzni hisobdan chiqarish: Dt 4910 Kt 4010."],
+ ["n356",1,"Valyuta","Valyuta schyotidagi qoldiq kurs o'zgarishi tufayli qayta baholanib, 400 000 so'm kurs farqidan daromad olindi.","5210>9540>400000","Valyuta schyoti qiymati oshdi: Dt 5210. Valyuta kurslari farqidan daromad: Kt 9540."],
+ ["n357",1,"Valyuta","Valyuta schyotidagi qoldiq qayta baholanib, 250 000 so'm kurs farqidan zarar ko'rildi.","9620>5210>250000","Kurs farqidan zarar: Dt 9620. Valyuta schyoti qiymati kamaydi: Kt 5210."],
+ ["n358",1,"Valyuta","Yetkazib beruvchiga valyutadagi qarz qayta baholanib, 300 000 so'm kurs zarari e'tirof etildi.","9620>6010>300000","Kurs farqidan zarar: Dt 9620. Qarz ko'paydi: Kt 6010."],
+ ["n359",1,"Valyuta","Yetkazib beruvchiga valyutadagi qarz qayta baholanib, 200 000 so'm kurs daromadi e'tirof etildi.","6010>9540>200000","Qarz kamaydi: Dt 6010. Kurs farqidan daromad: Kt 9540."],
+ ["n360",1,"Valyuta","Xaridorning valyutadagi qarzi qayta baholanib, 350 000 so'm kurs daromadi olindi.","4010>9540>350000","Xaridor qarzi ko'paydi: Dt 4010. Kurs farqidan daromad: Kt 9540."],
+ ["n361",1,"Valyuta","Xaridorning valyutadagi qarzi qayta baholanib, 150 000 so'm kurs zarari ko'rildi.","9620>4010>150000","Kurs farqidan zarar: Dt 9620. Xaridor qarzi kamaydi: Kt 4010."],
+ ["n362",1,"Valyuta","Valyuta kassasidagi qoldiq qayta baholanib, 100 000 so'm kurs daromadi olindi.","5020>9540>100000","Valyuta kassasi qiymati oshdi: Dt 5020. Kurs farqidan daromad: Kt 9540."],
+ ["n363",1,"Valyuta","Valyutadagi kredit qayta baholanib, 500 000 so'm kurs zarari e'tirof etildi.","9620>6810>500000","Kurs farqidan zarar: Dt 9620. Kredit qarzi ko'paydi: Kt 6810."],
+ ["n364",1,"Valyuta","Chet eldan 20 000 000 so'mga ekvivalent tovar olindi (QQSsiz, valyutada qarz).","2910>6010>20000000","Tovar kirim bo'ldi: Dt 2910. Yetkazib beruvchiga qarz (valyutada): Kt 6010."],
+ ["n365",1,"Yakuniy natija","Yil oxirida tovarlarni sotishdan daromad (40 000 000 so'm) yakuniy natijaga yopildi.","9020>9910>40000000","Daromad hisobvarag'i yopildi: Dt 9020. Natija: Kt 9910."],
+ ["n366",1,"Yakuniy natija","Yil oxirida xizmatlardan daromad (15 000 000 so'm) yakuniy natijaga yopildi.","9030>9910>15000000","Daromad yopildi: Dt 9030. Natija: Kt 9910."],
+ ["n367",1,"Yakuniy natija","Yil oxirida boshqa operatsion daromadlar (2 000 000 so'm) yakuniy natijaga yopildi.","9390>9910>2000000","Daromad yopildi: Dt 9390. Natija: Kt 9910."],
+ ["n368",1,"Yakuniy natija","Yil oxirida foiz ko'rinishidagi daromadlar (600 000 so'm) yakuniy natijaga yopildi.","9530>9910>600000","Daromad yopildi: Dt 9530. Natija: Kt 9910."],
+ ["n369",1,"Yakuniy natija","Yil oxirida kurs farqidan daromad (400 000 so'm) yakuniy natijaga yopildi.","9540>9910>400000","Daromad yopildi: Dt 9540. Natija: Kt 9910."],
+ ["n370",1,"Yakuniy natija","Yil oxirida sotilgan tovarlar tannarxi (25 000 000 so'm) yakuniy natijaga hisobdan chiqarildi.","9910>9120>25000000","Natija: Dt 9910. Tannarx hisobvarag'i yopildi: Kt 9120."],
+ ["n371",1,"Yakuniy natija","Yil oxirida bajarilgan ish va xizmatlar tannarxi (9 000 000 so'm) yakuniy natijaga hisobdan chiqarildi.","9910>9130>9000000","Natija: Dt 9910. Tannarx yopildi: Kt 9130."],
+ ["n372",1,"Yakuniy natija","Yil oxirida sotish xarajatlari (3 000 000 so'm) yakuniy natijaga hisobdan chiqarildi.","9910>9410>3000000","Natija: Dt 9910. Xarajat yopildi: Kt 9410."],
+ ["n373",1,"Yakuniy natija","Yil oxirida ma'muriy xarajatlar (6 000 000 so'm) yakuniy natijaga hisobdan chiqarildi.","9910>9420>6000000","Natija: Dt 9910. Xarajat yopildi: Kt 9420."],
+ ["n374",1,"Yakuniy natija","Yil oxirida boshqa operatsion xarajatlar (1 000 000 so'm) yakuniy natijaga hisobdan chiqarildi.","9910>9430>1000000","Natija: Dt 9910. Xarajat yopildi: Kt 9430."],
+ ["n375",1,"Yakuniy natija","Yil oxirida foiz xarajatlari (1 500 000 so'm) yakuniy natijaga hisobdan chiqarildi.","9910>9610>1500000","Natija: Dt 9910. Xarajat yopildi: Kt 9610."],
+ ["n376",1,"Yakuniy natija","Yil oxirida kurs farqidan zararlar (250 000 so'm) yakuniy natijaga hisobdan chiqarildi.","9910>9620>250000","Natija: Dt 9910. Zarar yopildi: Kt 9620."],
+ ["n377",1,"Yakuniy natija","Yil oxirida foyda solig'i bo'yicha xarajat (5 400 000 so'm) yakuniy natijaga hisobdan chiqarildi.","9910>9810>5400000","Natija: Dt 9910. Soliq xarajati yopildi: Kt 9810."],
+ ["n378",1,"Yakuniy natija","Yil oxirida tovar qaytishi (1 500 000 so'm) yakuniy natijaga hisobdan chiqarildi.","9910>9040>1500000","Natija: Dt 9910. Qaytish hisobvarag'i yopildi: Kt 9040."],
+ ["n379",1,"Yakuniy natija","Yangi yilda o'tgan yil hisobot davri foydasi (12 000 000 so'm) jamg'arilgan foydaga o'tkazildi.","8710>8720>12000000","Hisobot davri foydasi yopildi: Dt 8710. Jamg'arilgan foyda: Kt 8720."],
+ ["n380",2,"Yakuniy natija","Yil oxirida tovar savdosi daromadi (40 000 000 so'm) va tannarxi (25 000 000 so'm) yakuniy natijaga yopildi. Ikkala provodkani yozing.","9020>9910>40000000;9910>9120>25000000","Daromad: Dt 9020 Kt 9910. Tannarx: Dt 9910 Kt 9120."],
+ ["n381",2,"Yakuniy natija","Yil oxirida xizmat daromadi (15 000 000 so'm) va xizmat tannarxi (9 000 000 so'm) yakuniy natijaga yopildi. Ikkala provodkani yozing.","9030>9910>15000000;9910>9130>9000000","Daromad: Dt 9030 Kt 9910. Tannarx: Dt 9910 Kt 9130."],
+ ["n382",2,"Yakuniy natija","Yil oxirida ma'muriy (6 000 000 so'm) va sotish (3 000 000 so'm) xarajatlari yakuniy natijaga hisobdan chiqarildi. Ikkala provodkani yozing.","9910>9420>6000000;9910>9410>3000000","Ma'muriy: Dt 9910 Kt 9420. Sotish: Dt 9910 Kt 9410."],
+ ["n383",2,"Yakuniy natija","Yil oxirida foiz daromadlari (600 000 so'm) va foiz xarajatlari (1 500 000 so'm) yakuniy natijaga yopildi. Ikkala provodkani yozing.","9530>9910>600000;9910>9610>1500000","Daromad: Dt 9530 Kt 9910. Xarajat: Dt 9910 Kt 9610."],
+ ["n384",2,"Yakuniy natija","Foyda solig'i 5 400 000 so'm hisoblandi va shu xarajat yakuniy natijaga hisobdan chiqarildi. Ikkala provodkani yozing.","9810>6410>5400000;9910>9810>5400000","Hisoblash: Dt 9810 Kt 6410. Yopish: Dt 9910 Kt 9810."],
+ ["n385",2,"Yakuniy natija","Sof foyda (12 000 000 so'm) taqsimlanmagan foydaga o'tkazildi va undan 4 000 000 so'm dividend hisoblandi. Ikkala provodkani yozing.","9910>8710>12000000;8710>6610>4000000","Foydani o'tkazish: Dt 9910 Kt 8710. Dividend: Dt 8710 Kt 6610."],
+ ["n386",2,"Yakuniy natija","Hisobot yili foydasidan 5 000 000 so'm dividend hisoblandi va 1 000 000 so'm rezerv kapitaliga ajratildi. Ikkala provodkani yozing.","8710>6610>5000000;8710>8520>1000000","Dividend: Dt 8710 Kt 6610. Rezerv: Dt 8710 Kt 8520."],
+ ["n387",3,"Yakuniy natija","Yil oxirida daromad (40 000 000 so'm) va tannarx (25 000 000 so'm) yopildi, foyda (15 000 000 so'm) taqsimlanmagan foydaga o'tkazildi. Uchala provodkani yozing.","9020>9910>40000000;9910>9120>25000000;9910>8710>15000000","Daromad: Dt 9020 Kt 9910. Tannarx: Dt 9910 Kt 9120. Foyda: Dt 9910 Kt 8710."],
+ ["n388",3,"Yakuniy natija","Foyda solig'i 3 000 000 so'm hisoblandi va yopildi; qolgan sof foyda 9 000 000 so'm taqsimlanmagan foydaga o'tkazildi. Uchala provodkani yozing.","9810>6410>3000000;9910>9810>3000000;9910>8710>9000000","Soliq: Dt 9810 Kt 6410. Yopish: Dt 9910 Kt 9810. Foyda: Dt 9910 Kt 8710."],
+ ["n389",3,"Yakuniy natija","Yil oxirida tayyor mahsulot daromadi (30 000 000 so'm), tannarxi (18 000 000 so'm) va ma'muriy xarajatlar (7 000 000 so'm) yakuniy natijaga yopildi. Uchala provodkani yozing.","9010>9910>30000000;9910>9110>18000000;9910>9420>7000000","Daromad: Dt 9010 Kt 9910. Tannarx: Dt 9910 Kt 9110. Xarajat: Dt 9910 Kt 9420."],
+ ["n390",3,"Yakuniy natija","Zarar yili: xizmat daromadi (10 000 000 so'm) va ma'muriy xarajatlar (17 000 000 so'm) yopildi, zarar (7 000 000 so'm) qoplanmagan zararga o'tkazildi. Uchala provodkani yozing.","9030>9910>10000000;9910>9420>17000000;8710>9910>7000000","Daromad: Dt 9030 Kt 9910. Xarajat: Dt 9910 Kt 9420. Zarar: Dt 8710 Kt 9910."],
+ ["n391",3,"Yakuniy natija","Yil oxirida daromad (30 000 000 so'm), tannarx (18 000 000 so'm) va ma'muriy xarajat (7 000 000 so'm) yopildi, sof foyda (5 000 000 so'm) taqsimlanmagan foydaga o'tkazildi. To'rtala provodkani yozing.","9010>9910>30000000;9910>9110>18000000;9910>9420>7000000;9910>8710>5000000","Daromad: Dt 9010 Kt 9910. Tannarx: Dt 9910 Kt 9110. Xarajat: Dt 9910 Kt 9420. Foyda: Dt 9910 Kt 8710."],
+ ["n392",1,"Xaridlar","Yetkazib beruvchi bilan o'zaro hisob-kitob: bizning qarzimiz (4 000 000 so'm) shu tashkilotning bizdan qarzi bilan hisobga olindi (zachyot).","6010>4010>4000000","Bizning qarzimiz kamaydi: Dt 6010. Ularning qarzi kamaydi: Kt 4010."],
+ ["n393",1,"Xaridlar","Prokatga beriladigan buyumlar 3 000 000 so'mga sotib olindi (QQSsiz).","2940>6010>3000000","Prokatdagi buyumlar: Dt 2940. Yetkazib beruvchiga qarz: Kt 6010."],
+ ["n394",1,"Xaridlar","Tovar bilan kelgan taralar (250 000 so'm, QQSsiz) hisobga olindi.","2950>6010>250000","Tovarlar bilan band va bo'sh taralar: Dt 2950. Qarz: Kt 6010."],
+ ["n395",1,"Xaridlar","Hisobdor shaxs 2 000 000 so'mlik xo'jalik inventari sotib oldi (avans hisoboti, berilgan bo'nak hisobidan).","1080>4230>2000000","Inventar va xo'jalik jihozlari kirim bo'ldi: Dt 1080. Berilgan bo'nak yopildi: Kt 4230."],
+ ["n396",1,"Xaridlar","Xizmat ko'rsatuvchi xo'jalikka 300 000 so'mlik boshqa materiallar sarflandi.","2710>1090>300000","Xizmat ko'rsatuvchi xo'jaliklar xarajati: Dt 2710. Materiallar kamaydi: Kt 1090."],
+ ["n397",1,"Xaridlar","Litsenziya olish uchun davlat boji 800 000 so'm hisob-kitob schyotidan to'landi (nomoddiy aktiv qiymatiga qo'shiladi).","0830>5110>800000","Nomoddiy aktivlarni xarid qilish xarajati: Dt 0830. Pul chiqdi: Kt 5110."],
+ ["n398",1,"Xaridlar","Montaj uchun topshirilgan uskuna bo'yicha montaj xizmati 2 000 000 so'm (QQSsiz) hisoblandi.","0810>6010>2000000","Tugallanmagan qurilish (montaj): Dt 0810. Pudratchiga qarz: Kt 6010."],
+ ["n399",1,"Xaridlar","Montaj tugagan uskuna (11 000 000 so'm) foydalanishga topshirildi.","0130>0810>11000000","Uskuna asosiy vosita bo'ldi: Dt 0130. Tugallanmagan qurilish yopildi: Kt 0810."],
+ ["n400",3,"Xaridlar","Mahalliy uskuna 9 000 000 so'mga keldi, montajga topshirildi, montaj xizmati 2 000 000 so'm bo'ldi va uskuna (11 000 000 so'm) ishga tushirildi. To'rtala provodkani yozing.","0710>6010>9000000;0810>0710>9000000;0810>6010>2000000;0130>0810>11000000","Uskuna keldi: Dt 0710 Kt 6010. Montajga: Dt 0810 Kt 0710. Montaj xizmati: Dt 0810 Kt 6010. Ishga tushirish: Dt 0130 Kt 0810."],
+ ["n401",1,"Sotuvlar","Chakana savdodagi sotilgan tovarlarning tannarxi (5 000 000 so'm) hisobdan chiqarildi.","9120>2920>5000000","Sotilgan tovarlar tannarxi: Dt 9120. Chakana savdodagi tovarlar kamaydi: Kt 2920."],
+ ["n402",1,"Sotuvlar","Ko'rgazmadagi tovar sotildi: tannarxi 2 000 000 so'm hisobdan chiqarildi.","9120>2930>2000000","Sotilgan tovarlar tannarxi: Dt 9120. Ko'rgazmadagi tovar kamaydi: Kt 2930."],
+ ["n403",1,"Sotuvlar","Komissioner vositachilikdagi tovarni sotdi: tannarxi 4 000 000 so'm hisobdan chiqarildi.","9120>2960>4000000","Sotilgan tovarlar tannarxi: Dt 9120. Vositachilikdagi tovar kamaydi: Kt 2960."],
+ ["n404",1,"Sotuvlar","Ko'rgazmadagi tayyor mahsulot sotildi: tannarxi 3 000 000 so'm hisobdan chiqarildi.","9110>2820>3000000","Sotilgan mahsulot tannarxi: Dt 9110. Ko'rgazmadagi mahsulot kamaydi: Kt 2820."],
+ ["n405",1,"Sotuvlar","Komissioner sotgan tayyor mahsulotning tannarxi (5 000 000 so'm) hisobdan chiqarildi.","9110>2830>5000000","Sotilgan mahsulot tannarxi: Dt 9110. Vositachilikdagi mahsulot kamaydi: Kt 2830."],
+ ["n406",1,"Sotuvlar","Boshqa tashkilotga berilgan qarz bo'yicha 200 000 so'm foiz hisoblandi (olinadigan foiz).","4830>9530>200000","Olinadigan foiz: Dt 4830. Foiz ko'rinishidagi daromad: Kt 9530."],
+ ["n407",2,"Sotuvlar","Tayyor mahsulot komissionerga berilgan edi; u 4 000 000 so'mga sotdi (QQSsiz). Daromad va tannarx (3 000 000 so'm) uchun ikkala provodkani yozing.","4010>9010>4000000;9110>2830>3000000","Daromad: Dt 4010 Kt 9010. Tannarx: Dt 9110 Kt 2830."],
+ ["n408",3,"Sotuvlar","Ombordan do'konga 5 000 000 so'mlik tovar berildi; 7 000 000 so'mga naqd sotildi (QQSsiz) va tannarxi hisobdan chiqarildi. Uchala provodkani yozing.","2920>2910>5000000;5010>9020>7000000;9120>2920>5000000","Do'konga: Dt 2920 Kt 2910. Tushum: Dt 5010 Kt 9020. Tannarx: Dt 9120 Kt 2920."],
+ ["n409",3,"Sotuvlar","Xaridorga tovar 9 000 000 so'mga (QQSsiz) sotildi, tannarxi 6 000 000 so'm; xaridor shu summaga veksel berdi. Uchala provodkani yozing.","4010>9020>9000000;9120>2910>6000000;4020>4010>9000000","Daromad: Dt 4010 Kt 9020. Tannarx: Dt 9120 Kt 2910. Veksel: Dt 4020 Kt 4010."],
+ ["n410",3,"Sotuvlar","Tayyor mahsulot 18 000 000 so'mga (QQSsiz) sotildi, tannarxi 11 000 000 so'm; xaridorga 1 000 000 so'm chegirma berildi va u 17 000 000 so'mni hisob-kitob schyotimizga o'tkazdi. To'rtala provodkani yozing.","4010>9010>18000000;9110>2810>11000000;9050>4010>1000000;5110>4010>17000000","Daromad: Dt 4010 Kt 9010. Tannarx: Dt 9110 Kt 2810. Chegirma: Dt 9050 Kt 4010. To'lov: Dt 5110 Kt 4010."],
+ ["n411",1,"Kassa va bank","Boshqa tashkilotga qarz berilgani uchun 200 000 so'm foiz hisob-kitob schyotimizga tushdi.","5110>4830>200000","Pul keldi: Dt 5110. Olinadigan foiz so'ndi: Kt 4830."],
+ ["n412",2,"Kassa va bank","Kassaga xaridordan 3 000 000 so'm tushdi va shu kuni bankka topshirildi. Ikkala provodkani yozing.","5010>4010>3000000;5110>5010>3000000","Kassaga tushum: Dt 5010 Kt 4010. Bankka topshirish: Dt 5110 Kt 5010."],
+ ["n413",2,"Kassa va bank","Hisob-kitob schyotidan 6 000 000 so'm kassaga olindi va undan 4 000 000 so'm ish haqiga berildi. Ikkala provodkani yozing.","5010>5110>6000000;6710>5010>4000000","Kassaga olish: Dt 5010 Kt 5110. Ish haqi berish: Dt 6710 Kt 5010."],
+ ["n414",2,"Kassa va bank","Xodimga 1 000 000 so'm bo'nak kassadan berildi (xizmat safari uchun), keyin shu xodimga yana 500 000 so'm ish haqiga bo'nak berildi. Ikkala provodkani yozing.","4220>5010>1000000;4210>5010>500000","Safar bo'nagi: Dt 4220 Kt 5010. Ish haqi bo'nagi: Dt 4210 Kt 5010."],
+ ["n415",2,"Asosiy vositalar","Operativ ijaraga berilgan uskuna uchun oylik daromad hisoblandi (2 000 000 so'm) va unga eskirish (800 000 so'm) hisoblandi. Ikkala provodkani yozing.","4820>9350>2000000;9430>0230>800000","Daromad: Dt 4820 Kt 9350. Eskirish: Dt 9430 Kt 0230."],
+ ["n416",2,"Asosiy vositalar","Binoning yangi tomi uchun pudratchi hisobi 6 000 000 so'm (QQSsiz): bu rekonstruksiya bo'lib, bino qiymatiga qo'shiladi. Ikki provodkani yozing.","0890>6010>6000000;0120>0890>6000000","Xarajat: Dt 0890 Kt 6010. Bino qiymatiga qo'shish: Dt 0120 Kt 0890."],
+ ["n417",2,"Asosiy vositalar","Mashina va uskunaga 2 500 000 so'm, ma'muriy kompyuterlarga 300 000 so'm amortizatsiya hisoblandi (uskuna ishlab chiqarishda). Ikkala provodkani yozing.","2010>0230>2500000;9420>0250>300000","Ishlab chiqarish: Dt 2010 Kt 0230. Ma'muriy: Dt 9420 Kt 0250."],
+ ["n418",1,"Xarajatlar va kredit","Savdo do'konining joriy ta'miri uchun pudratchi hisobi 1 500 000 so'm (QQSsiz) keldi.","9410>6010>1500000","Joriy ta'mir — sotish xarajati: Dt 9410. Pudratchiga qarz: Kt 6010."],
+ ["n419",1,"Xarajatlar va kredit","Sex uskunasining joriy ta'miri uchun pudratchi hisobi 1 000 000 so'm (QQSsiz) keldi.","2510>6010>1000000","Umumiy ishlab chiqarish xarajatlari: Dt 2510. Pudratchiga qarz: Kt 6010."],
+ ["n420",1,"Xarajatlar va kredit","Kompyuterlarni ta'mirlash uchun 400 000 so'm kassadan to'landi (ma'muriy).","9420>5010>400000","Ma'muriy xarajat: Dt 9420. Kassadan pul chiqdi: Kt 5010."],
+ ["n421",1,"Xarajatlar va kredit","Boshqa tashkilotga 1 000 000 so'm qaytarilmaydigan moliyaviy yordam hisob-kitob schyotidan o'tkazildi.","9430>5110>1000000","Boshqa operatsion xarajat: Dt 9430. Pul chiqdi: Kt 5110."],
+ ["n422",1,"Xarajatlar va kredit","Bepul berilgan tovarning tannarxi (300 000 so'm) hisobdan chiqarildi.","9430>2910>300000","Boshqa operatsion xarajat: Dt 9430. Tovar kamaydi: Kt 2910."],
+ ["n423",1,"Soliqlar","Byudjetga mol-mulk solig'i bo'yicha 1 200 000 so'm hisob-kitob schyotidan to'landi (soliq oldin hisoblangan edi).","6410>5110>1200000","Byudjetga qarz so'ndi: Dt 6410. Pul chiqdi: Kt 5110."],
+ ["n424",2,"Soliqlar","Byudjetga oldindan 4 000 000 so'm bo'nak to'landi, so'ng uning 3 000 000 so'mi hisoblangan soliqqa hisobga olindi. Ikkala provodkani yozing.","4410>5110>4000000;6410>4410>3000000","Bo'nak to'lovi: Dt 4410 Kt 5110. Hisobga olish: Dt 6410 Kt 4410."],
+ ["n425",3,"Mehnat haqi","Xodimning ish haqidan JShDS (360 000 so'm) va qarz (200 000 so'm) ushlandi, qolgani 2 440 000 so'm kassadan berildi (hisoblangan ish haqi 3 000 000 so'm, ma'muriy). To'rtala provodkani yozing (hisoblash, JShDS, qarz, berish).","9420>6710>3000000;6710>6410>360000;6710>4720>200000;6710>5010>2440000","Hisoblash: Dt 9420 Kt 6710. JShDS: Dt 6710 Kt 6410. Qarz: Dt 6710 Kt 4720. Berish: Dt 6710 Kt 5010."],
+ ["n426",2,"Mehnat haqi","Ishlab chiqarish ishchilariga 12 000 000 so'm ish haqi hisoblandi, shuningdek ularga 1 440 000 so'm ijtimoiy soliq hisoblandi. Ikkala provodkani yozing.","2010>6710>12000000;2010>6410>1440000","Ish haqi: Dt 2010 Kt 6710. Ijtimoiy soliq: Dt 2010 Kt 6410."],
+ ["n427",3,"Kapital va pul","Ta'sischi 20 000 000 so'm ulush qo'shishni e'lon qildi va uni 12 000 000 so'mlik uskuna va 8 000 000 so'm naqd pul bilan kiritdi. Uchala provodkani yozing.","4610>8330>20000000;0130>4610>12000000;5010>4610>8000000","E'lon: Dt 4610 Kt 8330. Uskuna: Dt 0130 Kt 4610. Pul: Dt 5010 Kt 4610."],
+ ["n428",2,"Kapital va pul","Aksiyadorlik jamiyati 50 000 000 so'm nominalli oddiy aksiya chiqardi (obuna), obunachilar pulni hisob-kitob schyotiga kiritdi. Ikkala provodkani yozing.","4610>8310>50000000;5110>4610>50000000","Obuna: Dt 4610 Kt 8310. Pul: Dt 5110 Kt 4610."],
+ ["n429",3,"QQS","Yetkazib beruvchiga 10 000 000 so'm + QQS 12% (1 200 000 so'm) uchun materiallar olindi va hisob-kitob schyotidan 11 200 000 so'm to'landi. Uchala provodkani yozing.","1010>6010>10000000;4410>6010>1200000;6010>5110>11200000","Material: Dt 1010 Kt 6010. Kirim QQS: Dt 4410 Kt 6010. To'lov: Dt 6010 Kt 5110."],
+ ["n430",3,"QQS","Xaridorga 20 000 000 so'mlik mahsulot QQS 12% (2 400 000 so'm) bilan sotildi va xaridor 22 400 000 so'mni hisob-kitob schyotimizga o'tkazdi. Uchala provodkani yozing.","4010>9010>20000000;4010>6410>2400000;5110>4010>22400000","Daromad: Dt 4010 Kt 9010. QQS: Dt 4010 Kt 6410. To'lov: Dt 5110 Kt 4010."],
+ ["n431",3,"QQS","Xaridorga 30 000 000 so'm + QQS 12% (3 600 000 so'm) miqdorida xizmat ko'rsatildi, xizmat tannarxi 18 000 000 so'm. Uchala provodkani yozing.","4010>9030>30000000;4010>6410>3600000;9130>2010>18000000","Daromad: Dt 4010 Kt 9030. QQS: Dt 4010 Kt 6410. Tannarx: Dt 9130 Kt 2010."]
 ];
 
 /* ============ MASHQ MARKAZI: mustaqil mashg'ulot, ball, seriya, reyting ============
@@ -2276,8 +2826,7 @@ const PROV_OPS_RAW = [
    Talaba progressi: kv_store "progress:<identifikator>" (har talabaga bitta yozuv). */
 const PR = { SESSION:10, DAILY_CAP:100, STREAK_MIN:5, MASTER_AT:2 };
 const PR_LEVELS = [
-  {min:0, name:"Boshlovchi"}, {min:100, name:"O'rganuvchi"}, {min:300, name:"Mohir"},
-  {min:700, name:"Tajribali"}, {min:1500, name:"Mutaxassis"}, {min:3000, name:"Ustoz"}
+  {min:0, name:"Start"}, {min:400, name:"Pro"}, {min:1500, name:"Master"}
 ];
 function prLevel(pts){
   let i = 0; PR_LEVELS.forEach((l,k)=>{ if(pts>=l.min) i = k; });
@@ -2426,7 +2975,7 @@ const PR_TABS = [ ['topics',"Mavzular"], ['prov',"Provodka"], ['badges',"Yutuqla
 async function showPractice(tab){
   if(tab) state.prTab = tab;
   if(!state.prTab) state.prTab = 'topics';
-  state.pr = null;
+  state.pr = null; state.prAtCenter = false;
   hideAll();
   showScreen('screen-practice');
   document.getElementById('practiceBody').innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
@@ -2452,6 +3001,7 @@ function prRenderHead(p){
 }
 function prRenderCenter(){
   const p = state.progress; if(!p) return;
+  state.prAtCenter = true;
   const tabs = PR_TABS.map(([id,label])=> `<button class="tab ${state.prTab===id?'active':''}" onclick="showPractice('${id}')">${label}</button>`).join('');
   document.getElementById('practiceTabs').innerHTML = tabs;
   document.getElementById('practiceHead').innerHTML = prRenderHead(p);
@@ -2516,6 +3066,7 @@ async function prStart(topicId, mode){
   if(p._loadFailed){ p = await prLoad(true); if(p._loadFailed){ showToast("Natijalarni yuklab bo'lmadi. Internetni tekshiring.", true); return; } }
   const queue = prPickQueue(t, p, mode);
   if(!queue.length){ showToast("Bu rejim uchun savol yo'q.", true); return; }
+  state.prAtCenter = false;
   state.pr = { topicId, topicName:t.name, queue, i:0, right:0, wrong:[], pts:0, mastered:0, locked:false, order:[], answered:0 };
   document.getElementById('practiceTabs').innerHTML = '';
   document.getElementById('practiceHead').innerHTML = '';
@@ -2624,6 +3175,31 @@ function provAllOps(cfg){
   const dis = new Set((cfg && cfg.disabled) || []);
   return [ ...PROV_BUILTIN.filter(o=>!dis.has(o.id)), ...(((cfg && cfg.ops) || []).filter(o=>o.active!==false)) ];
 }
+/* Vaqt chegarasi: 1 ta provodka — 15 s, 2 ta — 20 s, 3 ta — 25 s, 4 va undan ko'p — 30 s. Amaliyotda `t` (soniya) bo'lsa, 15–30 oralig'ida shu olinadi. */
+const PROV_SEC_MIN = 15, PROV_SEC_MAX = 30;
+function provSeconds(o){
+  const t = +o.t; if(t > 0) return Math.max(PROV_SEC_MIN, Math.min(PROV_SEC_MAX, Math.round(t)));
+  const k = (o.e && o.e.length) || 1;
+  return Math.max(PROV_SEC_MIN, Math.min(PROV_SEC_MAX, 10 + 5*k));
+}
+function provTimerStop(){ clearInterval(state.provTimer); state.provTimer = null; }
+function provTimerStart(secs){
+  provTimerStop();
+  const S = state.prov; if(!S) return;
+  S.deadline = Date.now() + secs*1000; S.secs = secs;
+  const tick = ()=>{
+    const S2 = state.prov; if(!S2 || S2.checked){ provTimerStop(); return; }
+    const left = Math.max(0, S2.deadline - Date.now());
+    const bar = document.getElementById('provTimerBar'), sec = document.getElementById('provTimerSec'), box = document.getElementById('provTimer');
+    if(!bar || !sec){ provTimerStop(); return; }
+    bar.style.width = (100*left/(S2.secs*1000)).toFixed(1) + '%';
+    sec.textContent = Math.ceil(left/1000) + ' s';
+    if(box) box.classList.toggle('low', left <= 5000);
+    if(left <= 0){ provTimerStop(); provCheck(true); }
+  };
+  tick();
+  state.provTimer = setInterval(tick, 200);
+}
 function provAccName(code){ const a = PROV_BY_CODE[code]; return a ? a.name : null; }
 function provFmt(n){ return String(n||0).replace(/\B(?=(\d{3})+(?!\d))/g,' '); }
 
@@ -2637,7 +3213,7 @@ async function provRender(body){
   const masteredCount = ops.filter(o=> prIsMastered(mine(o.id))).length;
   const acc = p.drill.answered ? Math.round(100*p.drill.correct/p.drill.answered) : null;
   const btn = (label, onclick, cls)=> `<button class="${cls||'btn-ghost'}" onclick="${onclick}">${label}</button>`;
-  body.innerHTML = `<p class="desc">Xo'jalik amaliyot beriladi — siz <b>Debet</b> va <b>Kredit</b> hisobvaraq raqamlarini (4 xonali) yozasiz. Javob zumda tekshiriladi. Raqamini bilmasangiz, hisobvaraq nomining bir qismini yozib qidirishingiz yoki pastdagi «Hisoblar rejasi»dan foydalanishingiz mumkin. Bu ham <b>nazoratga ta'sir qilmaydi</b>.</p>
+  body.innerHTML = `<p class="desc">Xo'jalik amaliyot beriladi — siz <b>Debet</b> va <b>Kredit</b> hisobvaraq raqamlarini (4 xonali) yozasiz. Javob zumda tekshiriladi. <b>Vaqt cheklangan:</b> 1 ta provodka — 15 soniya, murakkabroqlari — 20–30 soniya; vaqt tugasa yozganingiz avtomatik tekshiriladi. Raqamini bilmasangiz, hisobvaraq nomining bir qismini yozib qidirishingiz yoki pastdagi «Hisoblar rejasi»dan foydalanishingiz mumkin. Bu ham <b>nazoratga ta'sir qilmaydi</b>.</p>
     <div class="stat-grid" style="margin-bottom:16px;">
       <div class="stat-box"><div class="num">${masteredCount}/${ops.length}</div><div class="lbl">O'zlashtirilgan</div></div>
       <div class="stat-box"><div class="num">${p.drill.answered}</div><div class="lbl">Javoblar</div></div>
@@ -2645,7 +3221,7 @@ async function provRender(body){
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
       ${btn('Tasodifiy mashq (10 ta)',"provStart({})",'btn-primary')}
-      ${btn("1-daraja: oson","provStart({lv:1})")}${btn("2-daraja: o'rta","provStart({lv:2})")}${btn("3-daraja: murakkab","provStart({lv:3})")}
+      ${btn("1-daraja: oson (15 s)","provStart({lv:1})")}${btn("2-daraja: o'rta (20 s)","provStart({lv:2})")}${btn("3-daraja: murakkab (25–30 s)","provStart({lv:3})")}
       ${wrongCount?btn(`Xatolarim (${wrongCount})`,"provStart({wrong:true})"):''}
     </div>
     <div class="lead" style="font-size:1rem;margin:16px 0 8px;">Mavzu bo'yicha</div>
@@ -2682,11 +3258,13 @@ function provPickQueue(ops, p, f){
   return (f.cat || f.wrong) ? all.slice(0, 15) : all.slice(0, PR.SESSION);
 }
 async function provStart(f){
+  provTimerStop();
   let p = state.progress;
   if(p._loadFailed){ p = await prLoad(true); if(p._loadFailed){ showToast("Natijalarni yuklab bo'lmadi. Internetni tekshiring.", true); return; } }
   if(!state.provCfg) state.provCfg = await loadProvConfig();
   const queue = provPickQueue(provAllOps(state.provCfg), p, f||{});
   if(!queue.length){ showToast("Bu tanlov uchun amaliyot yo'q.", true); return; }
+  state.prAtCenter = false;
   state.prov = { queue, i:0, right:0, pts:0, answered:0, mastered:0, wrong:[], checked:false, f:f||{} };
   document.getElementById('practiceTabs').innerHTML = '';
   document.getElementById('practiceHead').innerHTML = '';
@@ -2696,7 +3274,7 @@ function provRenderQ(){
   const S = state.prov, body = document.getElementById('practiceBody'); if(!S) return;
   if(S.i >= S.queue.length){ provFinish(false); return; }
   const o = S.queue[S.i]; S.checked = false;
-  const k = o.e.length;
+  const k = o.e.length, secs = provSeconds(o);
   const rows = o.e.map((_,r)=> `<div class="prov-row">
       <span class="prov-n">${r+1}</span>
       <div class="prov-side"><label>Debet (Dt)</label><input type="text" inputmode="numeric" autocomplete="off" maxlength="40" id="prov-dt-${r}" placeholder="Hisob raqami" oninput="provInput(${r},'dt',this)"><div class="prov-name" id="prov-dt-${r}-n"></div><div class="prov-sg" id="prov-dt-${r}-s"></div></div>
@@ -2704,7 +3282,8 @@ function provRenderQ(){
     </div>`).join('');
   body.innerHTML = `<div class="qblock">
     <div class="qnum">Provodka · ${S.i+1} / ${S.queue.length} · ${o.lv}-daraja · ${escapeHtml(o.cat)}</div>
-    <div class="pr-bar" style="margin:6px 0 12px;"><i style="width:${Math.round(100*S.i/S.queue.length)}%"></i></div>
+    <div class="pr-bar" style="margin:6px 0 10px;"><i style="width:${Math.round(100*S.i/S.queue.length)}%"></i></div>
+    <div class="prov-timer" id="provTimer"><div class="bar"><i id="provTimerBar"></i></div><span class="sec" id="provTimerSec">${secs} s</span></div>
     <div class="qtext">${escapeHtml(o.text)}</div>
     <p class="row-meta" style="margin:-4px 0 10px;">${k===1?"Bitta provodka yozing.":`${k} ta provodka yozing (tartibi muhim emas).`}</p>
     ${rows}
@@ -2714,6 +3293,7 @@ function provRenderQ(){
       <button class="btn-ghost btn-small" onclick="provFinish(true)">Mashqni yakunlash</button>
     </div></div>`;
   const first = document.getElementById('prov-dt-0'); if(first && !/Mobi|Android|iPhone/i.test(navigator.userAgent)) first.focus();
+  provTimerStart(secs);
 }
 function provInput(r, side, el){
   const S = state.prov; if(!S || S.checked) return;
@@ -2765,18 +3345,21 @@ function provMatch(expected, given){
   });
   return { perExpected:res, ok: res.every(Boolean) };
 }
-function provCheck(){
+function provCheck(timedOut){
+  timedOut = timedOut === true;
   const S = state.prov; if(!S || S.checked) return;
   const o = S.queue[S.i];
   const given = o.e.map((_,r)=>{
     const dt = (document.getElementById(`prov-dt-${r}`).value||'').trim(), kt = (document.getElementById(`prov-kt-${r}`).value||'').trim();
     return { dt, kt };
   });
-  if(given.some(g=> !/^\d{4}$/.test(g.dt) || !/^\d{4}$/.test(g.kt))){
+  const incomplete = given.some(g=> !/^\d{4}$/.test(g.dt) || !/^\d{4}$/.test(g.kt));
+  if(incomplete && !timedOut){
     showToast("Hamma Debet va Kredit maydonlariga 4 xonali hisob raqamini yozing.", true); return;
   }
+  provTimerStop();
   S.checked = true;
-  const m = provMatch(o.e, given), ok = m.ok, p = state.progress;
+  const m = incomplete ? { perExpected:o.e.map(()=>false), ok:false } : provMatch(o.e, given), ok = m.ok, p = state.progress;
   const r = provRecord(p, o.id, ok);
   S.answered++; S.pts += r.pts; if(r.mastered) S.mastered++;
   if(ok){ S.right++; playCorrectSound(); } else { S.wrong.push(o); playWrongSound(); }
@@ -2791,7 +3374,7 @@ function provCheck(){
   const rowsHtml = o.e.map(ex=> `<div class="prov-ans"><span class="prov-ans-code">Dt ${ex.dt}</span> <span>${escapeHtml(provAccName(ex.dt)||'')}</span><br><span class="prov-ans-code">Kt ${ex.kt}</span> <span>${escapeHtml(provAccName(ex.kt)||'')}</span>${ex.sum?`<div class="row-meta">Summa: ${provFmt(ex.sum)} so'm</div>`:''}</div>`).join('');
   const gain = r.pts>0 ? `<span class="pr-gain">+${r.pts} ball${r.mastered?' · o\'zlashtirildi!':''}</span>` : (r.wanted>0 ? `<span class="row-meta">Bugungi ball chegarasi to'ldi</span>` : '');
   document.getElementById('provFeedback').innerHTML = `<div class="pr-fb ${ok?'ok':'bad'}">
-    <b>${ok?"To'g'ri!":"Noto'g'ri."}</b> ${gain}
+    <b>${ok?"To'g'ri!":(timedOut?"Vaqt tugadi.":"Noto'g'ri.")}</b> ${gain}
     ${ok?'':`<div style="margin-top:8px;">To'g'ri javob:</div>`}${ok?'':rowsHtml}
     ${o.x?`<div class="pr-expl">${escapeHtml(o.x)}</div>`:''}
     <div style="margin-top:10px;"><button class="btn-primary btn-small" onclick="provNext()">Keyingisi</button></div></div>`;
@@ -2799,6 +3382,7 @@ function provCheck(){
 }
 function provNext(){ const S = state.prov; if(!S || !S.checked) return; S.i++; provRenderQ(); }
 async function provFinish(early){
+  provTimerStop();
   const S = state.prov; if(!S) return;
   const p = state.progress;
   let bonus = 0;
@@ -2827,26 +3411,63 @@ async function provFinish(early){
 async function provAdminRender(holder){
   holder.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
   state.provCfg = await loadProvConfig(); state.provCfgAt = Date.now();
-  const cfg = state.provCfg, dis = new Set(cfg.disabled);
-  const total = PROV_BUILTIN.length - [...dis].filter(id=>PROV_BUILTIN.some(o=>o.id===id)).length + cfg.ops.length;
+  const cfg = state.provCfg;
   const rowOps = (arr, custom)=> arr.map(o=>`<tr>
       <td>${escapeHtml(o.id)}</td><td style="max-width:360px;white-space:normal;">${escapeHtml(o.text)}</td><td>${o.lv}</td><td>${escapeHtml(o.cat)}</td>
       <td style="white-space:normal;">${o.e.map(e=>`Dt ${e.dt} / Kt ${e.kt}`).join('<br>')}</td>
-      <td>${custom ? `<button class="btn-ghost btn-small" onclick="provAdminEdit(${jsArg(o.id)})">${icon('edit')}</button> <button class="btn-danger btn-small" onclick="provAdminDelete(${jsArg(o.id)})">${icon('trash')}</button>`
-        : `<button class="btn-ghost btn-small" onclick="provAdminToggleBuiltin(${jsArg(o.id)})">${dis.has(o.id)?'Yoqish':"O'chirib qo'yish"}</button>`}</td></tr>`).join('');
+      <td>${custom ? `<button class="btn-ghost btn-small" onclick="provAdminEdit(${jsArg(o.id)})">${icon('edit')}</button> <button class="btn-danger btn-small" onclick="provAdminDelete(${jsArg(o.id)})">${icon('trash')}</button>` : ''}</td></tr>`).join('');
   holder.innerHTML = `<div class="notify-banner" style="margin-bottom:14px;"><div class="notify-banner-title">Provodka trenajyori</div>
-    <p class="desc" style="margin:0;">Talabalar bu yerdagi amaliyotlar bo'yicha Debet/Kredit hisobvaraqlarini mashq qiladi. Tayyor to'plam (${PROV_BUILTIN.length} ta amaliyot, 2026-yil hisobvaraqlar rejasi bo'yicha) mavjud; <b>albatta ko'rib chiqing</b> — o'zingizga to'g'ri kelmaydiganini «O'chirib qo'yish» mumkin, o'zingizniki esa qo'shing. Hozir faol: <b>${total}</b> ta.</p></div>
+    <p class="desc" style="margin:0;">Talabalar bu yerdagi amaliyotlar bo'yicha Debet/Kredit hisobvaraqlarini mashq qiladi. Tayyor to'plam (${PROV_BUILTIN.length} ta amaliyot, 21-son BHMS hisobvaraqlar rejasi bo'yicha) mavjud; <b>albatta ko'rib chiqing</b> — o'zingizga to'g'ri kelmaydiganini «O'chirib qo'yish» mumkin, o'zingizniki esa qo'shing. Har bir amaliyotga vaqt beriladi: 1 ta provodka — 15 s, 2 ta — 20 s, 3 ta — 25 s, 4 ta — 30 s. Hozir faol: <b id="provActiveCount"></b> ta.</p></div>
     <div class="toolbar"><div class="lead" style="margin:0;font-size:1.1rem;">Sizning amaliyotlaringiz (${cfg.ops.length})</div><button class="btn-primary btn-small" onclick="provAdminEdit(null)">${icon('plus')}Yangi amaliyot</button></div>
     <div id="provEditHolder"></div>
     ${cfg.ops.length?`<div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Amaliyot</th><th>Daraja</th><th>Bo'lim</th><th>Provodka</th><th></th></tr></thead><tbody>${rowOps(cfg.ops,true)}</tbody></table></div>`:`<div class="empty">Hali o'zingizning amaliyotingiz yo'q.</div>`}
-    <details style="margin-top:20px;"><summary style="cursor:pointer;font-weight:700;">Tayyor to'plam (${PROV_BUILTIN.length} ta)</summary>
-      <div class="tbl-wrap" style="margin-top:10px;"><table><thead><tr><th>ID</th><th>Amaliyot</th><th>Daraja</th><th>Bo'lim</th><th>Provodka</th><th></th></tr></thead><tbody>${rowOps(PROV_BUILTIN,false)}</tbody></table></div></details>`;
+    <details id="provBuiltinDet" style="margin-top:20px;" ontoggle="provAdminBuiltinOpen(this)"><summary style="cursor:pointer;font-weight:700;">Tayyor to'plam (${PROV_BUILTIN.length} ta) — ko'rish va tekshirish</summary>
+      <div id="provBuiltinBody" style="margin-top:10px;"></div></details>`;
+  provAdminCount();
+}
+function provAdminCount(){
+  const el = document.getElementById('provActiveCount'); if(!el || !state.provCfg) return;
+  const dis = new Set(state.provCfg.disabled);
+  el.textContent = PROV_BUILTIN.filter(o=>!dis.has(o.id)).length + state.provCfg.ops.filter(o=>o.active!==false).length;
+}
+window._provB = { q:'', cat:'', lv:'', only:'', limit:80 };
+function provAdminBuiltinOpen(det){
+  if(!det || !det.open) return;
+  const holder = document.getElementById('provBuiltinBody'); if(!holder || holder.dataset.ready) return;
+  holder.dataset.ready = '1';
+  const F = window._provB;
+  holder.innerHTML = `<div class="flexrow" style="gap:8px;margin-bottom:10px;align-items:flex-end;">
+      <div class="field" style="flex:2;min-width:160px;margin:0;"><label>Qidirish (matn, ID yoki hisob raqami)</label><input type="text" id="provBq" value="${escapeAttr(F.q)}" oninput="provAdminBFilter()" placeholder="Masalan: 5110 yoki ish haqi"></div>
+      <div class="field" style="margin:0;"><label>Bo'lim</label><select id="provBcat" onchange="provAdminBFilter()"><option value="">Hammasi</option>${PROV_CATS.map(c=>`<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`).join('')}</select></div>
+      <div class="field" style="margin:0;"><label>Daraja</label><select id="provBlv" onchange="provAdminBFilter()"><option value="">Hammasi</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+      <div class="field" style="margin:0;"><label>Holati</label><select id="provBonly" onchange="provAdminBFilter()"><option value="">Hammasi</option><option value="off">O'chirib qo'yilgan</option></select></div>
+    </div><div id="provBuiltinTbl"></div>`;
+  provAdminBuiltinTable();
+}
+function provAdminBFilter(){
+  const F = window._provB;
+  F.q = (document.getElementById('provBq')||{value:''}).value; F.cat = document.getElementById('provBcat').value; F.lv = document.getElementById('provBlv').value; F.only = document.getElementById('provBonly').value; F.limit = 80;
+  clearTimeout(window._provBt); window._provBt = setTimeout(provAdminBuiltinTable, 160);
+}
+function provAdminBuiltinTable(){
+  const holder = document.getElementById('provBuiltinTbl'); if(!holder || !state.provCfg) return;
+  const F = window._provB, dis = new Set(state.provCfg.disabled), q = F.q.trim().toLowerCase();
+  const list = PROV_BUILTIN.filter(o=> (!F.cat || o.cat===F.cat) && (!F.lv || String(o.lv)===F.lv) && (F.only!=='off' || dis.has(o.id))
+    && (!q || o.id.includes(q) || o.text.toLowerCase().includes(q) || o.e.some(e=>e.dt.includes(q) || e.kt.includes(q))));
+  const shown = list.slice(0, F.limit);
+  holder.innerHTML = `<div class="row-meta" style="margin-bottom:6px;">Topildi: ${list.length} ta${list.length>shown.length?` (dastlabki ${shown.length} tasi ko'rsatilgan)`:''}</div>
+    <div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Amaliyot</th><th>Dar.</th><th>Bo'lim</th><th>Provodka</th><th>Izoh</th><th></th></tr></thead><tbody>${shown.map(o=>`<tr${dis.has(o.id)?' style="opacity:.55;"':''}>
+      <td>${escapeHtml(o.id)}</td><td style="max-width:340px;white-space:normal;">${escapeHtml(o.text)}</td><td>${o.lv}</td><td>${escapeHtml(o.cat)}</td>
+      <td style="white-space:normal;">${o.e.map(e=>`Dt ${e.dt} / Kt ${e.kt}`).join('<br>')}</td>
+      <td style="max-width:260px;white-space:normal;font-size:.8rem;">${escapeHtml(o.x||'')}</td>
+      <td><button class="btn-ghost btn-small" onclick="provAdminToggleBuiltin(${jsArg(o.id)})">${dis.has(o.id)?'Yoqish':"O'chirib qo'yish"}</button></td></tr>`).join('') || `<tr><td colspan="7"><div class="empty">Topilmadi</div></td></tr>`}</tbody></table></div>
+    ${list.length>shown.length?`<div style="margin-top:10px;"><button class="btn-ghost btn-small" onclick="window._provB.limit+=120;provAdminBuiltinTable()">Yana 120 tasini ko'rsatish</button></div>`:''}`;
 }
 async function provAdminToggleBuiltin(id){
   const cfg = state.provCfg, i = cfg.disabled.indexOf(id);
   if(i>=0) cfg.disabled.splice(i,1); else cfg.disabled.push(id);
   if(!(await saveProvConfig(cfg))){ if(i>=0) cfg.disabled.push(id); else cfg.disabled.pop(); return; }
-  provAdminRender(document.getElementById('provAdminHolder'));
+  provAdminBuiltinTable(); provAdminCount();
 }
 async function provAdminDelete(id){
   if(!(await customConfirm("Bu amaliyot o'chiriladi. Davom etasizmi?"))) return;
@@ -3247,10 +3868,185 @@ function hwEffective(sub, grade){
   return e;
 }
 function hwFilesHtml(files){
-  return (files||[]).map(f=> hwFileKind(f)==='img'
-    ? `<a class="hw-thumb" href="${escapeAttr(f.url)}" target="_blank" rel="noopener"><img src="${escapeAttr(f.url)}" alt="${escapeAttr(f.name)}" loading="lazy"></a>`
-    : `<a class="hw-file" href="${escapeAttr(f.url)}" target="_blank" rel="noopener">${icon('file')}<span>${escapeHtml(f.name)}</span></a>`).join('');
+  return (files||[]).map(f=>{
+    const a = `${jsArg(f.url)},${jsArg(f.name)},${jsArg(f.type||'')}`;
+    return hwFileKind(f)==='img'
+      ? `<span class="hw-fileitem"><button type="button" class="hw-thumb hw-thumbbtn" onclick="fvOpen(${a})" title="Ochish"><img src="${escapeAttr(f.url)}" alt="${escapeAttr(f.name)}" loading="lazy"></button><button type="button" class="hw-save" onclick="fvSave(${a})" title="Yuklab olish" aria-label="Yuklab olish">${icon('download')}</button></span>`
+      : `<span class="hw-fileitem"><button type="button" class="hw-file" onclick="fvOpen(${a})" title="Sayt ichida ochish">${icon('file')}<span>${escapeHtml(f.name)}</span></button><button type="button" class="hw-save" onclick="fvSave(${a})" title="Yuklab olish" aria-label="Yuklab olish">${icon('download')}<span style="margin-left:6px;font-size:0.8rem;">Yuklab olish</span></button></span>`;
+  }).join('');
 }
+/* ============ FAYL KO'RUVCHI (uyga vazifa fayllari: sayt ichida ochish + yuklab olish) ============
+   Rasm, PDF, Word (.docx), Excel (.xlsx/.xls/.csv) sayt ichida ochiladi. .doc va boshqa turlar faqat yuklab olinadi.
+   Word/Excel mazmuni "sandbox" iframe ichida ko'rsatiladi — fayl ichidagi hech narsa saytning o'zida ishlay olmaydi. */
+const FV = { cur:null, token:0, pdfWorkerSet:false };
+function fvKind(name, type){
+  const n = String(name||'').toLowerCase(), t = String(type||'').toLowerCase();
+  if(/\.(jpe?g|png|webp|gif|bmp|avif|heic|heif)$/.test(n) || /^image\/(jpe?g|png|webp|gif|bmp|avif|heic|heif)/.test(t)) return 'img';
+  if(/\.pdf$/.test(n) || t==='application/pdf') return 'pdf';
+  if(/\.docx$/.test(n)) return 'docx';
+  if(/\.(xlsx|xlsm|xls|csv)$/.test(n)) return 'xlsx';
+  return 'other';
+}
+function fvEnsureRoot(){
+  let r = document.getElementById('fvRoot'); if(r) return r;
+  r = document.createElement('div'); r.id = 'fvRoot'; r.className = 'fv-root hidden';
+  r.setAttribute('role','dialog'); r.setAttribute('aria-modal','true');
+  r.innerHTML = `<div class="fv-bar"><div class="fv-title" id="fvTitle"></div>
+      <div class="fv-actions"><button class="btn-primary btn-small" id="fvDl" onclick="fvDownload()">${icon('download')}Yuklab olish</button><button class="btn-ghost btn-small" onclick="fvClose()">Yopish</button></div></div>
+    <div class="fv-body" id="fvBody"></div>`;
+  document.body.appendChild(r);
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && FV.cur) fvClose(); });
+  return r;
+}
+async function fvGet(url){
+  const r = await withTimeout(fetch(url), 60000);
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  return await r.arrayBuffer();
+}
+function fvMsg(body, text, withDl){
+  body.innerHTML = `<div class="fv-msg"><p>${escapeHtml(text)}</p>${withDl ? `<button class="btn-primary" onclick="fvDownload()">${icon('download')}Yuklab olish</button>` : ''}</div>`;
+}
+async function fvOpen(url, name, type){
+  const root = fvEnsureRoot(), body = document.getElementById('fvBody');
+  const kind = fvKind(name, type), token = ++FV.token;
+  FV.cur = { url, name:name||'fayl', type:type||'', kind, buf:null };
+  document.getElementById('fvTitle').textContent = FV.cur.name;
+  root.classList.remove('hidden'); document.body.classList.add('fv-open');
+  body.scrollTop = 0;
+  if(kind === 'other'){ fvMsg(body, "Bu turdagi faylni sayt ichida ochib bo'lmaydi. «Yuklab olish» tugmasini bosing" + (/\.doc$/i.test(name||'') ? " (eski .doc format; .docx qilib saqlab yuklasangiz, sayt ichida ochiladi)." : "."), true); return; }
+  if(kind === 'img'){
+    body.innerHTML = `<div class="fv-img"><img src="${escapeAttr(url)}" alt="${escapeAttr(FV.cur.name)}" onclick="this.parentNode.classList.toggle('zoom')"></div>`;
+    const im = body.querySelector('img'); im.onerror = ()=>{ if(FV.token===token) fvMsg(body, "Rasmni ochib bo'lmadi. «Yuklab olish» tugmasini bosing.", true); };
+    return;
+  }
+  body.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+  try{
+    const buf = await fvGet(url);
+    if(FV.token !== token) return;
+    FV.cur.buf = buf;
+    if(kind === 'pdf') await fvRenderPdf(body, buf, token);
+    else if(kind === 'docx') await fvRenderDocx(body, buf, token);
+    else await fvRenderSheet(body, buf, token, /\.csv$/i.test(name||''));
+  }catch(e){
+    console.error('fvOpen', e);
+    if(FV.token === token) fvMsg(body, "Faylni sayt ichida ochib bo'lmadi. «Yuklab olish» tugmasini bosib ko'ring.", true);
+  }
+}
+function fvClose(){
+  const root = document.getElementById('fvRoot'); if(!root || !FV.cur) return;
+  FV.token++; FV.cur = null;
+  root.classList.add('hidden'); document.body.classList.remove('fv-open');
+  document.getElementById('fvBody').innerHTML = '';
+}
+async function fvDownload(){
+  const c = FV.cur; if(!c) return;
+  try{
+    const buf = c.buf || await fvGet(c.url);
+    const blob = new Blob([buf], { type: c.type || 'application/octet-stream' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = c.name || 'fayl';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(a.href), 30000);
+  }catch(e){ window.open(c.url, '_blank', 'noopener'); }
+}
+/* Faylni ochmasdan to'g'ridan-to'g'ri yuklab olish (ro'yxatdagi kichik tugma uchun) */
+async function fvSave(url, name, type){
+  try{
+    const buf = await fvGet(url);
+    const blob = new Blob([buf], { type: type || 'application/octet-stream' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name || 'fayl';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(a.href), 30000);
+  }catch(e){ window.open(url, '_blank', 'noopener'); }
+}
+/* ---- PDF ---- */
+function fvSetupPdf(){
+  const lib = window.pdfjsLib; if(!lib) throw new Error('pdf.js yuklanmadi');
+  if(FV.pdfWorkerSet) return lib;
+  lib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  FV.pdfWorkerSet = true; return lib;
+}
+async function fvRenderPdf(body, buf, token){
+  const lib = fvSetupPdf();
+  const pdf = await lib.getDocument({ data: new Uint8Array(buf.slice(0)) }).promise;
+  if(FV.token !== token) return;
+  body.innerHTML = `<div class="fv-pdf" id="fvPdf"></div>`;
+  const wrap = document.getElementById('fvPdf');
+  const maxW = Math.min(Math.max(body.clientWidth - 16, 240), 980), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const io = ('IntersectionObserver' in window) ? new IntersectionObserver(entries=>{
+    entries.forEach(en=>{ if(en.isIntersecting){ io.unobserve(en.target); en.target._draw && en.target._draw(); } });
+  }, { root: body, rootMargin: '900px 0px' }) : null;
+  const last = Math.min(pdf.numPages, 150);
+  for(let i=1; i<=last; i++){
+    if(FV.token !== token) return;
+    const page = await pdf.getPage(i);
+    const v1 = page.getViewport({ scale:1 }), vp = page.getViewport({ scale: maxW / v1.width });
+    const d = document.createElement('div'); d.className = 'fv-page'; d.style.width = vp.width + 'px'; d.style.height = vp.height + 'px';
+    d._draw = async ()=>{
+      if(FV.token !== token || d._done) return; d._done = true;
+      const c = document.createElement('canvas'); c.width = Math.floor(vp.width * dpr); c.height = Math.floor(vp.height * dpr);
+      c.style.width = vp.width + 'px'; c.style.height = vp.height + 'px'; d.appendChild(c);
+      try{ await page.render({ canvasContext: c.getContext('2d'), viewport: page.getViewport({ scale: (maxW / v1.width) * dpr }) }).promise; }catch(e){}
+    };
+    wrap.appendChild(d);
+    if(io) io.observe(d); else d._draw();
+  }
+  if(pdf.numPages > last) wrap.insertAdjacentHTML('beforeend', `<p class="row-meta" style="text-align:center;">Birinchi ${last} bet ko'rsatildi. Hammasini ko'rish uchun «Yuklab olish»ni bosing.</p>`);
+}
+/* ---- Word / Excel: sandbox iframe ---- */
+const FV_DOC_CSS = `body{font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.55;color:#1c1c1c;background:#fff;margin:0;padding:18px 20px;word-wrap:break-word}
+img{max-width:100%;height:auto}table{border-collapse:collapse;margin:10px 0;max-width:100%}td,th{border:1px solid #bbb;padding:4px 8px;vertical-align:top;font-size:14px}
+h1,h2,h3{line-height:1.25}a{color:#0b6b5c}p{margin:0 0 .8em}`;
+function fvSanitize(html){
+  const doc = new DOMParser().parseFromString('<body>' + html + '</body>', 'text/html');
+  doc.querySelectorAll('script,style,iframe,object,embed,link,meta,base,form,input,button,textarea,select,svg,math,audio,video,source,frame,frameset').forEach(n=>n.remove());
+  doc.body.querySelectorAll('*').forEach(el=>{
+    Array.from(el.attributes).forEach(a=>{
+      const n = a.name.toLowerCase();
+      if(n.startsWith('on')) el.removeAttribute(a.name);
+      else if(n === 'href'){ if(!/^(https?:|mailto:|#)/i.test(a.value.trim())) el.removeAttribute(a.name); else { el.setAttribute('target','_blank'); el.setAttribute('rel','noopener noreferrer'); } }
+      else if(n === 'src'){ if(!/^(data:image\/(png|jpe?g|gif|webp|bmp);|https?:)/i.test(a.value.trim())) el.removeAttribute(a.name); }
+      else if(n === 'style' || n === 'srcdoc' || n === 'formaction' || n === 'xlink:href') el.removeAttribute(a.name);
+    });
+  });
+  return doc.body.innerHTML;
+}
+function fvDocHtml(inner){
+  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base target="_blank"><' + 'style>' + FV_DOC_CSS + '</' + 'style></head><body>' + inner + '</body></html>';
+}
+function fvFrame(html){
+  return `<iframe class="fv-frame" id="fvFrame" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" srcdoc="${escapeAttr(fvDocHtml(html))}"></iframe>`;
+}
+async function fvRenderDocx(body, buf, token){
+  if(!window.mammoth) throw new Error('mammoth yuklanmadi');
+  const res = await mammoth.convertToHtml({ arrayBuffer: buf.slice(0) });
+  if(FV.token !== token) return;
+  const html = fvSanitize(res.value || '');
+  body.innerHTML = html.trim() ? fvFrame(html) : '';
+  if(!html.trim()) fvMsg(body, "Hujjatda ko'rsatiladigan matn topilmadi.", true);
+}
+async function fvRenderSheet(body, buf, token, isCsv){
+  if(!window.XLSX) throw new Error('XLSX yuklanmadi');
+  const wb = isCsv ? XLSX.read(new TextDecoder('utf-8').decode(buf), { type:'string' }) : XLSX.read(buf.slice(0), { type:'array', cellDates:true });
+  if(FV.token !== token) return;
+  const names = wb.SheetNames || []; if(!names.length) throw new Error('bo\'sh');
+  const MAXR = 500, MAXC = 40;
+  const htmlOf = nm=>{
+    const ws = wb.Sheets[nm]; if(!ws || !ws['!ref']) return '<p>Bu varaq bo\'sh.</p>';
+    const rg = XLSX.utils.decode_range(ws['!ref']); let note = '';
+    if(rg.e.r - rg.s.r + 1 > MAXR){ rg.e.r = rg.s.r + MAXR - 1; note = `<p><i>Birinchi ${MAXR} qator ko'rsatildi. Hammasi uchun «Yuklab olish»ni bosing.</i></p>`; }
+    if(rg.e.c - rg.s.c + 1 > MAXC) rg.e.c = rg.s.c + MAXC - 1;
+    const copy = Object.assign({}, ws, { '!ref': XLSX.utils.encode_range(rg) });
+    return fvSanitize(XLSX.utils.sheet_to_html(copy, { header:'', footer:'' })) + note;
+  };
+  FV.sheets = names.map(htmlOf);
+  body.innerHTML = (names.length > 1 ? `<div class="fv-sheets">${names.map((n,i)=>`<button class="tab ${i===0?'active':''}" onclick="fvPickSheet(${i}, this)">${escapeHtml(n)}</button>`).join('')}</div>` : '') + fvFrame(FV.sheets[0]);
+}
+function fvPickSheet(i, btn){
+  const fr = document.getElementById('fvFrame'); if(!fr || !FV.sheets) return;
+  fr.srcdoc = fvDocHtml(FV.sheets[i]);
+  document.querySelectorAll('.fv-sheets .tab').forEach(b=>b.classList.toggle('active', b===btn));
+}
+
 
 /* ---------- Talaba ---------- */
 async function hwLoadMine(force){
@@ -3295,26 +4091,52 @@ function hwDeadlineText(item){
   const days = Math.ceil(left/86400000);
   return days<=1 ? 'Muddat: bugun tugaydi!' : `Muddat: ${item.deadline} (${days} kun qoldi)`;
 }
+function hwSig(d){
+  try{ return JSON.stringify([ (d.items||[]).map(h=>[h.id,h.title,h.deadline,h.active]), Object.keys(d.subs||{}).sort().map(k=>[k,d.subs[k].status,d.subs[k].score,d.subs[k].gradedAt,d.subs[k].submittedAt]) ]); }
+  catch(e){ return 'z' + Math.random(); }
+}
 async function renderStudentHwView(){
   const holder = document.getElementById('studentView');
-  holder.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
-  const d = await hwLoadMine(true);
-  state._hw = d;
-  if(d.failed && !d.items.length){ holder.innerHTML = `<div class="empty">Vazifalarni yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.</div>`; return; }
-  if(!d.items.length){ holder.innerHTML = `<div class="empty">Hozircha uyga vazifa yo'q. O'qituvchi vazifa berganda shu yerda paydo bo'ladi.</div>`; return; }
+  const memo = state._hwMemo;
+  const have = !!memo && memo.k === myIdentity() && !memo.v.failed && Date.now() - memo.t < 300000;
+  let d;
+  if(have) d = memo.v;
+  else { holder.innerHTML = `<div class="loading">Yuklanmoqda...</div>`; d = await hwLoadMine(true); }
+  const shown = hwDrawList(d, null);
+  if(have){
+    const before = hwSig(d);
+    hwLoadMine(true).then(fresh=>{
+      if(fresh.failed || hwSig(fresh) === before) return;
+      if(!navShown('screen-test-list') || (state.studentView || 'home') !== 'hw' || state.hwScreen !== 'list') return;
+      hwDrawList(fresh, shown);
+    }).catch(()=>{});
+  }
+}
+function hwDrawList(d, prev){
+  const holder = document.getElementById('studentView');
+  state._hw = d; state.hwScreen = 'list';
+  const info = d.failed ? { newTasks:[], newGrades:[] } : hwBadgeInfo(d);
+  const newT = new Set(info.newTasks.map(h=>h.id)), newG = new Set(info.newGrades.map(x=>x.hwId));
+  if(prev){ prev.newT.forEach(x=>newT.add(x)); prev.newG.forEach(x=>newG.add(x)); }
+  if(!d.failed){ hwMarkSeen(d); setBadge('studentHwBadge', 0); state._lastHwNew = 0; }
+  const ret = { newT, newG };
+  if(d.failed && !d.items.length){ holder.innerHTML = `<div class="empty">Vazifalarni yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.</div>`; return ret; }
+  if(!d.items.length){ holder.innerHTML = `<div class="empty">Hozircha uyga vazifa yo'q. O'qituvchi vazifa berganda shu yerda paydo bo'ladi.</div>`; return ret; }
   const sorted = d.items.slice().sort((a,b)=>{
     const sa = d.subs[a.id] ? 1 : 0, sb = d.subs[b.id] ? 1 : 0; if(sa!==sb) return sa-sb;
     return (a.deadline||'9999').localeCompare(b.deadline||'9999');
   });
   holder.innerHTML = (d.failed ? `<p class="row-meta">Ba'zi vazifalar holatini yuklab bo'lmadi.</p>` : '') + sorted.map(h=>{
     const sub = d.subs[h.id], late = !sub && hwDeadlineEnd(h) < Date.now();
-    return `<div class="row-item"><span class="row-title">${escapeHtml(h.title)}<br><span class="row-meta" style="${!sub && !late && hwDeadlineEnd(h)-Date.now()<2*86400000?'color:var(--red);':''}">${escapeHtml(hwDeadlineText(h) || 'Muddatsiz')}</span></span>${hwStatusBadge(h, sub)}<button class="${sub?'btn-ghost':'btn-primary'} btn-small" onclick="hwOpen(${jsArg(h.id)})">${sub?"Ko'rish":'Topshirish'}</button></div>`;
+    return `<div class="row-item"><span class="row-title">${escapeHtml(h.title)}${newT.has(h.id)?' <span class="badge badge-new">Yangi</span>':''}${newG.has(h.id)?' <span class="badge badge-new">Baholandi</span>':''}<br><span class="row-meta" style="${!sub && !late && hwDeadlineEnd(h)-Date.now()<2*86400000?'color:var(--red);':''}">${escapeHtml(hwDeadlineText(h) || 'Muddatsiz')}</span></span>${hwStatusBadge(h, sub)}<button class="${sub?'btn-ghost':'btn-primary'} btn-small" onclick="hwOpen(${jsArg(h.id)})">${sub?"Ko'rish":'Topshirish'}</button></div>`;
   }).join('');
+  return ret;
 }
 function hwOpen(id){
   const d = state._hw; if(!d) return;
   const h = d.items.find(x=>x.id===id); if(!h) return;
-  const sub = d.subs[id]; state.hwFiles = []; state.hwOpenId = id;
+  const sub = d.subs[id]; state.hwFiles = []; state.hwOpenId = id; state.hwScreen = 'detail';
+  hwMarkSeen(d, id);
   const holder = document.getElementById('studentView');
   const locked = sub && sub.status==='qabul';
   holder.innerHTML = `<div class="toolbar"><div class="lead" style="margin:0;">${escapeHtml(h.title)}</div><button class="btn-ghost btn-small" onclick="switchStudentView('hw')">Orqaga</button></div>
@@ -3425,6 +4247,7 @@ async function renderAdminHomework(){
   state.hwCfg = cfg;
   if(cfg._loadFailed){ el.innerHTML = `<div class="empty">Vazifalarni yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.</div>`; return; }
   const by = {}; subs.forEach(s=>{ (by[s.hwId] = by[s.hwId] || []).push(s); });
+  { const n = hwPendingCount(cfg, rawSubs, grades); setBadge('hwTabBadge', n); state._lastHwPending = n; }
   const who = a=> !a || a.type==='all' ? 'Hammaga' : a.type==='groups' ? (a.groups||[]).join(', ') || 'Guruh tanlanmagan' : `${(a.accounts||[]).length} ta talaba`;
   el.innerHTML = `<div class="toolbar"><div class="lead" style="margin:0;">Uyga vazifa</div><button class="btn-primary btn-small" onclick="hwAdminEdit(null)">${icon('plus')}Yangi vazifa</button></div>
     <p class="desc">Talabalar vazifani rasm, PDF, Word yoki Excel fayl ko'rinishida topshiradi. Siz har birini ko'rib, ball va izoh qo'yasiz, «Qayta ishlang» deb qaytarishingiz mumkin.</p>
@@ -3438,6 +4261,25 @@ async function renderAdminHomework(){
         <button class="btn-danger btn-small" onclick="hwAdminDelete(${jsArg(h.id)})">${icon('trash')}</button></div>`;
     }).join('')}`;
 }
+/* ---- Uyga vazifa: tekshirilmagan topshiriqlar belgisi (admin/rahbar) ---- */
+function hwPendingCount(cfg, rawSubs, grades){
+  const ids = new Set((cfg.items||[]).map(h=>h.id));
+  const gmap = hwGradeMap(grades);
+  return rawSubs.filter(s=> ids.has(s.hwId)).map(s=> hwEffective(s, gmap[`${s.hwId}:${s.identity}`])).filter(s=> s.status==='topshirildi').length;
+}
+async function refreshAdminHwBadge(announce){
+  if(!state.role) return;
+  try{
+    const [cfg, rawSubs, grades] = await Promise.all([ loadHwConfig(), storageGetObjects('hw-sub:', {fresh:true}), storageGetObjects('hw-grade:', {fresh:true}) ]);
+    if(cfg._loadFailed) return;
+    if(!rawSubs.length && (state._lastHwPending||0) > 0) return;   // yuklanmadi — belgini bekorga o'chirmaymiz
+    const n = hwPendingCount(cfg, rawSubs, grades);
+    setBadge('hwTabBadge', n);
+    if(announce && n > (state._lastHwPending||0)) showToast(`Yangi topshirilgan uyga vazifa: ${n} ta tekshirilmagan`);
+    state._lastHwPending = n;
+  }catch(e){}
+}
+
 function hwGradeMap(grades){ const m = {}; (grades||[]).forEach(g=>{ m[`${g.hwId}:${g.identity}`] = g; }); return m; }
 function hwAdminOpen(id){ state.hwAdmin = { view:'detail', id }; renderAdminHomework(); }
 function hwAdminBack(){ state.hwAdmin = { view:'list', id:null }; window._draftHw = null; renderAdminHomework(); }
@@ -3568,9 +4410,9 @@ async function hwAdminGrade(i){
   if(score!==null && (isNaN(score) || score<0 || score>100)){ showToast("Ball 0 dan 100 gacha bo'lishi kerak.", true); return; }
   const grade = { hwId:s.hwId, identity:s.identity, status:(st==='topshirildi' ? 'qayta' : st), score, feedback:document.getElementById(`hwfb-${i}`).value.trim().slice(0,600),
     gradedAt:Date.now(), gradedBy: state.role==='rahbar' ? 'Rahbar' : 'Admin', forSubmittedAt:cur.submittedAt };
-  if(st==='topshirildi'){ await storageDelete(`hw-grade:${s.hwId}:${s.identity}`); showToast("Baho olib tashlandi ✓"); hwAdminDetail(s.hwId); return; }
+  if(st==='topshirildi'){ await storageDelete(`hw-grade:${s.hwId}:${s.identity}`); showToast("Baho olib tashlandi ✓"); hwAdminDetail(s.hwId); refreshAdminHwBadge(false); return; }
   if(!(await storageSet(`hw-grade:${s.hwId}:${s.identity}`, JSON.stringify(grade)))){ showToast("Saqlab bo'lmadi.", true); return; }
-  showToast("Saqlandi ✓"); hwAdminDetail(s.hwId);
+  showToast("Saqlandi ✓"); hwAdminDetail(s.hwId); refreshAdminHwBadge(false);
 }
 async function hwAdminExport(id){
   if(!window.XLSX) return;
@@ -3839,6 +4681,143 @@ setTimeout(()=>{ try{ refreshInstallUi(); }catch(e){} }, 0);
   window.addEventListener('load', ()=>{ try{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){} });
 })();
 
+/* ============ ORQAGA TUGMASI (telefon / brauzer «Orqaga») ============
+   Sayt tarixida bitta «qo'riqchi» yozuv turadi. «Orqaga» bosilganda ilova yopilmaydi: avval joriy bo'limdan
+   bir qadam yuqoriga qaytiladi (vazifa → vazifalar ro'yxati → bosh sahifa). Faqat bosh sahifada ikki marta bosilsa chiqiladi. */
+const NAV = { armed:false, exiting:false, exitAt:0 };
+function navShown(id){ const e = document.getElementById(id); return !!e && !e.classList.contains('hidden'); }
+function navClick(container, pick){
+  if(!container) return false;
+  const b = Array.from(container.querySelectorAll('button')).find(x=> x.offsetParent !== null && !x.disabled && (pick ? pick(x) : /^\s*Orqaga\s*$/.test(x.textContent)));
+  if(b){ b.click(); return true; }
+  return false;
+}
+function navActiveAdminTab(){ const el = document.querySelector('.admin-tab:not(.hidden)'); return el ? el.id.replace('adminTab-','') : ''; }
+async function navLeaveRun(){
+  if(!(await customConfirm("Joriy jarayonni tark etmoqchimisiz? Javoblaringiz saqlanmasligi mumkin."))) return;
+  renderTestList();
+}
+function navStepAdmin(){
+  if(navShown('screen-live-host')){ showToast("Jonli seans davom etmoqda. Uni seans tugmalari orqali yakunlang."); return true; }
+  if(!navShown('screen-admin-dashboard')) return false;
+  const tab = navActiveAdminTab(), el = document.getElementById('adminTab-' + tab);
+  if(tab === 'homework' && state.hwAdmin && state.hwAdmin.view && state.hwAdmin.view !== 'list'){ hwAdminBack(); return true; }
+  if(tab === 'practice' && state.prAdminSub && state.prAdminSub !== 'list'){ prAdminSwitch('list'); return true; }
+  if(tab === 'exams' && state.examsSubTab && state.examsSubTab !== 'list'){ switchExamsSubTab('list'); return true; }
+  if(navClick(el)) return true;
+  if(navClick(el, b=> /^(cancelDraftTest|cancelDraftExam)\b/.test(b.getAttribute('onclick')||''))) return true;
+  if(tab && tab !== 'home'){ switchAdminTab('home'); return true; }
+  return false;
+}
+function navStepStudent(){
+  const sh = navShown;
+  if(sh('screen-join') || sh('screen-live-link')) return false;
+  if(sh('screen-admin-login')){ if(state.studentSlug) renderTestList(); else showJoin(); return true; }
+  if(!state.studentSlug) return false;
+  if(sh('screen-test-take') || sh('screen-exam-take')){ navLeaveRun(); return true; }
+  if(sh('screen-live-student') || sh('screen-live-host')) return false;
+  if(sh('screen-test-result') || sh('screen-exam-result') || sh('screen-exam-intro')){ renderTestList(); return true; }
+  if(sh('screen-practice')){
+    if(state.pr){ prFinish(true); return true; }
+    if(state.prov){ provFinish(true); return true; }
+    if(navClick(document.getElementById('practiceBody'))) return true;
+    if(state.prAtCenter === false){ prRenderCenter(); return true; }
+    prFlush(); renderTestList(); return true;
+  }
+  if(sh('screen-student-profile') || sh('screen-leaderboard') || sh('screen-materials') || sh('screen-chat')){ renderTestList(); return true; }
+  if(sh('screen-test-list')){
+    if(navClick(document.getElementById('studentView'))) return true;      // vazifa tafsiloti → ro'yxat
+    if((state.studentView || 'home') !== 'home'){ switchStudentView('home'); return true; }
+    return false;
+  }
+  return false;
+}
+/* true — «Orqaga» ilova ichida ishlatildi; false — ildiz ekran (chiqish) */
+function navStep(){
+  if(typeof FV !== 'undefined' && FV.cur){ fvClose(); return true; }
+  if(navShown('modalOverlay')) return true;                  // oynacha ochiq: Orqaga hech narsa qilmaydi
+  if(navShown('screen-viewer')){ closeViewer(); return true; }
+  return state.role ? navStepAdmin() : navStepStudent();
+}
+function navOnPop(e){
+  if(NAV.exiting) return;
+  if(e.state && e.state.ft === 1) return;                    // «Oldinga»
+  let handled = true;
+  try{ handled = navStep(); }catch(err){ console.error('navStep', err); }
+  if(handled){ try{ history.pushState({ft:1}, ''); }catch(err){} return; }
+  const now = Date.now();
+  if(now - NAV.exitAt < 2500){ NAV.exiting = true; try{ history.back(); }catch(err){} return; }
+  NAV.exitAt = now;
+  showToast("Chiqish uchun yana bir marta «Orqaga»ni bosing");
+  try{ history.pushState({ft:1}, ''); }catch(err){}
+}
+function navArm(){
+  if(NAV.armed) return; NAV.armed = true;
+  try{
+    if(history.state && history.state.ft === 1) return;      // sahifa yangilangan — allaqachon tayyor
+    history.replaceState({ft:0}, '');
+    history.pushState({ft:1}, '');
+  }catch(e){}
+}
+function navInit(){
+  window.addEventListener('popstate', navOnPop);
+  // Chrome foydalanuvchi bosmagan tarix yozuvlarini «Orqaga»da o'tkazib yuboradi — shuning uchun birinchi bosishda yozuv qo'shamiz
+  const once = ()=>{ navArm(); ['pointerdown','keydown','touchstart'].forEach(t=>document.removeEventListener(t, once, true)); };
+  ['pointerdown','keydown','touchstart'].forEach(t=>document.addEventListener(t, once, true));
+}
+
+/* ============ TALABA SESSIYASI: bir marta kirsa, qayta login/parol so'ralmaydi ============
+   Kirish kodi rejimida kod + ism, login rejimida hisob identifikatori + parol «izi» (hash'dan olingan qisqa belgi) saqlanadi.
+   Parol yoki login o'zgarsa, hisob bloklansa yoki kod o'chirilsa — sessiya bekor bo'ladi. Admin/Rahbar sessiyasi saqlanmaydi. */
+const STUDENT_SESSION_KEY = 'ft-student-session';
+function credFp(a){
+  const t = String(a.login || '') + '|' + (a.secret ? (a.secret.salt || '') + (a.secret.hash || '') : 'p:' + (a.password === undefined ? '' : a.password));
+  let h = 5381; for(let i=0;i<t.length;i++) h = (((h << 5) + h) + t.charCodeAt(i)) | 0;
+  return (h >>> 0) + ':' + t.length;
+}
+function saveStudentSession(o){ try{ localStorage.setItem(STUDENT_SESSION_KEY, JSON.stringify(Object.assign({ v:1, savedAt:Date.now() }, o))); }catch(e){} }
+function readStudentSession(){ try{ const raw = localStorage.getItem(STUDENT_SESSION_KEY); if(!raw) return null; const o = JSON.parse(raw); return (o && o.v === 1) ? o : null; }catch(e){ return null; } }
+function clearStudentSession(){ try{ localStorage.removeItem(STUDENT_SESSION_KEY); }catch(e){} }
+function rememberOn(id){ const el = document.getElementById(id); return !el || el.checked; }
+function bootSplash(on){
+  const j = document.getElementById('screen-join'), b = document.getElementById('bootSplash');
+  if(on){ if(j) j.classList.add('hidden'); if(b) b.classList.remove('hidden'); } else if(b) b.classList.add('hidden');
+}
+/* { ok:true } — kirildi; aks holda { msg } */
+async function restoreStudentSession(){
+  const s = readStudentSession(); if(!s) return { ok:false };
+  const cfg = state.config;
+  if(!cfg || cfg._loadFailed) return { ok:false, msg:"Serverga ulanib bo'lmadi. Internetni tekshiring va sahifani yangilang.", keep:true };
+  const bad = msg=>{ clearStudentSession(); return { ok:false, msg }; };
+  let name, slug, group = '', accountId = null;
+  if(s.mode === 'account'){
+    const a = (cfg.studentAccounts || []).find(x=> x.id === s.accountId);
+    if(!a) return bad("Hisobingiz topilmadi. Iltimos, qayta kiring.");
+    if(a.blocked) return bad("Hisobingiz bloklangan. O'qituvchingiz bilan bog'laning.");
+    if(credFp(a) !== s.fp) return bad("Login yoki parol o'zgartirilgan. Iltimos, qayta kiring.");
+    name = a.fullName; slug = 'acct-' + slugify(a.login); group = a.group || ''; accountId = a.id;
+  } else if(s.mode === 'code'){
+    const codeObj = (cfg.accessCodes || []).find(c=> c.code === s.code);
+    if(!codeObj || !codeObj.active) return bad("Kirish kodi o'zgargan yoki faol emas. Iltimos, qayta kiring.");
+    name = s.name;
+    const acctMatch = (cfg.studentAccounts || []).find(a=> studentIdentity(a.fullName) === studentIdentity(name));
+    if(acctMatch) name = acctMatch.fullName;
+    slug = slugify(name); group = codeObj.label;
+    if(isStudentBlocked(cfg, slug, getDeviceId())) return bad("Kirish bloklangan. O'qituvchingiz bilan bog'laning.");
+  } else return bad('');
+  state.studentName = name; state.studentSlug = slug; state.studentGroup = group; state.deviceId = getDeviceId(); state.accountId = accountId;
+  upsertRosterEntry(slug, name, group, state.deviceId);
+  return { ok:true };
+}
+async function studentEnterAfterLogin(){
+  if(state.lockedTestId){
+    const t = state.config.tests.find(x=>x.id===state.lockedTestId);
+    if(t){ await startTest(state.lockedTestId); return; }
+  }
+  if(await tryAutoJoinLive()) return;
+  await renderTestList();
+}
+
 /* ============ NAV HELPERS ============ */
 function hideAll(){
   if(state.viewer){
@@ -3848,13 +4827,14 @@ function hideAll(){
     if(state.viewer.observer) state.viewer.observer.disconnect();
     state.viewer = null;
   }
-  ['screen-join','screen-test-list','screen-student-profile','screen-practice','screen-leaderboard','screen-chat','screen-materials','screen-viewer','screen-test-take','screen-test-result','screen-admin-login','screen-admin-dashboard','screen-live-student','screen-live-link','screen-live-host','screen-exam-intro','screen-exam-take','screen-exam-result']
-    .forEach(id=>document.getElementById(id).classList.add('hidden'));
+  ['screen-join','screen-test-list','screen-student-profile','screen-practice','screen-leaderboard','screen-chat','screen-materials','screen-viewer','screen-test-take','screen-test-result','screen-admin-login','screen-admin-dashboard','screen-live-student','screen-live-link','screen-live-host','screen-exam-intro','screen-exam-take','screen-exam-result','bootSplash']
+    .forEach(id=>{ const e = document.getElementById(id); if(e) e.classList.add('hidden'); });
   clearInterval(state.livePollTimer);
   clearInterval(state.liveUiTimer);
   liveRtLeave();
   clearInterval(state.examTimer);
   clearInterval(state.qTimer);
+  clearInterval(state.provTimer);
 }
 async function goHome(){
   // Admin/Rahbar: logo returns to their dashboard home
@@ -3923,6 +4903,8 @@ async function handleJoin(){
   state.deviceId = deviceId;
   upsertRosterEntry(slug, fullName, state.studentGroup, deviceId); // fire-and-forget: keeps the admin's block-list picker in sync
   logActivity('student_login', `Kirdi (kod): ${fullName} · ${state.studentGroup}`);
+  state._sdCache = null;
+  if(rememberOn('rememberCode')) saveStudentSession({ mode:'code', name:fullName, code:codeEntered }); else clearStudentSession();
 
   // Priority 1: a direct single-test link (?test=ID) takes the student straight into that test
   if(state.lockedTestId){
@@ -4005,7 +4987,7 @@ async function submitLiveLink(){
 function exitLiveGuest(){
   state.liveGuest = false;
   clearLiveLinkUrl();
-  logoutStudent();
+  logoutStudent(true);
 }
 async function tryAutoJoinLive(){
   const channels = await listActiveChannels();
@@ -4066,6 +5048,8 @@ async function handleAccountLogin(){
   state.accountId = account.id;
   upsertRosterEntry(slug, account.fullName, state.studentGroup, deviceId);
   logActivity('student_login', `Kirdi (login): ${account.fullName}`);
+  state._sdCache = null;
+  if(rememberOn('rememberAcct')) saveStudentSession({ mode:'account', accountId:account.id, login:account.login, fp:credFp(account) }); else clearStudentSession();
 
   if(state.lockedTestId){
     const t = state.config.tests.find(x=>x.id===state.lockedTestId);
@@ -4076,7 +5060,9 @@ async function handleAccountLogin(){
   if(liveJoined) return;
   await renderTestList();
 }
-function logoutStudent(){
+function logoutStudent(keepSession){
+  if(keepSession !== true) clearStudentSession();
+  state._sdCache = null;
   state.liveGuest = false; state.studentView = 'home'; state._lastStudentNew = 0;
   prFlush(); state.progress = null; state.practiceCfg = null; state.provCfg = null; state._badgeExtra = null; state._hw = null; state._hwMemo = null; state._attMemo = null; state.prBoard = null; state.pr = null; state.prov = null;
   state.studentName=''; state.studentSlug=''; state.studentGroup=''; state.accountId=null;
@@ -4121,7 +5107,10 @@ function deadlineInfo(t){
 }
 async function renderTestList(){
   if(state.liveGuest){ exitLiveGuest(); return; } // havola orqali kirgan mehmon testlar ro'yxatiga o'tmaydi
-  if(state.studentSlug){
+  const sc = state._sdCache;
+  const warm = !!state.studentSlug && !!sc && sc.k === state.studentSlug && Date.now() - sc.t < 180000
+    && !!state.config && !state.config._loadFailed && !!state.examConfig && !state.examConfig._loadFailed;
+  if(state.studentSlug && !warm){
     const channels = await listActiveChannels();
     if(channels.length===1){
       const live = await loadLiveSession(channels[0]);
@@ -4135,18 +5124,93 @@ async function renderTestList(){
   showScreen('screen-test-list');
   document.getElementById('masthead-sub').textContent = "Talaba rejimi";
   document.getElementById('studentGreeting').textContent = `${state.studentName} · ${state.studentGroup||'guruhsiz'}`;
-  state.config = await loadConfig();
-  state.examConfig = await loadExamConfig();
+  if(!warm){
+    const [cfg, ec] = await Promise.all([ loadConfig(), loadExamConfig() ]);
+    state.config = cfg; state.examConfig = ec;
+  }
   if(!state.studentView) state.studentView = 'home';
   await renderStudentView();
+  if(warm) navLiveCheckSoon();
+}
+/* Ro'yxat keshdan tez chizilganda jonli seans bor-yo'qligi fonda tekshiriladi */
+function navLiveCheckSoon(){
+  (async()=>{
+    try{
+      if(!state.studentSlug || state.liveGuest) return;
+      const channels = await listActiveChannels();
+      if(!channels.length || !navShown('screen-test-list')) return;
+      if(channels.length === 1){ const live = await loadLiveSession(channels[0]); if(live && live.status && live.status !== 'ended') await enterLiveStudentFlow(live); }
+      else await showChannelPicker(channels);
+    }catch(e){}
+  })();
 }
 /* ---- Talaba rejimi: Bosh sahifa / Testlar / Imtihonlar ---- */
 const STUDENT_VIEW_TITLES = { home:'Bosh sahifa', tests:'Testlar', exams:'Imtihonlar', hw:'Uyga vazifa' };
+/* ---- Uyga vazifa: yangi vazifa va yangi baho belgisi (talaba) ----
+   "Yangi vazifa" = topshirilmagan, muddati o'tmagan va talaba hali ko'rmagan vazifa.
+   "Yangi baho" = o'qituvchi baholagan/izoh yozgan, talaba hali ko'rmagan. Ko'rilganlar localStorage'da saqlanadi. */
+function hwGradeSeenKey(){ return 'ft-seen-hwg:' + state.studentSlug; }
+function hwReadGradeSeen(){ try{ const raw = localStorage.getItem(hwGradeSeenKey()); return raw===null ? null : (JSON.parse(raw)||{}); }catch(e){ return undefined; } }
+function hwWriteGradeSeen(o){ try{ localStorage.setItem(hwGradeSeenKey(), JSON.stringify(o)); }catch(e){} }
+function hwBadgeInfo(d){
+  const seenT = readSeen('hw'), seenG = hwReadGradeSeen();
+  const now = Date.now();
+  const newTasks = (seenT===undefined) ? [] : (d.items||[]).filter(h=> !d.subs[h.id] && hwDeadlineEnd(h) >= now && !(seenT && seenT.has(h.id)));
+  let newGrades = [];
+  if(seenG===null){                         // birinchi marta: mavjud baholar "yangi" emas
+    const seed = {}; Object.values(d.subs||{}).forEach(x=>{ if(x.gradedAt) seed[x.hwId] = x.gradedAt; });
+    hwWriteGradeSeen(seed);
+  } else if(seenG){
+    newGrades = Object.values(d.subs||{}).filter(x=> x.gradedAt && x.status!=='topshirildi' && x.gradedAt > (seenG[x.hwId]||0));
+  }
+  return { newTasks, newGrades, total:newTasks.length + newGrades.length };
+}
+function hwMarkSeen(d, onlyId){
+  const items = (d.items||[]).filter(h=> !onlyId || h.id===onlyId);
+  const seenT = readSeen('hw'); const set = new Set(seenT ? [...seenT] : []);
+  items.forEach(h=> set.add(h.id)); writeSeen('hw', set);
+  const g = hwReadGradeSeen() || {};
+  items.forEach(h=>{ const x = d.subs && d.subs[h.id]; if(x && x.gradedAt) g[h.id] = x.gradedAt; });
+  hwWriteGradeSeen(g);
+}
+function navRevealBadge(id){
+  const b = document.getElementById(id); if(!b || b.classList.contains('hidden')) return;
+  const tab = b.closest('.tab'), bar = tab && tab.parentElement; if(!bar) return;
+  const r = tab.getBoundingClientRect(), br = bar.getBoundingClientRect();
+  if(r.right > br.right - 2) bar.scrollLeft += (r.right - br.right) + 10;
+}
+async function refreshStudentHwBadge(announce){
+  if(!state.studentSlug || state.role || state.liveGuest) return;
+  try{
+    const memo = state._hwMemo;
+    let d = (memo && memo.k===myIdentity()) ? memo.v : null;
+    let stale = !d || Date.now()-memo.t > 55000;
+    if(!stale){                               // yangi vazifa qo'shilganmi — bitta yengil so'rov
+      const cfg = await loadHwConfig(); if(cfg._loadFailed) return;
+      const ids = cfg.items.filter(h=> h.active !== false && isAssignedToMe(h.assignTo)).slice(-20).map(h=>h.id).sort().join(',');
+      stale = ids !== d.items.map(h=>h.id).sort().join(',');
+    }
+    if(stale){ d = await hwLoadMine(true); if(d.failed) return; }
+    const onList = !document.getElementById('screen-test-list').classList.contains('hidden');
+    const onHwList = onList && (state.studentView||'home')==='hw' && state.hwScreen==='list';
+    const info = hwBadgeInfo(d);
+    if(announce && info.total > (state._lastHwNew||0)){
+      const msg = info.newTasks.length ? ('Yangi uyga vazifa: ' + info.newTasks[info.newTasks.length-1].title) : ('Vazifangiz baholandi: ' + info.newGrades[0].title);
+      showToast(msg);
+      try{ if('Notification' in window && Notification.permission==='granted' && document.hidden) new Notification('FINANCE TEAM', { body: msg }); }catch(e){}
+      if(onHwList){ renderStudentHwView(); state._lastHwNew = 0; return; }
+    }
+    if(onHwList){ hwMarkSeen(d); setBadge('studentHwBadge', 0); state._lastHwNew = 0; return; }
+    if(onList){ setBadge('studentHwBadge', info.total); navRevealBadge('studentHwBadge'); }
+    state._lastHwNew = info.total;
+  }catch(e){}
+}
+
 function studentNavHtml(){
   const v = state.studentView || 'home';
   const t = (id,label,badge)=> `<button class="tab ${v===id?'active':''}" onclick="switchStudentView('${id}')">${label}${badge?`<span class="count-badge hidden" id="${badge}" style="background:var(--gold,#C9A227);color:#1b1500;"></span>`:''}</button>`;
   return `<div class="tabs" style="margin-bottom:16px;">
-    ${t('home','Bosh sahifa')}${t('tests','Testlar','studentTestsBadge')}${t('exams','Imtihonlar','studentExamsBadge')}${t('hw','Vazifalar')}
+    ${t('home','Bosh sahifa')}${t('tests','Testlar','studentTestsBadge')}${t('exams','Imtihonlar','studentExamsBadge')}${t('hw','Vazifalar','studentHwBadge')}
     <button class="tab" onclick="showPractice('topics')">Mashq</button>
     <button class="tab" onclick="renderStudentProfile()">Natijalarim</button>
     <button class="tab" onclick="showLeaderboard('group')">Reyting</button>
@@ -4167,22 +5231,61 @@ async function loadStudentData(){
   allExam.filter(sameStudent).forEach(r=>{ myExams[r.examId] = r; });
   return { allResults, myTests, myExams };
 }
-async function renderStudentView(){
-  const v = state.studentView || 'home';
-  document.getElementById('studentViewTitle').textContent = STUDENT_VIEW_TITLES[v] || 'Bosh sahifa';
-  document.getElementById('studentNav').innerHTML = studentNavHtml();
-  const holder = document.getElementById('studentView');
-  holder.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
-  const data = await loadStudentData();
-  state._studentData = data;
-  await renderStudentNotifications(data);
+function sdSig(d){
+  try{ return JSON.stringify([ (d.allResults||[]).length,
+    Object.keys(d.myTests||{}).sort().map(k=>[k,(d.myTests[k]||{}).percentage,(d.myTests[k]||{}).timestamp]),
+    Object.keys(d.myExams||{}).sort().map(k=>[k,(d.myExams[k]||{}).percentage,(d.myExams[k]||{}).openGraded,(d.myExams[k]||{}).timestamp]) ]); }
+  catch(e){ return 'x' + Math.random(); }
+}
+function cfgSig(){
+  try{ return JSON.stringify([ (state.config.tests||[]).map(t=>[t.id,t.active,t.topic,t.openedAt,t.assignTo]), (state.examConfig.exams||[]).map(e=>[e.id,e.active,e.title,e.openedAt,e.assignTo]) ]); }
+  catch(e){ return 'y' + Math.random(); }
+}
+async function drawStudentView(v, data){
   if(v==='tests') renderStudentTestsView(data);
   else if(v==='exams') renderStudentExamsView(data);
   else if(v==='hw') await renderStudentHwView();
   else await renderStudentHome(data);
+}
+/* Ekran kesh bilan DARHOL chiziladi; yangi ma'lumot fonda olinadi va faqat o'zgargan bo'lsa ekran yangilanadi
+   (shunda «Orqaga» bosilganda «Yuklanmoqda…» uzilishi bo'lmaydi). */
+async function renderStudentView(opts){
+  opts = opts || {};
+  const v = state.studentView || 'home';
+  document.getElementById('studentViewTitle').textContent = STUDENT_VIEW_TITLES[v] || 'Bosh sahifa';
+  document.getElementById('studentNav').innerHTML = studentNavHtml();
+  const holder = document.getElementById('studentView');
+  const token = state._svToken = (state._svToken || 0) + 1;
+  const c = state._sdCache;
+  const warm = !opts.force && !!c && c.k === state.studentSlug && Date.now() - c.t < 180000;
+  let data;
+  if(warm) data = c.data;
+  else {
+    holder.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
+    data = await loadStudentData();
+    if(token !== state._svToken) return;
+    state._sdCache = { k: state.studentSlug, t: Date.now(), data };
+  }
+  state._studentData = data;
+  await drawStudentView(v, data);
+  renderStudentNotifications(data).catch(()=>{});
   refreshStudentChatBadge(false);
   updateMaterialsBadge();
   updateStudentNewBadges();
+  if(warm) sdRefreshInBackground(token, v, data);
+}
+function sdRefreshInBackground(token, v, shownData){
+  const before = sdSig(shownData) + cfgSig();
+  Promise.all([ loadStudentData(), loadConfig(), loadExamConfig() ]).then(async ([fresh, cfg, ec])=>{
+    if(token !== state._svToken) return;
+    if(!cfg._loadFailed) state.config = cfg;
+    if(!ec._loadFailed) state.examConfig = ec;
+    state._sdCache = { k: state.studentSlug, t: Date.now(), data: fresh };
+    state._studentData = fresh;
+    const changed = (sdSig(fresh) + cfgSig()) !== before;
+    const here = navShown('screen-test-list') && (state.studentView || 'home') === v && v !== 'hw';
+    if(changed && here){ await drawStudentView(v, fresh); updateStudentNewBadges(); }
+  }).catch(()=>{});
 }
 function myTestsList(){ return state.config.tests.filter(t=>t.active && isAssignedToMe(t.assignTo)); }
 function myExamsList(){ return state.examConfig.exams.filter(e=>e.active && isAssignedToMe(e.assignTo)); }
@@ -4253,6 +5356,71 @@ async function homeOpenHw(id){ state.studentView = 'hw'; await renderStudentView
 async function attProfileSection(){
   try{ const a = await attLoadMine(); if(!a.total) return ''; return `<div class="lead" style="font-size:1.05rem;margin:18px 0 10px;">Davomat</div>` + attMineHtml(a); }catch(e){ return ''; }
 }
+/* ============ KUNLIK IQTIBOSLAR (bosh sahifa) ============
+   Har kuni bitta iqtibos, sanaga qarab aylanadi. Faqat manbasi aniq iqtiboslar va xalq maqollari kiritilgan. */
+const DAILY_QUOTES = [
+  ["Agar men boshqalardan uzoqroqni ko'rgan bo'lsam, bu devlar yelkasida turganim tufaylidir.", "Isaak Nyuton"],
+  ["Omad faqat tayyorlangan onggagina yor bo'ladi.", "Lui Paster"],
+  ["Daho — bir foiz ilhom va to'qson to'qqiz foiz mehnatdir.", "Tomas Edison"],
+  ["Eng muhimi — savol berishdan to'xtamaslik.", "Albert Eynshteyn"],
+  ["Muvaffaqiyatli odam bo'lishga emas, qadrli odam bo'lishga intiling.", "Albert Eynshteyn"],
+  ["Ta'lim — maktabda o'rganganlarimizni unutganimizdan keyin qolgan narsadir.", "Albert Eynshteyn"],
+  ["Ta'lim — dunyoni o'zgartirish uchun qo'lingizdagi eng kuchli qurol.", "Nelson Mandela"],
+  ["Hech qachon taslim bo'lmang — hech qachon, hech qachon, hech qachon.", "Uinston Cherchill"],
+  ["Yaxshilanish — o'zgarish demak; mukammal bo'lish uchun esa tez-tez o'zgarish kerak.", "Uinston Cherchill"],
+  ["Hisobga olinadigan — tanqidchi emas, balki maydonga tushib kurashgan odamdir.", "Teodor Ruzvelt"],
+  ["Uchib bo'lmasa — yuguring, yugurib bo'lmasa — yuring, yurib bo'lmasa — emaklang. Nima qilsangiz ham, oldinga harakat qilishda davom eting.", "Martin Lyuter King"],
+  ["Buyuk ish qilishning yagona yo'li — qilayotgan ishingizni sevishdir.", "Stiv Jobs"],
+  ["Hisobchilik — biznes tilidir.", "Uorren Baffet"],
+  ["Xavf — nima qilayotganingizni bilmaslikdan keladi.", "Uorren Baffet"],
+  ["Har kuni tong otgandagiga qaraganda biroz donoroq bo'lishga intilib yashang.", "Charli Manger"],
+  ["Savdogar debet kreditga teng bo'lmaguncha uxlamasligi kerak.", "Luka Pachioliga nisbat beriladi (buxgalteriya otasi)"],
+  ["Mayda xarajatlardan ehtiyot bo'ling: kichik teshik ham katta kemani cho'ktiradi.", "Benjamin Franklin"],
+  ["Yaxshi qilingan ish chiroyli aytilgan so'zdan afzal.", "Benjamin Franklin"],
+  ["Yo'qotilgan vaqt hech qachon topilmaydi.", "Benjamin Franklin"],
+  ["Fikrsiz o'qish — behuda mehnat; o'qimay fikrlash — xavfli.", "Konfutsiy"],
+  ["Ming chaqirimlik yo'l ham bitta qadamdan boshlanadi.", "Lao-szi"],
+  ["Ishlar qiyin bo'lgani uchun biz jur'at etmaymiz emas; jur'at etmaganimiz uchun ular qiyin bo'lib ko'rinadi.", "Seneka"],
+  ["O'zini tekshirmagan hayot yashashga arzimaydi.", "Sokrat"],
+  ["Bilishning o'zi yetmaydi — qo'llash ham kerak. Xohlashning o'zi yetmaydi — qilish ham kerak.", "Iogann Gyote"],
+  ["Qiyinchilik yangi g'oyalarni topishda emas, eskilaridan qutulishdadir.", "Jon Meynard Keyns"],
+  ["Karyeramda to'qqiz mingdan ortiq to'pni nishonga tegizolmadim, uch yuzga yaqin o'yinda yutqazdim. Aynan shuning uchun muvaffaqiyatga erishdim.", "Maykl Jordan"],
+  ["Muvaffaqiyat — yomon o'qituvchi: u aqlli odamlarni yutqazolmaymiz deb ishontiradi.", "Bill Geyts"],
+  ["Hech narsada muvaffaqiyatsizlikka uchramay yashab bo'lmaydi — agar shunchalik ehtiyotkor yashamasangiz, siz o'z-o'zidan muvaffaqiyatsizsiz.", "Joan Roulling"],
+  ["Bitta bola, bitta o'qituvchi, bitta kitob va bitta qalam dunyoni o'zgartira oladi.", "Malala Yusufzay"],
+  ["Mukammallik — bir marta qilingan ish emas, odatdir.", "Uill Dyurant (Aristotel g'oyalari haqida)"],
+  ["Orzularingiz tomon dadil yuring va xayolingizdagi hayotni yashashga intiling.", "Genri Toro"],
+  ["Ishtiyoqsiz hech qanday buyuk ish qilinmagan.", "Ralf Uoldo Emerson"],
+  ["Muvaffaqiyat egallangan mavqe bilan emas, yengib o'tilgan to'siqlar bilan o'lchanadi.", "Bukker Vashington"],
+  ["Dunyo azob-uqubatga to'la, lekin uni yengib o'tish ham shu qadar ko'p.", "Xelen Keller"],
+  ["O'zini boshqara olmagan odam ozod emas.", "Epiktet"],
+  ["Yo'lga to'siq bo'lgan narsa yo'lning o'ziga aylanadi.", "Mark Avreliy"],
+  ["Mehnatning o'rnini hech narsa bosa olmaydi.", "Tomas Edison"],
+  ["Har qanday ishning eng muhim qismi — boshlanishi.", "Aflotun"],
+  ["Hayot qisqa, hunar o'rganish esa uzoq.", "Gippokrat"],
+  ["Kuch — adolatdadir.", "Amir Temur"],
+  ["Dinlar parokanda bo'ladi, hukmdorlar saltanati yo'qoladi, faqat ilmning izlari abadiy qoladi.", "Mirzo Ulug'bek"],
+  ["Odami ersang, demagil odami, onikim, yo'q xalq g'amidin g'ami.", "Alisher Navoiy"],
+  ["Harakatda barakat.", "Xalq maqoli"],
+  ["Hunarli kishi xor bo'lmas.", "Xalq maqoli"],
+  ["Tirishgan toshdan non chiqarar.", "Xalq maqoli"],
+  ["Bugungi ishni ertaga qoldirma.", "Xalq maqoli"],
+  ["Yaxshi boshlangan ish — yarim bitgan ish.", "Xalq maqoli"],
+  ["Qatra-qatra daryo bo'lar.", "Xalq maqoli"],
+  ["Sabrning tagi — sariq oltin.", "Xalq maqoli"],
+  ["Bir yigitga yetmish hunar ham oz.", "Xalq maqoli"],
+  ["Ko'p yashagan bilmas, ko'p ko'rgan bilar.", "Xalq maqoli"],
+  ["Mehnatning tagi — rohat.", "Xalq maqoli"]
+];
+function quoteOfTheDay(){
+  const day = Math.floor((Date.now() - new Date().getTimezoneOffset()*60000) / 86400000);
+  return DAILY_QUOTES[((day % DAILY_QUOTES.length) + DAILY_QUOTES.length) % DAILY_QUOTES.length];
+}
+function quoteBoxHtml(){
+  const q = quoteOfTheDay();
+  return `<div class="quote-box"><div class="quote-text">«${escapeHtml(q[0])}»</div><div class="quote-by">— ${escapeHtml(q[1])}</div></div>`;
+}
+
 async function renderStudentHome(data){
   const holder = document.getElementById('studentView');
   const tests = myTestsList(), exams = myExamsList();
@@ -4282,6 +5450,7 @@ async function renderStudentHome(data){
     <div class="notify-banner" style="margin-bottom:16px;border-color:var(--teal);">
       <div class="notify-banner-title">${hello}, ${escapeHtml(first)}!</div>
       <p class="desc" style="margin:0;">${level}.${pendingGrade?` Baholanishi kutilayotgan imtihon: ${pendingGrade} ta.`:''}</p>
+      ${quoteBoxHtml()}
     </div>
     <div class="stat-grid" style="margin-bottom:18px;">
       ${box(avg===null?'—':avg+'%', "O'rtacha natija", avg===null?'':'barcha natijalar')}
@@ -4358,6 +5527,7 @@ function updateStudentNewBadges(){
   if(view==='exams'){ markStudentSeen('exams'); } else setBadge('studentExamsBadge', n.exams.length);
   const t = studentUnseen(state.config, state.examConfig);
   state._lastStudentNew = t.tests.length + t.exams.length;
+  refreshStudentHwBadge(false);
 }
 function enableStudentNotifications(){
   try{ Notification.requestPermission().then(()=>{ showToast("Bildirishnomalar yoqildi ✓"); renderStudentView(); }); }catch(e){}
@@ -4494,11 +5664,11 @@ async function refreshStudentChatBadge(announce){
 setInterval(()=>{
   if(document.hidden){
     // fon rejimida faqat bildirishnoma ruxsati berilgan talaba uchun tekshiramiz
-    try{ if(!state.role && state.studentSlug && 'Notification' in window && Notification.permission==='granted') refreshStudentNotifications(true); }catch(e){}
+    try{ if(!state.role && state.studentSlug && 'Notification' in window && Notification.permission==='granted'){ refreshStudentNotifications(true); refreshStudentHwBadge(true); } }catch(e){}
     return;
   }
-  if(state.role){ refreshAdminChatBadge(true); refreshPendingGrading(true); }
-  else if(state.studentSlug){ refreshStudentChatBadge(true); refreshStudentNotifications(true); }
+  if(state.role){ refreshAdminChatBadge(true); refreshPendingGrading(true); refreshAdminHwBadge(true); }
+  else if(state.studentSlug){ refreshStudentChatBadge(true); refreshStudentNotifications(true); refreshStudentHwBadge(true); }
 }, 15000);
 function renderChatMessages(){
   const thread = window._chatThread;
@@ -5891,10 +7061,11 @@ async function openAdminDashboard(){
   const tabs = isOwner ? [...BASE_ADMIN_TABS, {id:'owner', label:'Rahbar nazorati', owner:true, ic:'shield'}] : BASE_ADMIN_TABS;
   const defaultTab = 'home';
   const tabsBar = document.getElementById('adminTabsBar');
-  tabsBar.innerHTML = tabs.map(t => `<button class="tab ${t.owner?'owner-tab':''} ${t.id===defaultTab?'active':''}" data-tab="${t.id}" onclick="switchAdminTab('${t.id}')">${icon(t.ic)}${t.label}${t.id==='chats'?'<span class="count-badge hidden" id="chatsTabBadge"></span>':''}${t.id==='exams'?'<span class="count-badge hidden" id="examsTabBadge" style="background:var(--gold,#C9A227);color:#1b1500;"></span>':''}</button>`).join('');
+  tabsBar.innerHTML = tabs.map(t => `<button class="tab ${t.owner?'owner-tab':''} ${t.id===defaultTab?'active':''}" data-tab="${t.id}" onclick="switchAdminTab('${t.id}')">${icon(t.ic)}${t.label}${t.id==='chats'?'<span class="count-badge hidden" id="chatsTabBadge"></span>':''}${t.id==='exams'?'<span class="count-badge hidden" id="examsTabBadge" style="background:var(--gold,#C9A227);color:#1b1500;"></span>':''}${t.id==='homework'?'<span class="count-badge hidden" id="hwTabBadge"></span>':''}</button>`).join('');
   switchAdminTab(defaultTab);
   refreshAdminChatBadge(false);
   refreshPendingGrading(true);
+  refreshAdminHwBadge(true);
 }
 /* Panel tugmalarini sichqoncha bilan ushlab surish */
 (function initTabDrag(){
@@ -5988,11 +7159,11 @@ function renderAdminHelp(){
     },
     {
       q: "Provodka trenajyori qanday ishlaydi?",
-      a: `Talabaga xo'jalik amaliyoti beriladi, u Debet va Kredit hisobvaraq raqamlarini (4 xonali) yozadi. Javob darrov tekshiriladi va to'g'ri javob izohi ko'rsatiladi. Tayyor to'plam (hisoblar rejasi va ${PROV_BUILTIN.length} ta amaliyot) 2026-yil hisobvaraqlar rejasiga tayyorlangan, lekin <b>albatta o'zingiz tekshirib chiqing</b>: «Mashq → Provodka» bo'limida har bir amaliyotni ko'rish, kerak bo'lmaganini o'chirib qo'yish va o'zingizniki qo'shish mumkin. Tekshirishda provodkalar tartibi muhim emas, summa faqat ma'lumot sifatida ko'rsatiladi.`
+      a: `Talabaga xo'jalik amaliyoti beriladi, u Debet va Kredit hisobvaraq raqamlarini (4 xonali) yozadi. Javob darrov tekshiriladi va to'g'ri javob izohi ko'rsatiladi. Tayyor to'plam (hisoblar rejasi va ${PROV_BUILTIN.length} ta amaliyot) 2026-yil hisobvaraqlar rejasiga tayyorlangan, lekin <b>albatta o'zingiz tekshirib chiqing</b>: «Mashq → Provodka» bo'limida har bir amaliyotni ko'rish, kerak bo'lmaganini o'chirib qo'yish va o'zingizniki qo'shish mumkin. Tekshirishda provodkalar tartibi muhim emas, summa faqat ma'lumot sifatida ko'rsatiladi. Har bir amaliyotga <b>vaqt chegarasi</b> bor: 1 ta provodka — 15 soniya, 2 ta — 20 soniya, 3–4 ta — 25–30 soniya; vaqt tugasa javob shu holatda tekshiriladi. Mashq darajalari: <b>Start</b> (0 ball), <b>Pro</b> (400 ball), <b>Master</b> (1500 ball).`
     },
     {
       q: "Uyga vazifa qanday beriladi va tekshiriladi?",
-      a: `«Uyga vazifa» panelida «Yangi vazifa»ni bosing: sarlavha, matn, muddat va kimlarga ko'rinishini tanlang. Talaba vazifani rasm, PDF, Word yoki Excel fayl qilib yuklaydi (rasmlar avtomatik kichraytiriladi). «Topshirganlar» bo'limida har bir ishni ochib, holatini («Qabul qilindi» / «Qayta ishlang»), ballini va izohini yozasiz. Muddatdan keyin topshirilgani «kechikkan» deb belgilanadi, lekin topshirishga to'sqinlik qilinmaydi. Qabul qilingan vazifani talaba qayta topshira olmaydi. Natijalarni Excel'ga yuklab olish mumkin.`
+      a: `«Uyga vazifa» panelida «Yangi vazifa»ni bosing: sarlavha, matn, muddat va kimlarga ko'rinishini tanlang. Talaba vazifani rasm, PDF, Word yoki Excel fayl qilib yuklaydi (rasmlar avtomatik kichraytiriladi). «Topshirganlar» bo'limida har bir ishni ochib, holatini («Qabul qilindi» / «Qayta ishlang»), ballini va izohini yozasiz. Muddatdan keyin topshirilgani «kechikkan» deb belgilanadi, lekin topshirishga to'sqinlik qilinmaydi. Qabul qilingan vazifani talaba qayta topshira olmaydi. Natijalarni Excel'ga yuklab olish mumkin. Yuklangan rasm, PDF, Word (.docx) va Excel fayllar sayt ichida ochiladi («Yuklab olish» tugmasi ham bor). Talaba tabida yangi vazifa yoki yangi baho kelganda belgi chiqadi; sizning «Uyga vazifa» tabingizda esa tekshirilmagan topshiriqlar soni ko'rinadi.`
     },
     {
       q: "Davomat qanday belgilanadi?",
@@ -6005,6 +7176,10 @@ function renderAdminHelp(){
     {
       q: "Saytni telefonga ilova kabi qanday o'rnataman?",
       a: `Android (Chrome)da sayt ochilganda pastda «O'rnatish» taklifi chiqadi yoki brauzer menyusidan «Ilovani o'rnatish» / «Bosh ekranga qo'shish»ni tanlang. iPhone (Safari)da «Ulashish» tugmasini bosib, «Bosh ekranga qo'shish»ni tanlang. Talaba bosh sahifada ham «Telefonga o'rnatish» tugmasini ko'radi. Sayt yangilanganda ilova ham avtomatik yangilanadi.`
+    },
+    {
+      q: "Talaba har safar login va parol kiritishi shartmi?",
+      a: `Yo'q. Talaba bir marta kirsa («Meni eslab qol» belgisi yoqilgan bo'lsa), shu qurilmada qayta kirishi shart emas. Sessiya quyidagi hollarda bekor bo'ladi: talaba «Chiqish»ni bosganda, siz login yoki parolni o'zgartirganda, hisobni bloklaganda yoki kirish kodini o'chirib/almashtirganda. Umumiy kompyuterda talaba «Meni eslab qol»ni o'chirib qo'yishi yoki chiqishda «Chiqish»ni bosishi kerak. Admin va Rahbar sessiyasi har safar kod bilan kiriladi. Telefondagi «Orqaga» tugmasi ilovadan chiqarib yubormaydi — bir qadam oldingi bo'limga qaytaradi; bosh sahifada ikki marta bosilsa chiqadi.`
     }
   ];
   el.innerHTML = `
