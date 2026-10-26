@@ -304,7 +304,8 @@
   .modal-box{background:linear-gradient(160deg, var(--card-hi), var(--card));border:1px solid var(--edge);border-radius:16px;box-shadow:var(--shadow-hover);padding:26px 24px;max-width:400px;width:100%;animation:modalIn .2s ease;}
   @keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(0.98);}to{opacity:1;transform:translateY(0) scale(1);}}
   .modal-message{font-size:0.98rem;line-height:1.55;margin-bottom:22px;white-space:pre-line;}
-  .modal-actions{display:flex;gap:10px;justify-content:flex-end;}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;}
+  .rk-key{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:1.15rem;font-weight:700;letter-spacing:.06em;text-align:center;padding:14px 8px;border:1px dashed var(--edge);border-radius:10px;background:rgba(255,255,255,0.06);color:var(--ink);user-select:all;-webkit-user-select:all;word-break:break-all;}
   /* Screen transitions */
   @keyframes screenIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
   .screen-enter{animation:screenIn .35s cubic-bezier(.2,.8,.3,1);}
@@ -721,6 +722,7 @@
       <button class="btn-primary" onclick="handleAdminLogin()">Kirish</button>
       <button class="btn-ghost" onclick="showJoin()">Bekor qilish</button>
     </div>
+    <div style="margin-top:14px;"><button type="button" class="btn-ghost btn-small" id="forgotCodeBtn" onclick="rkOpenMenu()">Kodni unutdim?</button></div>
     <div id="adminLoginError" style="color:var(--red);font-size:0.85rem;margin-top:10px;"></div>
   </div>
 
@@ -6878,6 +6880,7 @@ function ensureAdminAuth(){
           const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
           if(error){ errEl.textContent = "Email yoki parol noto'g'ri."; return; }
           try{ localStorage.setItem('ft-admin-remember', document.getElementById('sbRemember').checked ? '1' : '0'); }catch(e){}
+          try{ localStorage.setItem('ft-recovery-email', email); }catch(e){}
           closeModal(); showToast("Supabase hisobi bilan kirdingiz ✓"); resolve(true);
         }catch(e){ errEl.textContent = "Ulanishda xatolik. Qayta urinib ko'ring."; }
       }},
@@ -9854,6 +9857,14 @@ async function renderOwnerPanel(){
       </div>
     </div>
 
+    <div class="lead" style="font-size:1.1rem;margin:26px 0 10px;">Kodni tiklash</div>
+    <p class="desc">Rahbar kodini unutsangiz, kirish oynasidagi «Kodni unutdim?» orqali ikki yo'l bilan qaytasiz. Ikkalasini hozir sozlab qo'ying.</p>
+    <div class="row-item"><span class="row-title">Zaxira kalit</span>
+      ${state.config.recovery ? `<span class="badge badge-open">Yaratilgan · ${escapeHtml(String(state.config.recovery.createdAt||'').slice(0,10))}</span><button class="btn-ghost btn-small" onclick="rkCreateKey()">Yangilash</button>` : `<span class="badge badge-closed">Yaratilmagan</span><button class="btn-owner btn-small" onclick="rkCreateKey()">Yaratish</button>`}</div>
+    ${state.config.recovery ? `<div class="row-meta" style="margin:-4px 0 10px;">Saqlangan talaba parollarini ham tiklaydi: ${state.config.recovery.wrapVault ? '<b>Ha</b>' : (state.config.vault ? "<b>Yo'q</b> — kalitni omborni ochib turib yangilang" : "ombor hali yoqilmagan")}</div>` : ''}
+    <div class="row-item"><span class="row-title">Gmail orqali tiklash</span>
+      <button class="btn-ghost btn-small" onclick="rkEmailHelp()">Sozlash</button><button class="btn-ghost btn-small" onclick="rkEmailFlow(true)">Sinab ko'rish</button></div>
+
     <div class="lead" style="font-size:1.1rem;margin:26px 0 10px;">Parollar ombori</div>
     <p class="desc">Talaba parollari shifrlangan holda saqlanadi va faqat kod bilan ochiladi. ${state.config.vault ? 'Ombor <b>yoqilgan</b>.' : "Ombor hali yoqilmagan — rahbar sifatida qayta kirsangiz avtomatik yoqiladi."} Eslatma: kodlar qancha uzun va murakkab bo'lsa, ombor shuncha xavfsiz.</p>
     ${state.config.vault ? `<div class="row-item"><span class="row-title">Admin saqlangan parollarni ko'ra oladimi?</span>
@@ -10029,6 +10040,286 @@ async function togglePermission(){
   if(ok){ showToast(newVal ? "Ruxsat berildi ✓" : "Ruxsat bekor qilindi ✓"); logActivity('settings', newVal ? "Admin testlarni o'chirishga ruxsat oldi" : "Adminning o'chirish ruxsati bekor qilindi"); }
   else state.config.permissions.adminCanDeleteTests = !newVal;
   renderOwnerPanel();
+}
+
+/* ============ KODNI TIKLASH: zaxira kalit + Gmail (Supabase email kodi) ============
+   Rahbar kodi unutilsa, sayt egasi ikki yo'l bilan qaytishi mumkin:
+   1) Zaxira kalit — Rahbar bo'limida bir marta yaratiladi (20 belgi). Bazada faqat xeshi turadi. Kalit ombor
+      kalitini ham o'rab turadi, shuning uchun saqlangan talaba parollari yo'qolmaydi. Ishlatilgach yangisi beriladi.
+   2) Gmail — Supabase admin emailiga 6 xonali kod yuboriladi (signInWithOtp / verifyOtp). Ombor kaliti
+      kodga bog'liq bo'lgani uchun bu yo'l faqat yangi kod beradi (admin ruxsati bo'lsa, ombor saqlanadi). */
+const RK_ALPHA = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';   // 31 belgi: 0/O, 1/I/L yo'q
+function rkNorm(k){ return String(k||'').toUpperCase().replace(/[^A-Z0-9]/g,''); }
+function rkGen(){
+  const n = RK_ALPHA.length, lim = 256 - (256 % n); let out = '';
+  while(out.length < 20){
+    crypto.getRandomValues(new Uint8Array(32)).forEach(b=>{ if(b < lim && out.length < 20) out += RK_ALPHA[b % n]; });
+  }
+  return out;
+}
+function rkFmt(k){ return k.match(/.{1,5}/g).join('-'); }
+async function rkRecord(keyNorm, jwk){
+  const rec = { secret: await makeSecret(keyNorm), createdAt: new Date().toISOString() };
+  if(jwk) rec.wrapVault = await vaultWrap(jwk, keyNorm);
+  return rec;
+}
+// Tugma ishlayotganda qayta bosilmasin
+function rkGuard(fn){
+  return async (ev)=>{
+    const b = ev && ev.currentTarget;
+    if(b){ if(b.disabled) return; b.disabled = true; }
+    try{ await fn(); } finally { if(b) b.disabled = false; }
+  };
+}
+function rkSetErr(msg){ const e = document.getElementById('rkErr'); if(e) e.textContent = msg || ''; }
+async function rkLoadCfg(){
+  const cfg = await loadConfig();
+  if(cfg._loadFailed){ await customAlert("Serverga ulanib bo'lmadi. Internetni tekshirib, qayta urinib ko'ring."); return null; }
+  return cfg;
+}
+async function rkCheckNewCode(cfg, a, b){
+  if(!a || a.length < 8) return "Yangi kod kamida 8 belgidan iborat bo'lishi kerak.";
+  if(a !== b) return "Ikkala kod bir xil emas.";
+  if(a === DEFAULT_RAHBAR_CODE || a === DEFAULT_ADMIN_CODE) return "Bu standart kod, u dasturda ochiq yozilgan. Boshqa kod tanlang.";
+  if(await codeMatchesOther(a, cfg.adminSecret, cfg.adminCode)) return "Rahbar kodi Admin kodi bilan bir xil bo'lmasligi kerak.";
+  return '';
+}
+// Yangi rahbar kodini config'ga yozadi (saqlamaydi). jwk — ombor kaliti (zaxira kalitdan ochilgan bo'lsa).
+async function rkApplyCode(cfg, newCode, jwk){
+  cfg.rahbarSecret = await makeSecret(newCode); delete cfg.rahbarCode;
+  let vault = 'none';
+  if(cfg.vault){
+    if(jwk){ cfg.vault.wrapRahbar = await vaultWrap(jwk, newCode); vault = 'kept'; }
+    else if(cfg.vault.wrapAdmin){ delete cfg.vault.wrapRahbar; vault = 'adminOnly'; }
+    else { delete cfg.vault; if(cfg.recovery) delete cfg.recovery.wrapVault; vault = 'reset'; }
+  }
+  return { vault };
+}
+function rkVaultNote(v){
+  if(v === 'adminOnly') return "Eski saqlangan parollarni ko'rish uchun: Talaba loginlari bo'limida «Parollarni ochish» tugmasini bosib, admin kodini kiriting.";
+  if(v === 'reset') return "Eski saqlangan parollar ko'rinmaydi (ombor kodsiz ochilmaydi). Talaba loginlari bo'limidagi «yangi parol berib, saqlash» tugmasi ularni yangilaydi; yangi parollar yangi omborga saqlanadi.";
+  return '';
+}
+async function rkFinishLogin(cfg, newCode, notes){
+  state.config = cfg; state.role = 'rahbar'; state.usingDefaultCode = false;
+  await openAdminDashboard();
+  await vaultOnLogin('rahbar', newCode);
+  const msg = (notes || []).filter(Boolean).join('\n\n');
+  showToast("Rahbar kodi tiklandi ✓");
+  if(msg) await customAlert(msg);
+}
+async function rkCopy(text){
+  try{ await navigator.clipboard.writeText(text); return true; }
+  catch(e){
+    try{ const t = document.createElement('textarea'); t.value = text; t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.select(); const ok = document.execCommand('copy'); t.remove(); return ok; }
+    catch(e2){ return false; }
+  }
+}
+function rkDownload(fmt){
+  const txt = "FINANCE TEAM — Rahbar zaxira kaliti\r\n\r\nKalit: " + fmt + "\r\nYaratilgan: " + new Date().toISOString().slice(0,10) + "\r\n\r\nBu kalit rahbar kodini unutganda panelga qaytarish uchun. Hech kimga bermang.\r\n";
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = 'finance-team-zaxira-kalit.txt';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ try{ URL.revokeObjectURL(a.href); }catch(e){} a.remove(); }, 500);
+}
+// Kalitni bir marta ko'rsatadi. Foydalanuvchi "saqladim" desa true.
+function rkShowKey(fmt, intro){
+  return new Promise(resolve=>{
+    showModal('', [
+      {label:'Bekor qilish', onClick:()=>{ closeModal(); resolve(false); }},
+      {label:'Saqladim, davom etish', primary:true, onClick:()=>{
+        const c = document.getElementById('rkSavedChk');
+        if(!c || !c.checked){ rkSetErr("Avval kalitni saqlaganingizni belgilang."); return; }
+        closeModal(); resolve(true);
+      }}
+    ]);
+    document.getElementById('modalMessage').innerHTML = `<div class="lead" style="font-size:1.05rem;margin-bottom:6px;">Zaxira kalitingiz</div>
+      <p class="desc" style="margin:0 0 10px;">${escapeHtml(intro||'')}Rahbar kodini unutsangiz, shu kalit bilan panelga qaytasiz. <b>Kalit faqat hozir ko'rsatiladi.</b> Qog'ozga yozing yoki Telegram'dagi «Saved Messages»ga saqlang. Hech kimga bermang.</p>
+      <div id="rkKeyBox" class="rk-key">${escapeHtml(fmt)}</div>
+      <div class="flexrow" style="margin:10px 0;">
+        <button type="button" class="btn-ghost btn-small" id="rkCopyBtn">Nusxa olish</button>
+        <button type="button" class="btn-ghost btn-small" id="rkDlBtn">Faylga yuklab olish</button>
+      </div>
+      <label class="remember" style="text-transform:none;letter-spacing:0;font-size:0.9rem;color:var(--ink);"><input type="checkbox" id="rkSavedChk"> Kalitni xavfsiz joyga saqladim</label>
+      <div id="rkErr" style="color:var(--red);font-size:0.85rem;min-height:1em;"></div>`;
+    document.getElementById('rkCopyBtn').onclick = async (ev)=>{ const ok = await rkCopy(fmt); ev.currentTarget.textContent = ok ? "Nusxalandi ✓" : "Nusxalab bo'lmadi"; };
+    document.getElementById('rkDlBtn').onclick = ()=> rkDownload(fmt);
+  });
+}
+
+/* --- Rahbar bo'limi: kalit yaratish / yangilash --- */
+async function rkCreateKey(){
+  if(state.role !== 'rahbar'){ showToast("Bu amal faqat rahbar uchun.", true); return; }
+  if(!cryptoAvailable()){ showToast("Brauzer shifrlashni qo'llamaydi (HTTPS kerak).", true); return; }
+  const cfg = state.config, prev = cfg.recovery;
+  if(!(await askRahbarCode(prev ? "Eski zaxira kalit bekor bo'lib, yangisi yaratiladi. Davom etish uchun rahbar kodini kiriting." : "Zaxira kalit yaratish uchun rahbar kodini kiriting."))) return;
+  const key = rkGen();
+  const rec = await rkRecord(key, state.vaultPrivJwk || null);
+  if(!(await rkShowKey(rkFmt(key)))) return;
+  cfg.recovery = rec;
+  if(await saveConfig(cfg)){
+    showToast("Zaxira kalit saqlandi ✓"); logActivity('settings', prev ? "Zaxira kalit yangilandi" : "Zaxira kalit yaratildi");
+  } else {
+    if(prev) cfg.recovery = prev; else delete cfg.recovery;
+    await customAlert("Kalit saqlanmadi, shuning uchun u ishlamaydi. Eski holat o'zgarmagan. Internetni tekshirib, qaytadan yarating.");
+  }
+  renderOwnerPanel();
+}
+function rkEmailHelp(){
+  showModalHtml(`<div class="lead" style="font-size:1.05rem;margin-bottom:6px;">Gmail orqali tiklashni sozlash</div>
+    <p class="desc" style="margin:0 0 8px;">Bir marta sozlanadi (2 daqiqa):</p>
+    <ol style="margin:0 0 10px 18px;padding:0;font-size:0.9rem;line-height:1.5;">
+      <li>supabase.com → loyihangiz → <b>Authentication → Emails → Templates</b> → <b>Magic link</b>.</li>
+      <li>Xat matniga <code>{{ .Token }}</code> ni qo'shing, masalan: <code>&lt;h2&gt;Kirish kodi: {{ .Token }}&lt;/h2&gt;</code>. Keyin <b>Save</b>.</li>
+      <li>Shu sahifadagi «Sinab ko'rish» tugmasi bilan tekshiring: Supabase'dagi admin emailingizni kiriting, 6 xonali kod keladi.</li>
+    </ol>
+    <p class="desc" style="margin:0;">Kod yuborish cheklangan (bir emailga 60 soniyada 1 ta, soatiga bir nechta). Xat kelmasa «Spam» papkasini ham ko'ring.</p>`);
+}
+
+/* --- Kirish oynasidagi «Kodni unutdim?» --- */
+function rkOpenMenu(){
+  showModal('', [
+    {label:'Zaxira kalit bilan', primary:true, onClick:()=>{ closeModal(); rkKeyFlow(); }},
+    {label:'Gmail orqali', onClick:()=>{ closeModal(); rkEmailFlow(false); }},
+    {label:'Yopish', onClick:closeModal}
+  ]);
+  document.getElementById('modalMessage').innerHTML = `<div class="lead" style="font-size:1.05rem;margin-bottom:6px;">Rahbar kodini tiklash</div>
+    <p class="desc" style="margin:0;">Bu faqat sayt egasi uchun. Admin kodini unutgan bo'lsangiz, rahbar uni Rahbar bo'limida almashtirib beradi.</p>`;
+}
+async function rkKeyFlow(){
+  const cfg = await rkLoadCfg(); if(!cfg) return;
+  if(!cfg.recovery || !cfg.recovery.secret){ await customAlert("Zaxira kalit hali yaratilmagan. Gmail orqali tiklashdan foydalaning."); return; }
+  showModal('', [
+    {label:'Bekor qilish', onClick:closeModal},
+    {label:'Tiklash', primary:true, onClick: rkGuard(async ()=>{
+      const key = rkNorm(document.getElementById('rkKeyIn').value);
+      const a = document.getElementById('rkNew1').value.trim(), b = document.getElementById('rkNew2').value.trim();
+      rkSetErr('');
+      if(key.length < 20){ rkSetErr("Zaxira kalitni to'liq kiriting."); return; }
+      const bad = await rkCheckNewCode(cfg, a, b); if(bad){ rkSetErr(bad); return; }
+      let ok = false; try{ ok = await verifySecret(key, cfg.recovery.secret); }catch(e){}
+      if(!ok){ rkSetErr("Zaxira kalit noto'g'ri."); logActivity('admin_login_failed', "Zaxira kalit noto'g'ri kiritildi"); return; }
+      closeModal(); showToast("Tiklanmoqda...");
+      const prevRec = cfg.recovery;
+      const jwk = cfg.recovery.wrapVault ? await vaultUnwrap(cfg.recovery.wrapVault, key) : null;
+      state.role = 'rahbar';                       // yozish rad etilsa, Supabase hisobi so'raladi
+      const res = await rkApplyCode(cfg, a, jwk);
+      if(!(await saveConfig(cfg))){ state.role = null; await customAlert("Saqlab bo'lmadi, hech narsa o'zgarmadi. Internetni tekshirib, qayta urinib ko'ring."); return; }
+      logActivity('code_change', "Rahbar kodi zaxira kalit bilan tiklandi");
+      // Kalit bir martalik: yangisini beramiz
+      const nk = rkGen(), rec = await rkRecord(nk, jwk);
+      const notes = [rkVaultNote(res.vault)];
+      if(await rkShowKey(rkFmt(nk), "Eski kalit ishlatildi, shuning uchun yangisi yaratildi. ")){
+        cfg.recovery = rec;
+        if(!(await saveConfig(cfg))){ cfg.recovery = prevRec; notes.push("Yangi kalit saqlanmadi — eski kalit hali amal qiladi. Rahbar bo'limida zaxira kalitni qaytadan yarating."); }
+      } else notes.push("Yangi kalit olinmadi — eski kalit hali amal qiladi. Rahbar bo'limida uni yangilab qo'ying.");
+      await rkFinishLogin(cfg, a, notes);
+    })}
+  ]);
+  document.getElementById('modalMessage').innerHTML = `<div class="lead" style="font-size:1.05rem;margin-bottom:6px;">Zaxira kalit bilan tiklash</div>
+    <p class="desc" style="margin:0 0 10px;">Zaxira kalitni va yangi rahbar kodini kiriting.</p>
+    <input type="text" id="rkKeyIn" placeholder="XXXXX-XXXXX-XXXXX-XXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" style="margin-bottom:8px;font-family:ui-monospace,Menlo,Consolas,monospace;">
+    <input type="password" id="rkNew1" placeholder="Yangi rahbar kodi (kamida 8 belgi)" autocomplete="new-password" style="margin-bottom:8px;">
+    <input type="password" id="rkNew2" placeholder="Yangi kodni takrorlang" autocomplete="new-password">
+    <div id="rkErr" style="color:var(--red);font-size:0.85rem;margin-top:6px;min-height:1em;"></div>`;
+}
+
+/* --- Gmail orqali --- */
+function rkErrText(error){
+  const m = String((error && error.message) || '').toLowerCase();
+  if(error && (error.status === 429 || /rate limit|too many|only request|after \d+ seconds/.test(m))) return "Juda ko'p urinish. Birozdan keyin qayta urinib ko'ring (har 60 soniyada bitta kod yuboriladi).";
+  if(/signups? not allowed|not found|user/.test(m)) return "Bu email bilan hisob topilmadi. Supabase'da admin sifatida yaratilgan emailni kiriting.";
+  return "Kod yuborib bo'lmadi. Internetni va emailni tekshirib, qayta urinib ko'ring.";
+}
+async function rkSendOtp(email){
+  try{
+    const r = await supabaseClient.auth.signInWithOtp({ email, options:{ shouldCreateUser:false } });
+    return r && r.error ? r.error : null;
+  }catch(e){ return e || { message:'network' }; }
+}
+async function rkEmailFlow(test){
+  if(!supabaseClient.auth){ await customAlert("Bu qurilmada Gmail orqali tiklash ishlamaydi."); return; }
+  const cfg0 = await rkLoadCfg(); if(!cfg0) return;
+  let email = ''; try{ email = localStorage.getItem('ft-recovery-email') || ''; }catch(e){}
+  const stage1 = ()=>{
+    showModal('', [
+      {label:'Bekor qilish', onClick:closeModal},
+      {label:'Kod yuborish', primary:true, onClick: rkGuard(async ()=>{
+        const v = document.getElementById('rkEmail').value.trim().toLowerCase();
+        rkSetErr('');
+        if(!/^\S+@\S+\.\S+$/.test(v)){ rkSetErr("Emailni to'g'ri kiriting."); return; }
+        const err = await rkSendOtp(v);
+        if(err){ rkSetErr(rkErrText(err)); return; }
+        email = v; stage2();
+      })}
+    ]);
+    document.getElementById('modalMessage').innerHTML = `<div class="lead" style="font-size:1.05rem;margin-bottom:6px;">${test?'Gmail tiklashni sinash':'Gmail orqali tiklash'}</div>
+      <p class="desc" style="margin:0 0 10px;">Supabase'da admin sifatida yaratilgan emailni kiriting. Unga 6 xonali kod yuboriladi.</p>
+      <input type="email" id="rkEmail" placeholder="Email" autocomplete="username" value="${escapeAttr(email)}">
+      <div id="rkErr" style="color:var(--red);font-size:0.85rem;margin-top:6px;min-height:1em;"></div>`;
+  };
+  const stage2 = ()=>{
+    let left = 60, timer = null;
+    const stop = ()=>{ if(timer){ clearInterval(timer); timer = null; } };
+    showModal('', [
+      {label:'Bekor qilish', onClick:()=>{ stop(); closeModal(); }},
+      {label:test ? 'Tekshirish' : 'Tiklash', primary:true, onClick: rkGuard(async ()=>{
+        rkSetErr('');
+        const tok = document.getElementById('rkTok').value.replace(/\s/g,'');
+        if(!/^\d{6,10}$/.test(tok)){ rkSetErr("Emailga kelgan kodni kiriting."); return; }
+        let a = '', pw = '';
+        if(!test){
+          a = document.getElementById('rkNew1').value.trim();
+          const b = document.getElementById('rkNew2').value.trim();
+          pw = document.getElementById('rkSbPw').value;
+          const bad = await rkCheckNewCode(cfg0, a, b); if(bad){ rkSetErr(bad); return; }
+          if(pw && pw.length < 6){ rkSetErr("Supabase paroli kamida 6 belgi bo'lishi kerak."); return; }
+        }
+        let vr; try{ vr = await supabaseClient.auth.verifyOtp({ email, token: tok, type:'email' }); }catch(e){ vr = { error: e }; }
+        if(!vr || vr.error || !vr.data || !vr.data.session){ rkSetErr("Kod noto'g'ri yoki muddati o'tgan."); return; }
+        stop(); closeModal();
+        try{ localStorage.setItem('ft-recovery-email', email); }catch(e){}
+        if(test){ await customAlert("✓ Gmail orqali tiklash ishlayapti. Kod emailingizga keldi va tasdiqlandi. Hech narsa o'zgartirilmadi."); return; }
+        const notes = [];
+        if(pw){
+          try{ const ur = await supabaseClient.auth.updateUser({ password: pw }); notes.push(ur && ur.error ? "Supabase parolini yangilab bo'lmadi (eskisi o'zgarmadi)." : "Supabase paroli yangilandi."); }
+          catch(e){ notes.push("Supabase parolini yangilab bo'lmadi (eskisi o'zgarmadi)."); }
+        }
+        const cfg = await rkLoadCfg(); if(!cfg) return;
+        state.role = 'rahbar';
+        const res = await rkApplyCode(cfg, a, null);
+        if(!(await saveConfig(cfg))){ state.role = null; await customAlert("Saqlab bo'lmadi, rahbar kodi o'zgarmadi. Internetni tekshirib, qayta urinib ko'ring."); return; }
+        logActivity('code_change', "Rahbar kodi Gmail orqali tiklandi");
+        notes.unshift(rkVaultNote(res.vault));
+        if(!cfg.recovery) notes.push("Maslahat: Rahbar bo'limida zaxira kalit yarating.");
+        await rkFinishLogin(cfg, a, notes);
+      })}
+    ]);
+    const warn = (!test && cfg0.vault && !cfg0.vault.wrapAdmin) ? `<p class="desc" style="margin:0 0 8px;color:var(--red);">Diqqat: bu yo'l eski saqlangan parollarni ochmaydi (ular faqat eski kod bilan ochilardi). Yangi parollar yangi omborga saqlanadi.</p>` : '';
+    document.getElementById('modalMessage').innerHTML = `<div class="lead" style="font-size:1.05rem;margin-bottom:6px;">Kodni kiriting</div>
+      <p class="desc" style="margin:0 0 8px;"><b>${escapeHtml(email)}</b> manziliga kod yuborildi. Xat kelmasa «Spam» papkasini ham ko'ring.</p>
+      <input type="text" id="rkTok" placeholder="Emaildagi kod" inputmode="numeric" autocomplete="one-time-code" maxlength="10" style="margin-bottom:8px;">
+      ${test ? '' : `${warn}<input type="password" id="rkNew1" placeholder="Yangi rahbar kodi (kamida 8 belgi)" autocomplete="new-password" style="margin-bottom:8px;">
+      <input type="password" id="rkNew2" placeholder="Yangi kodni takrorlang" autocomplete="new-password" style="margin-bottom:8px;">
+      <input type="password" id="rkSbPw" placeholder="Yangi Supabase paroli (ixtiyoriy)" autocomplete="new-password">`}
+      <div style="margin-top:8px;"><button type="button" class="btn-ghost btn-small" id="rkResend" disabled>Qayta yuborish (60)</button></div>
+      <div id="rkErr" style="color:var(--red);font-size:0.85rem;margin-top:6px;min-height:1em;"></div>`;
+    const rb = document.getElementById('rkResend');
+    const tick = ()=>{
+      const el = document.getElementById('rkResend');
+      if(!el){ stop(); return; }
+      left--; if(left <= 0){ stop(); el.disabled = false; el.textContent = 'Qayta yuborish'; } else el.textContent = `Qayta yuborish (${left})`;
+    };
+    timer = setInterval(tick, 1000);
+    rb.onclick = async ()=>{
+      rb.disabled = true; rkSetErr('');
+      const err = await rkSendOtp(email);
+      if(err){ rkSetErr(rkErrText(err)); }
+      left = 60; rb.textContent = 'Qayta yuborish (60)'; stop(); timer = setInterval(tick, 1000);
+    };
+  };
+  stage1();
 }
 
 /* ============ UTIL ============ */
