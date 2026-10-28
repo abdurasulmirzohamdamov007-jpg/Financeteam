@@ -354,7 +354,7 @@
   :root[data-theme="light"] .hw-tpl button{background:#EEF3F1;}
   .gm-actions{display:flex;gap:8px;flex-wrap:nowrap;} .gm-actions button{flex:1 1 auto;min-width:0;white-space:nowrap;}
   .gm-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:0.78rem;color:var(--ink-soft);} .gm-legend span{display:inline-flex;align-items:center;gap:5px;}
-  @media (max-width:640px){ .gm-actions{width:100%;} .gm-hm{display:none;} .gm-tbl .gm-chip{display:none;} .gm-tbl td.gm-nm{min-width:0;} .gm-name{font-size:0.86rem;} .gm-filters .field{max-width:none;flex:1 1 100%;} }
+  @media (max-width:640px){ .gm-actions{width:100%;} .gm-hm{display:none;} .gm-tbl .gm-chip{display:none;} .gm-tbl td.gm-nm{min-width:0;} .gm-name{font-size:0.86rem;} .gm-filters .field{max-width:none;flex:1 1 calc(50% - 8px);min-width:0;} }
   .stu-menu-head{display:flex;align-items:center;gap:14px;}
   .stu-menu-name{font-weight:700;font-size:1.05rem;line-height:1.25;word-break:break-word;}
   .modal-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;}
@@ -542,7 +542,50 @@
   .hw-file{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--edge);border-radius:10px;color:var(--ink);text-decoration:none;font-size:0.85rem;background:rgba(0,0,0,0.14);max-width:100%;}
   .hw-file span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px;}
   .hw-card{margin-bottom:14px;}
-  @media (max-width:560px){ .prov-row{grid-template-columns:1fr 1fr;} .prov-n{display:none;} .att-btns{width:100%;} .att-btn{flex:1;} .att-note{max-width:none;flex-basis:100%;} }
+  @media (max-width:560px){ .prov-row{grid-template-columns:1fr 1fr;} .prov-n{display:none;} }
+  /* --- Yuqori panel: 5 ta asosiy bo'lim + ichki bo'limlar qatori --- */
+  .sec-bar{overflow:visible;cursor:default;gap:8px;margin-bottom:10px;}
+  .sec-bar .tab{display:inline-flex;align-items:center;justify-content:center;gap:7px;position:relative;}
+  .sec-bar .tab .icon{margin:0;}
+  .sec-bar .tab .ts,.sub-bar .tab .ts{display:none;}
+  .sec-bar .tab .count-badge{margin:0 0 0 2px;}
+  .sub-bar{margin:0 0 16px;gap:6px;padding-bottom:2px;}
+  .sub-bar .tab{padding:7px 14px;font-size:0.82rem;background:transparent;}
+  .sub-bar .tab.active{background:rgba(47,199,174,0.14);color:var(--teal);border-color:var(--teal);}
+  @media (max-width:640px){
+    .sec-bar{margin:0 0 10px;padding:0;gap:5px;}
+    .sec-bar .tab{flex:1 1 0;min-width:0;flex-direction:column;gap:3px;padding:8px 2px;font-size:0.7rem;line-height:1.1;white-space:normal;}
+    .sec-bar .tab .tl,.sub-bar .tab .tl{display:none;} .sec-bar .tab .ts,.sub-bar .tab .ts{display:inline;}
+    .sec-bar .tab .count-badge{position:absolute;top:2px;right:3px;margin:0;min-width:16px;height:16px;font-size:0.62rem;}
+    .sub-bar{margin:0 -14px 14px;padding:0 14px 4px;}
+    .sub-bar{gap:5px;} .sub-bar .tab{padding:7px 8px;font-size:0.76rem;}
+  }
+  @media (max-width:380px){ .sub-bar{gap:4px;} .sub-bar .tab{padding:7px 6px;font-size:0.72rem;} }
+  /* --- Guruh nazorati: davomat kartasi va xulosa --- */
+  .gm-card{border:1px solid var(--edge);border-radius:14px;padding:14px 14px 0;margin:0 0 20px;background:rgba(0,0,0,0.12);}
+  .gm-card-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .gm-card-t{font-weight:700;font-size:1.05rem;}
+  .att-date{display:flex;gap:8px;align-items:center;} .att-date input{max-width:170px;margin:0;}
+  .att-sum{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 6px;}
+  .att-sum span{font-size:0.78rem;font-weight:600;padding:3px 10px;border-radius:999px;border:1px solid var(--edge);color:var(--ink-soft);}
+  .att-sum .k{color:var(--teal);border-color:rgba(47,199,174,0.45);} .att-sum .n{color:var(--red);border-color:rgba(229,88,75,0.45);} .att-sum .s{color:#C9A227;border-color:rgba(201,162,39,0.5);} .att-sum .ok{color:var(--teal);border-color:transparent;}
+  .att-row{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;padding:9px 2px;border-top:1px solid var(--edge);}
+  .att-row .att-nm{flex:1 1 160px;min-width:0;font-weight:600;font-size:0.93rem;overflow-wrap:anywhere;}
+  .att-row .att-btns{display:inline-flex;gap:6px;flex-wrap:nowrap;}
+  .att-row .att-note{flex:1 1 100%;max-width:none;min-width:0;margin:0;}
+  .att-foot{position:sticky;bottom:0;z-index:3;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 0 12px;margin-top:2px;border-top:1px solid var(--edge);background:var(--card);border-radius:0 0 14px 14px;}
+  .att-foot .att-state{flex:1 1 120px;min-width:0;}
+  .att-foot .btn-primary{padding:9px 22px;}
+  .att-foot .btn-ghost{flex:0 1 auto;white-space:nowrap;}
+  @media (max-width:560px){ .att-row{padding:7px 2px;} .att-row .att-btns{width:100%;} .att-row .att-btn{flex:1;padding:8px 6px;} .att-foot .btn-ghost{flex:1 1 auto;} .att-foot .btn-primary{flex:1 1 100%;} .att-foot .att-state{order:3;flex:1 1 100%;} }
+  .gm-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .gm-kpi{border:1px solid var(--edge);border-radius:12px;padding:12px 10px;text-align:center;background:rgba(255,255,255,0.03);}
+  .gm-kpi-v{font-size:1.5rem;font-weight:700;line-height:1.1;} .gm-kpi-l{font-size:0.72rem;color:var(--ink-soft);margin-top:4px;}
+  @media (max-width:560px){ .gm-kpis{grid-template-columns:repeat(2,1fr);} }
+  .gm-click{cursor:pointer;} .gm-click:hover{border-color:var(--teal);} .gm-go{font-size:1.4rem;color:var(--ink-soft);line-height:1;padding:0 4px;}
+  .gm-more{margin-top:20px;border-top:1px solid var(--edge);padding-top:6px;}
+  .gm-more > summary{cursor:pointer;font-weight:700;padding:10px 0;color:var(--teal);list-style:none;}
+  .gm-more > summary::-webkit-details-marker{display:none;} .gm-more > summary::before{content:'▸';display:inline-block;margin-right:8px;transition:transform .15s;} .gm-more[open] > summary::before{transform:rotate(90deg);}
 </style>
 </head>
 <body>
@@ -794,12 +837,8 @@
       <div class="lead" style="margin:0;" id="dashboardTitle">Boshqaruv paneli</div>
       <button type="button" class="avatar-btn" id="staffAvatarBtn" onclick="openStaffMenu()" aria-label="Profil menyusi"></button>
     </div>
-    <div class="tabs" id="adminTabsBar">
-      <button class="tab active" data-tab="tests" onclick="switchAdminTab('tests')">Testlar</button>
-      <button class="tab" data-tab="results" onclick="switchAdminTab('results')">Natijalar</button>
-      <button class="tab" data-tab="analytics" onclick="switchAdminTab('analytics')">Tahlil</button>
-      <button class="tab" data-tab="block" onclick="switchAdminTab('block')">Bloklash</button>
-    </div>
+    <div class="tabs sec-bar" id="adminTabsBar"></div>
+    <div class="tabs sub-bar hidden" id="adminSubBar"></div>
 
     <div id="adminTab-home" class="admin-tab card"></div>
     <div id="adminTab-monitor" class="admin-tab card hidden"></div>
@@ -807,7 +846,6 @@
     <div id="adminTab-exams" class="admin-tab card hidden"></div>
     <div id="adminTab-practice" class="admin-tab card hidden"></div>
     <div id="adminTab-homework" class="admin-tab card hidden"></div>
-    <div id="adminTab-attendance" class="admin-tab card hidden"></div>
     <div id="adminTab-materials" class="admin-tab card hidden"></div>
     <div id="adminTab-groups" class="admin-tab card hidden"></div>
     <div id="adminTab-accounts" class="admin-tab card hidden"></div>
@@ -3763,84 +3801,76 @@ async function attAutoFromLive(players){
 }
 
 /* --- Admin: Davomat bo'limi --- */
-async function attRoster(group){
-  const ids = new Map();
-  const add = (name)=>{ const n = String(name||'').trim(); if(!n) return; const id = studentIdentity(n); if(!ids.has(id)) ids.set(id, n); };
-  (state.config.studentAccounts||[]).filter(a=>a.group===group).forEach(a=>add(a.fullName));
-  try{
-    const [ros, res, ex] = await Promise.all([ fetchRoster(), fetchAllResults(), fetchAllExamResultsEvery() ]);
-    ros.filter(r=>r.group===group).forEach(r=>add(r.name));
-    [...res, ...ex].filter(r=>r.studentGroup===group).forEach(r=>add(r.studentName));
-  }catch(e){}
-  return ids;
-}
-async function renderAdminAttendance(){
-  const el = document.getElementById('adminTab-attendance');
-  const groups = collectKnownGroupNamesSync();
-  if(!state.att) state.att = { view:'mark', group:groups[0]||'', date:dayKey(), from:dayKey(new Date(Date.now()-29*86400000)), to:dayKey() };
-  const A = state.att;
-  if(A.group && !groups.includes(A.group)) A.group = groups[0]||'';
-  const vt = (id,label)=> `<button class="tab ${A.view===id?'active':''}" onclick="attSetView('${id}')">${label}</button>`;
-  el.innerHTML = `<div class="toolbar"><div class="lead" style="margin:0;">Davomat</div></div>
-    <div class="tabs" style="margin-bottom:14px;">${vt('mark','Belgilash')}${vt('report','Hisobot')}</div>
-    ${groups.length===0 ? `<div class="empty">Avval «Guruhlar» bo'limida guruh yarating.</div>` : `<div id="attBody"></div>`}`;
-  if(groups.length===0) return;
-  if(A.view==='report') attRenderReport(); else attRenderMark();
-}
-async function attSetView(v){
-  if(state.att && state.att.draft && state.att.dirty && !(await customConfirm("Saqlanmagan belgilar bor. Baribir o'tasizmi?"))) return;
-  state.att.view = v; state.att.draft = null; state.att.dirty = false; renderAdminAttendance();
-}
-function attGroupSelect(onchange){
-  const groups = collectKnownGroupNamesSync();
-  return `<select onchange="${onchange}(this.value)" style="max-width:260px;">${groups.map(g=>`<option value="${escapeAttr(g)}" ${state.att.group===g?'selected':''}>${escapeHtml(g)}</option>`).join('')}</select>`;
+/* ---- Admin: davomatni belgilash — «Guruh nazorati» sahifasining eng tepasida ----
+   Ro'yxat nazoratdagi a'zolardan olinadi (bloklanganlar kirmaydi). Saqlashda faqat o'zgartirilgan talabalar yoziladi. */
+function attState(){
+  if(!state.att) state.att = { group:'', date:dayKey(), draft:null, dirty:false, roster:null, base:null, touched:new Set(), tok:0, loadedDate:'' };
+  return state.att;
 }
 async function attConfirmLeave(){
   const A = state.att;
-  if(A.draft && A.dirty && !(await customConfirm("Saqlanmagan belgilar bor. Baribir o'tasizmi?"))) return false;
+  if(A && A.draft && A.dirty && !(await customConfirm("Saqlanmagan davomat belgilari bor. Baribir o'tasizmi? (Belgilar saqlanmaydi)"))) return false;
   return true;
 }
-async function attPickGroup(g){ if(!(await attConfirmLeave())){ renderAdminAttendance(); return; } state.att.group = g; state.att.draft = null; state.att.dirty = false; attRenderMark(); }
-async function attPickDate(d){ if(!d) return; if(!(await attConfirmLeave())){ renderAdminAttendance(); return; } state.att.date = d; state.att.draft = null; state.att.dirty = false; attRenderMark(); }
+function attRosterFromModel(){
+  const M = gmState().model, ids = new Map();
+  if(M) M.students.forEach(x=> ids.set(x.id, x.name));
+  return ids;
+}
+function attDateLabel(d){
+  const t = dayKey(), y = dayKey(new Date(Date.now() - 86400000));
+  const dm = String(d).split('-').reverse().join('.');
+  return d === t ? `Bugun · ${dm}` : d === y ? `Kecha · ${dm}` : dm;
+}
+async function attInit(force){
+  const A = attState(), G = gmState();
+  if(!document.getElementById('attBody')) return;
+  if(A.dirty && A.group === G.group && A.draft){ attDrawMark(); return; }       // yozilgan belgilar yo'qolmasin
+  if(!force && A.group === G.group && A.draft && A.loadedDate === A.date){ attDrawMark(); return; }
+  await attRenderMark();
+}
+async function attPickDate(d){
+  if(!d) return; const A = attState();
+  if(!(await attConfirmLeave())){ const i = document.getElementById('attDate'); if(i) i.value = A.date; return; }
+  A.date = d; A.draft = null; A.dirty = false; attRenderMark();
+}
 async function attRenderMark(){
-  const A = state.att, holder = document.getElementById('attBody'); if(!holder) return;
+  const A = attState(), G = gmState(), holder = document.getElementById('attBody'); if(!holder) return;
+  const group = G.group; A.group = group;
+  const di = document.getElementById('attDate'); if(di && di.value !== A.date) di.value = A.date;
+  const dl = document.getElementById('attDateLbl'); if(dl) dl.textContent = attDateLabel(A.date);
+  const tb = document.getElementById('attToday'); if(tb) tb.classList.toggle('hidden', A.date === dayKey());
   holder.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
-  const key = attKey(A.group, A.date);
-  const [roster, r] = await Promise.all([ attRoster(A.group), storageGetStrict(key) ]);
-  if(!r.ok){ holder.innerHTML = `<div class="empty">Yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.</div>`; return; }
+  const tok = ++A.tok, key = attKey(group, A.date);
+  const r = await storageGetStrict(key);
+  if(tok !== A.tok || A.group !== G.group || !document.getElementById('attBody')) return;
+  if(!r.ok){ A.draft = null; holder.innerHTML = `<div class="empty" style="padding:16px;">Davomatni yuklab bo'lmadi. Internetni tekshirib, «Yangilash»ni bosing.</div>`; return; }
   let rec = null; try{ rec = r.value ? JSON.parse(r.value) : null; }catch(e){}
-  rec = attParse(rec) || { group:A.group, date:A.date, marks:{}, by:'', ts:0 };
+  rec = attParse(rec) || { group, date:A.date, marks:{}, by:'', ts:0 };
+  const roster = attRosterFromModel();
   Object.keys(rec.marks).forEach(id=>{ if(!roster.has(id)) roster.set(id, rec.marks[id].name || id); });
-  A.roster = roster; A.draft = JSON.parse(JSON.stringify(rec.marks)); A.dirty = false; A.base = rec; A.touched = new Set();
+  A.roster = roster; A.draft = JSON.parse(JSON.stringify(rec.marks)); A.dirty = false; A.base = rec; A.touched = new Set(); A.loadedDate = A.date;
   attDrawMark();
 }
 function attDrawMark(){
-  const A = state.att, holder = document.getElementById('attBody'); if(!holder || !A.roster) return;
+  const A = attState(), holder = document.getElementById('attBody'); if(!holder || !A.roster || !A.draft) return;
   const ids = [...A.roster.keys()].sort((a,b)=> A.roster.get(a).localeCompare(A.roster.get(b)));
   const cnt = attStats(ids.map(id=> (A.draft[id]||{}).status).filter(Boolean));
-  const unmarked = ids.filter(id=>!A.draft[id]).length;
-  const btn = (id, st)=> { const cur = (A.draft[id]||{}).status; return `<button class="att-btn att-${st} ${cur===st?'on':''}" onclick="attSet(${jsArg(id)},'${st}')">${ATT_STATUS[st]}</button>`; };
-  holder.innerHTML = `<div class="flexrow" style="align-items:flex-end;margin-bottom:12px;">
-      <div class="field" style="margin:0;"><label>Guruh</label>${attGroupSelect('attPickGroup')}</div>
-      <div class="field" style="margin:0;"><label>Sana</label><input type="date" value="${A.date}" max="${dayKey()}" onchange="attPickDate(this.value)" style="max-width:190px;"></div>
-    </div>
-    ${A.base && A.base.ts ? `<p class="row-meta" style="margin:0 0 10px;">Oxirgi saqlangan: ${new Date(A.base.ts).toLocaleString('uz-UZ')}${A.base.by?` · ${escapeHtml(A.base.by)}`:''}</p>` : ''}
-    <div class="stat-grid" style="margin-bottom:12px;">
-      <div class="stat-box"><div class="num">${cnt.keldi}</div><div class="lbl">Keldi</div></div>
-      <div class="stat-box"><div class="num">${cnt.kelmadi}</div><div class="lbl">Kelmadi</div></div>
-      <div class="stat-box"><div class="num">${cnt.sababli}</div><div class="lbl">Sababli</div></div>
-      <div class="stat-box"><div class="num">${unmarked}</div><div class="lbl">Belgilanmagan</div></div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-      <button class="btn-ghost btn-small" onclick="attAll('keldi')">Belgilanmaganlarni «Keldi» qilish</button>
-      <button class="btn-ghost btn-small" onclick="attAddName()">${icon('plus')}Ism qo'shish</button>
-    </div>
-    ${ids.length===0 ? `<div class="empty">Bu guruhda hali talaba yo'q. «Ism qo'shish» orqali qo'lda qo'shing.</div>` : ids.map(id=>{
-      const m = A.draft[id] || {};
-      return `<div class="row-item att-row"><span class="row-title">${escapeHtml(A.roster.get(id))}${m.auto?` <span class="row-meta">(jonli seansdan)</span>`:''}</span>
+  const unmarked = ids.filter(id=> !(A.draft[id] && A.draft[id].status)).length;
+  const btn = (id, st)=> { const cur = (A.draft[id]||{}).status; return `<button type="button" class="att-btn att-${st} ${cur===st?'on':''}" onclick="attSet(${jsArg(id)},'${st}')">${ATT_STATUS[st]}</button>`; };
+  const saved = A.base && A.base.ts ? `Saqlangan: ${new Date(A.base.ts).toLocaleTimeString('uz-UZ', { hour:'2-digit', minute:'2-digit' })}${A.base.by ? ' · ' + escapeHtml(A.base.by) : ''}` : '';
+  holder.innerHTML = `<div class="att-sum"><span class="k">Keldi ${cnt.keldi}</span><span class="n">Kelmadi ${cnt.kelmadi}</span><span class="s">Sababli ${cnt.sababli}</span>${unmarked ? `<span class="u">Belgilanmagan ${unmarked}</span>` : (ids.length ? `<span class="ok">Hammasi belgilangan ✓</span>` : '')}</div>
+    ${ids.length === 0 ? `<div class="empty" style="padding:18px;">Bu guruhda hali talaba yo'q. «Talaba qo'shish» orqali ro'yxatga qo'shing.</div>` : `<div class="att-list">${ids.map(id=>{
+      const m = A.draft[id] || {}, showNote = m.status === 'kelmadi' || m.status === 'sababli' || !!m.note;
+      return `<div class="att-row"><span class="att-nm">${escapeHtml(A.roster.get(id))}${m.auto ? ` <span class="row-meta">(jonli seansdan)</span>` : ''}</span>
         <span class="att-btns">${btn(id,'keldi')}${btn(id,'kelmadi')}${btn(id,'sababli')}</span>
-        <input type="text" class="att-note" placeholder="Izoh (ixtiyoriy)" value="${escapeAttr(m.note||'')}" oninput="attNote(${jsArg(id)},this.value)"></div>`; }).join('')}
-    <div style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;"><button class="btn-primary" id="attSaveBtn" onclick="attSave()">Saqlash</button><span class="row-meta" id="attDirtyNote">${A.dirty?'Saqlanmagan o\'zgarish bor':''}</span></div>`;
+        ${showNote ? `<input type="text" class="att-note" placeholder="Sababi (ixtiyoriy)" value="${escapeAttr(m.note||'')}" oninput="attNote(${jsArg(id)},this.value)">` : ''}</div>`; }).join('')}</div>`}
+    <div class="att-foot">
+      <button type="button" class="btn-ghost btn-small" onclick="attAll('keldi')" ${unmarked ? '' : 'disabled'}>Qolganlarini «Keldi» qilish</button>
+      <button type="button" class="btn-ghost btn-small" onclick="attAddName()">${icon('plus')}Talaba qo'shish</button>
+      <span class="row-meta att-state" id="attDirtyNote">${A.dirty ? "Saqlanmagan o'zgarish bor" : saved}</span>
+      <button type="button" class="btn-primary" id="attSaveBtn" onclick="attSave()" ${A.dirty ? '' : 'disabled'}>Saqlash</button>
+    </div>`;
 }
 function attSet(id, st){
   const A = state.att; const cur = A.draft[id] || { name:A.roster.get(id), note:'' };
@@ -3851,6 +3881,7 @@ function attNote(id, v){
   const A = state.att; const cur = A.draft[id] || { name:A.roster.get(id), status:'', note:'' };
   cur.note = v; A.draft[id] = cur; A.touched.add(id); A.dirty = true;
   const n = document.getElementById('attDirtyNote'); if(n) n.textContent = "Saqlanmagan o'zgarish bor";
+  const sv = document.getElementById('attSaveBtn'); if(sv) sv.disabled = false;
 }
 function attAll(st){
   const A = state.att;
@@ -3865,7 +3896,7 @@ async function attAddName(){
   A.dirty = true; attDrawMark();
 }
 async function attSave(){
-  const A = state.att; if(!A.draft) return;
+  const A = attState(); if(!A.draft) return;
   const btn = document.getElementById('attSaveBtn'); if(btn) btn.disabled = true;
   const key = attKey(A.group, A.date);
   const r = await storageGetStrict(key);
@@ -3880,44 +3911,12 @@ async function attSave(){
   });
   cur.group = A.group; cur.date = A.date; cur.ts = Date.now(); cur.by = state.role==='rahbar' ? 'Rahbar' : 'Admin';
   const ok = await storageSet(key, JSON.stringify(cur));
-  if(btn) btn.disabled = false;
-  if(!ok){ showToast("Xatolik: davomat saqlanmadi.", true); return; }
+  if(!ok){ if(btn) btn.disabled = false; showToast("Xatolik: davomat saqlanmadi.", true); return; }
   showToast("Davomat saqlandi ✓");
-  A.dirty = false; attRenderMark();
-}
-async function attRenderReport(){
-  const A = state.att, holder = document.getElementById('attBody'); if(!holder) return;
-  holder.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
-  const rows = (await storageGetObjects(`attendance:${slugify(A.group)}:`, {fresh:true})).map(attParse).filter(Boolean)
-    .filter(r=> r.date >= A.from && r.date <= A.to).sort((a,b)=> a.date.localeCompare(b.date));
-  const people = new Map();
-  rows.forEach(r=> Object.keys(r.marks).forEach(id=>{ if(!people.has(id)) people.set(id, r.marks[id].name || id); }));
-  const list = [...people.keys()].map(id=>{
-    const sts = rows.map(r=> (r.marks[id]||{}).status).filter(Boolean);
-    return Object.assign({ id, name:people.get(id) }, attStats(sts));
-  }).sort((a,b)=> (b.pct===null?-1:b.pct) - (a.pct===null?-1:a.pct) || a.name.localeCompare(b.name));
-  A.reportRows = rows; A.reportList = list; A.reportPeople = people;
-  holder.innerHTML = `<div class="flexrow" style="align-items:flex-end;margin-bottom:12px;">
-      <div class="field" style="margin:0;"><label>Guruh</label>${attGroupSelect('attReportGroup')}</div>
-      <div class="field" style="margin:0;"><label>Dan</label><input type="date" value="${A.from}" onchange="state.att.from=this.value;attRenderReport()" style="max-width:170px;"></div>
-      <div class="field" style="margin:0;"><label>Gacha</label><input type="date" value="${A.to}" onchange="state.att.to=this.value;attRenderReport()" style="max-width:170px;"></div>
-      <button class="btn-owner btn-small" onclick="attExport()" ${list.length?'':'disabled'}>${icon('download')}Excel</button>
-    </div>
-    <p class="desc">Tanlangan davrda belgilangan darslar: <b>${rows.length}</b> ta. Foiz = «Keldi» / («Keldi» + «Kelmadi»); «Sababli» hisobga olinmaydi.</p>
-    ${list.length===0 ? `<div class="empty">Bu davrda davomat belgilanmagan.</div>` : `<div class="tbl-wrap"><table><thead><tr><th>Talaba</th><th>Keldi</th><th>Kelmadi</th><th>Sababli</th><th>Davomat</th></tr></thead><tbody>
-      ${list.map(r=>`<tr><td>${escapeHtml(r.name)}</td><td>${r.keldi}</td><td>${r.kelmadi}</td><td>${r.sababli}</td><td class="pct-cell ${r.pct!==null && r.pct<70?'pct-low':'pct-ok'}">${r.pct===null?'—':r.pct+'%'}</td></tr>`).join('')}</tbody></table></div>`}`;
-}
-async function attReportGroup(g){ state.att.group = g; attRenderReport(); }
-function attExport(){
-  const A = state.att; if(!A.reportRows || !A.reportList || !window.XLSX) return;
-  const dates = A.reportRows.map(r=>r.date);
-  const head = ['Talaba', ...dates.map(d=>d.split('-').reverse().join('.')), 'Keldi', 'Kelmadi', 'Sababli', 'Davomat %'];
-  const short = {keldi:'+', kelmadi:'−', sababli:'S'};
-  const body = A.reportList.map(r=> [ r.name, ...A.reportRows.map(x=> short[(x.marks[r.id]||{}).status] || ''), r.keldi, r.kelmadi, r.sababli, r.pct===null?'':r.pct ]);
-  const ws = XLSX.utils.aoa_to_sheet([head, ...body]);
-  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Davomat");
-  XLSX.writeFile(wb, `davomat-${slugify(A.group)}-${A.from}_${A.to}.xlsx`);
-  logActivity('export', `Davomat hisoboti: ${A.group}`);
+  A.dirty = false;
+  const G = gmState(); delete G.attc[A.group];                      // pastdagi xulosa yangi davomat bilan qayta hisoblansin
+  await attRenderMark();
+  gmReload(false);
 }
 
 /* ============ GURUH NAZORATI (admin + rahbar) ============
@@ -3937,7 +3936,7 @@ const GM_HW = {
   wait: { sym:'·',  cls:'wait',  txt:'Muddat hali tugamagan' },
   na:   { sym:'',   cls:'wait',  txt:'' }
 };
-function gmState(){ if(!state.gm) state.gm = { group:'', days:30, sub:'sum', student:null, model:null, glob:null, attc:{}, tok:0, avT:0 }; return state.gm; }
+function gmState(){ if(!state.gm) state.gm = { group:'', days:30, sub:'sum', student:null, model:null, glob:null, attc:{}, tok:0, avT:0, more:false, attnAll:false }; return state.gm; }
 function gmGroupNames(){
   const arch = new Set((state.config.groups || []).filter(g=> g.archived).map(g=> g.name));
   return collectKnownGroupNamesSync().filter(n=> !arch.has(n));
@@ -4137,22 +4136,36 @@ async function renderAdminMonitor(){
   const el = document.getElementById('adminTab-monitor'), G = gmState(), groups = gmGroupNames();
   G.student = null;
   if(!G.group || !groups.includes(G.group)) G.group = groups[0] || '';
-  if(!groups.length){ el.innerHTML = `<div class="lead">Guruh nazorati</div><div class="empty">Avval «Guruhlar» bo'limida guruh yarating.</div>`; return; }
+  if(!groups.length){ el.innerHTML = `<div class="lead">Guruh nazorati</div><div class="empty">Avval «Talabalar → Guruhlar» bo'limida guruh yarating.</div>`; return; }
+  const A = attState(); if(!A.dirty) A.date = dayKey();
   el.innerHTML = `<div class="toolbar"><div class="lead" style="margin:0;">Guruh nazorati</div>
       <div class="gm-actions"><button class="btn-ghost btn-small" onclick="gmReload(true)">Yangilash</button>
         <button class="btn-owner btn-small" id="gmXlsBtn" onclick="gmExcel()" disabled>${icon('download')}Excel</button>
         <button class="btn-owner btn-small" id="gmPdfBtn" onclick="gmPdf()" disabled>${icon('download')}PDF</button></div></div>
-    <p class="desc">Guruhni tanlang: uyga vazifa, davomat va o'zlashtirish bir joyda. Qizil va sariq belgili talabalar ro'yxat boshida turadi.</p>
     <div class="gm-filters">
       <div class="field"><label>Guruh</label><select id="gmGroup" onchange="gmSetGroup(this.value)">${groups.map(g=> `<option value="${escapeAttr(g)}" ${g === G.group ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}</select></div>
-      <div class="field"><label>Davr</label><select id="gmDays" onchange="gmSetDays(this.value)">${GM_PERIODS.map(p=> `<option value="${p[0]}" ${p[0] === G.days ? 'selected' : ''}>${p[1]}</option>`).join('')}</select></div>
+      <div class="field"><label>Hisobot davri</label><select id="gmDays" onchange="gmSetDays(this.value)">${GM_PERIODS.map(p=> `<option value="${p[0]}" ${p[0] === G.days ? 'selected' : ''}>${p[1]}</option>`).join('')}</select></div>
     </div>
+    <section class="gm-card" id="gmAtt">
+      <div class="gm-card-h"><div><div class="gm-card-t">Davomat</div><div class="row-meta" id="attDateLbl">${attDateLabel(A.date)}</div></div>
+        <div class="att-date"><button type="button" class="btn-ghost btn-small ${A.date === dayKey() ? 'hidden' : ''}" id="attToday" onclick="attPickDate(dayKey())">Bugun</button><input type="date" id="attDate" value="${A.date}" max="${dayKey()}" onchange="attPickDate(this.value)" aria-label="Davomat sanasi"></div></div>
+      <div id="attBody"><div class="loading">Yuklanmoqda...</div></div>
+    </section>
     <div id="gmBody"><div class="loading">Yuklanmoqda...</div></div>`;
   gmReload(false);
 }
-function gmSetGroup(g){ const G = gmState(); G.group = g; G.student = null; gmReload(false); }
+async function gmSetGroup(g){
+  const G = gmState();
+  if(g === G.group) return;
+  if(!(await attConfirmLeave())){ const sel = document.getElementById('gmGroup'); if(sel) sel.value = G.group; return; }
+  const A = attState(); A.dirty = false; A.draft = null;
+  G.group = g; G.student = null; G.attnAll = false; gmReload(false);
+}
 function gmSetDays(v){ const G = gmState(); G.days = parseInt(v, 10) || 0; G.student = null; gmReload(false); }
 function gmSetSub(s){ gmState().sub = s; gmDraw(); }
+function gmToggleMore(open){ gmState().more = !!open; }
+function gmKey(e, id){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); gmOpenStudent(id); } }
+function gmShowAllAttn(){ const G = gmState(); G.attnAll = !G.attnAll; gmDraw(); }
 async function gmReload(force){
   const G = gmState(), body = document.getElementById('gmBody'); if(!body) return;
   const tok = ++G.tok, keep = G.student;
@@ -4161,7 +4174,9 @@ async function gmReload(force){
   if(tok !== G.tok || !document.getElementById('gmBody')) return;
   G.model = gmCompute(glob, att, G.group, G.days);
   G.student = keep && G.model.students.some(s=> s.id === keep) ? keep : null;
+  attInit(force);
   gmDraw();
+  if(state.gmFocus){ state.gmFocus = ''; const at = document.getElementById('gmAtt'); if(at && at.scrollIntoView) at.scrollIntoView({ block:'start' }); }
   gmLoadAvatars(force).then(()=>{ if(tok === G.tok) gmHydrate(document.getElementById('gmBody')); });
 }
 function gmDraw(){
@@ -4169,31 +4184,36 @@ function gmDraw(){
   const has = M.students.length > 0;
   ['gmXlsBtn', 'gmPdfBtn'].forEach(id=>{ const b = document.getElementById(id); if(b) b.disabled = !has; });
   const fl = document.querySelector('#adminTab-monitor .gm-filters'); if(fl) fl.style.display = G.student ? 'none' : '';
+  const at = document.getElementById('gmAtt'); if(at) at.style.display = G.student ? 'none' : '';
   if(G.student){ gmDrawStudent(); return; }
-  const S = M.sum, box = (n, l, col)=> `<div class="stat-box"><div class="num" ${col ? `style="color:${col};"` : ''}>${n}</div><div class="lbl">${l}</div></div>`;
+  const S = M.sum;
   const warn = M.fail.size ? `<div class="notify-banner" style="margin-bottom:12px;"><div class="notify-banner-title">Ba'zi ma'lumotlar yuklanmadi</div><p class="desc" style="margin:0;">${[...M.fail].map(k=> ({ hw:'uyga vazifa', att:'davomat', prog:'mashq faolligi', ros:"talabalar ro'yxati" }[k] || k)).join(', ')} bo'yicha ko'rsatkichlar hisoblanmadi. Internetni tekshirib, «Yangilash»ni bosing.</p></div>` : '';
+  if(!has){ body.innerHTML = warn + `<div class="empty">Bu guruhda hozircha talaba topilmadi. Talabalar kirgach yoki «Talabalar → Loginlar»da guruhga biriktirilgach shu yerda ko'rinadi.</div>`; return; }
+  const attn = M.students.filter(s=> s.flag.level > 0);
+  const kpi = (v, l, col)=> `<div class="gm-kpi"><div class="gm-kpi-v" ${col ? `style="color:${col};"` : ''}>${v}</div><div class="gm-kpi-l">${l}</div></div>`;
+  const pcol = (v, lo, mid)=> v === null ? '' : v < lo ? 'var(--red)' : v < mid ? 'var(--gm-y)' : '';
+  const SHOW = 5, shown = G.attnAll ? attn : attn.slice(0, SHOW);
   const tabs = [['sum', 'Talabalar'], ['hw', 'Vazifalar'], ['att', 'Davomat'], ['mast', "O'zlashtirish"]];
   const tab = (id, l)=> `<button class="tab ${G.sub === id ? 'active' : ''}" onclick="gmSetSub('${id}')">${l}</button>`;
-  if(!has){ body.innerHTML = warn + `<div class="empty">Bu guruhda hozircha talaba topilmadi. Talabalar kirgach yoki «Talaba loginlari»da guruhga biriktirilgach shu yerda ko'rinadi.</div>`; return; }
-  const attn = M.students.filter(s=> s.flag.level > 0);
   body.innerHTML = warn + `
-    <div class="stat-grid" style="margin-bottom:14px;">
-      ${box(S.n, 'Talabalar')}
-      ${box(S.hwPct === null ? '—' : S.hwPct + '%', 'Vazifa bajarilishi')}
-      ${box(S.hwCheck, 'Tekshirilmagan', S.hwCheck ? 'var(--gm-y)' : '')}
-      ${box(S.attPct === null ? '—' : S.attPct + '%', 'Davomat')}
-      ${box(S.avg === null ? '—' : S.avg + '%', "O'rtacha natija")}
-      ${box(S.red, 'Diqqat talab', S.red ? 'var(--red)' : '')}
+    <div class="gm-kpis">
+      ${kpi(S.attPct === null ? '—' : S.attPct + '%', 'Davomat', pcol(S.attPct, GM.ATT_RED, GM.ATT_YEL))}
+      ${kpi(S.hwPct === null ? '—' : S.hwPct + '%', 'Vazifa bajarilishi', pcol(S.hwPct, 50, 75))}
+      ${kpi(S.avg === null ? '—' : S.avg + '%', "O'rtacha natija", pcol(S.avg, GM.AVG_RED, GM.AVG_YEL))}
+      ${kpi(attn.length, 'Diqqat talab', S.red ? 'var(--red)' : (attn.length ? 'var(--gm-y)' : ''))}
     </div>
-    ${S.blocked ? `<p class="row-meta" style="margin:-4px 0 10px;">Bloklangan ${S.blocked} ta talaba hisobga olinmadi.</p>` : ''}
-    <div class="lead" style="font-size:1.05rem;margin:6px 0 8px;">Diqqat talab qiladi (${attn.length})</div>
-    ${attn.length ? attn.map(s=> `<div class="row-item gm-attn">${gmDot(s.flag.level)}<span class="row-title" style="min-width:0;">${gmWho(s, 30)}<br>${gmChips(s.flag.reasons)}</span><button class="btn-ghost btn-small" onclick="gmOpenStudent(${jsArg(s.id)})">Batafsil</button></div>`).join('')
+    <p class="row-meta" style="margin:8px 0 16px;">${S.n} ta talaba${S.blocked ? ` · bloklangan ${S.blocked} ta hisobga olinmadi` : ''}${S.hwCheck ? ` · <button type="button" class="toplink" onclick="switchAdminTab('homework')">${S.hwCheck} ta vazifa tekshirilmagan</button>` : ''}</p>
+    <div class="lead" style="font-size:1.05rem;margin:0 0 8px;">Diqqat talab qiladi${attn.length ? ` (${attn.length})` : ''}</div>
+    ${attn.length ? shown.map(s=> `<div class="row-item gm-attn gm-click" role="button" tabindex="0" onclick="gmOpenStudent(${jsArg(s.id)})" onkeydown="gmKey(event,${jsArg(s.id)})">${gmDot(s.flag.level)}<span class="row-title" style="min-width:0;">${gmWho(s, 30)}<br>${gmChips(s.flag.reasons.slice(0, 2))}${s.flag.reasons.length > 2 ? `<span class="gm-chip">+${s.flag.reasons.length - 2}</span>` : ''}</span><span class="gm-go" aria-hidden="true">›</span></div>`).join('')
+        + (attn.length > SHOW ? `<div style="margin-top:8px;"><button type="button" class="btn-ghost btn-small" onclick="gmShowAllAttn()">${G.attnAll ? 'Kamroq ko\'rsatish' : `Hammasini ko'rsatish (${attn.length})`}</button></div>` : '')
       : `<div class="empty" style="padding:14px;">Hammasi joyida ✓ — diqqat talab qiladigan talaba yo'q.</div>`}
-    <details class="gm-rules"><summary>Belgilar qanday aniqlanadi?</summary>
-      <div class="row-meta" style="line-height:1.6;margin-top:6px;">Qizil — jiddiy: ${GM.HW_RED} va undan ko'p vazifa topshirilmagan; davomat ${GM.ATT_RED}% dan past (kamida ${GM.ATT_MIN} dars); ketma-ket ${GM.ABS_RED} dars kelmagan; o'rtacha natija ${GM.AVG_RED}% dan past; ${GM.IDLE_RED} kundan beri saytda faol emas.<br>
-      Sariq — kuzatib turing: 1 ta vazifa topshirilmagan yoki qayta ishlash kutilmoqda; davomat ${GM.ATT_YEL}% dan past; ketma-ket ${GM.ABS_YEL} dars kelmagan; o'rtacha natija ${GM.AVG_YEL}% dan past; ${GM.IDLE_YEL} kundan beri faol emas. «Sababli» kelmagan kunlar davomat foiziga kirmaydi. Bu belgilar faqat yordamchi — qaror sizniki.</div></details>
-    <div class="tabs" style="margin:16px 0 12px;">${tabs.map(t=> tab(t[0], t[1])).join('')}</div>
-    <div id="gmSub">${G.sub === 'hw' ? gmHwHtml(M) : G.sub === 'att' ? gmAttHtml(M) : G.sub === 'mast' ? gmMastHtml(M) : gmSumHtml(M)}</div>`;
+    <details class="gm-more" ${G.more ? 'open' : ''} ontoggle="gmToggleMore(this.open)"><summary>Batafsil jadvallar</summary>
+      <div class="tabs" style="margin:12px 0;">${tabs.map(t=> tab(t[0], t[1])).join('')}</div>
+      <div id="gmSub">${G.sub === 'hw' ? gmHwHtml(M) : G.sub === 'att' ? gmAttHtml(M) : G.sub === 'mast' ? gmMastHtml(M) : gmSumHtml(M)}</div>
+      <details class="gm-rules"><summary>Belgilar qanday aniqlanadi?</summary>
+        <div class="row-meta" style="line-height:1.6;margin-top:6px;">Qizil — jiddiy: ${GM.HW_RED} va undan ko'p vazifa topshirilmagan; davomat ${GM.ATT_RED}% dan past (kamida ${GM.ATT_MIN} dars); ketma-ket ${GM.ABS_RED} dars kelmagan; o'rtacha natija ${GM.AVG_RED}% dan past; ${GM.IDLE_RED} kundan beri saytda faol emas.<br>
+        Sariq — kuzatib turing: 1 ta vazifa topshirilmagan yoki qayta ishlash kutilmoqda; davomat ${GM.ATT_YEL}% dan past; ketma-ket ${GM.ABS_YEL} dars kelmagan; o'rtacha natija ${GM.AVG_YEL}% dan past; ${GM.IDLE_YEL} kundan beri faol emas. «Sababli» kelmagan kunlar davomat foiziga kirmaydi. Bu belgilar faqat yordamchi — qaror sizniki.</div></details>
+    </details>`;
   gmHydrate(body);
 }
 function gmSumHtml(M){
@@ -4307,9 +4327,7 @@ async function gmRemovePhoto(id){
 
 /* ---------- boshqa bo'limlarga o'tish, eslatma ---------- */
 function gmOpenHw(id){
-  document.querySelectorAll('.tab').forEach(b=> b.classList.toggle('active', b.dataset.tab === 'homework'));
-  document.querySelectorAll('.admin-tab').forEach(el=> el.classList.add('hidden'));
-  document.getElementById('adminTab-homework').classList.remove('hidden');
+  adminShowTab('homework');
   window._draftHw = null; hwAdminOpen(id);
 }
 function gmReminderText(M){
@@ -4971,15 +4989,17 @@ function hwDrawPicked(){
 function hwUnpick(i){ state.hwFiles.splice(i,1); hwDrawPicked(); }
 /* Rasmlarni yuborishdan oldin kichraytiradi (telefon rasmlari 5–10 MB bo'ladi) */
 async function hwPrepareFile(file){
-  if(!/^image\//.test(file.type) || /gif/.test(file.type)) return file;
-  if(file.size < 600*1024 && /jpe?g|png|webp/.test(file.type)) return file;
+  const heic = imgIsHeic(file), isImg = heic || /^image\//.test(file.type || '') || (!file.type && IMG_EXT_RE.test(file.name || ''));
+  if(!isImg || /gif/.test(file.type || '') || /\.gif$/i.test(file.name || '')) return file;
+  if(!heic && file.size < 600*1024 && /jpe?g|png|webp/.test(file.type || '')) return file;
   try{
-    const bmp = await createImageBitmap(file);
-    const max = 1800, k = Math.min(1, max/Math.max(bmp.width, bmp.height));
-    const c = document.createElement('canvas'); c.width = Math.round(bmp.width*k); c.height = Math.round(bmp.height*k);
-    const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height); ctx.drawImage(bmp, 0, 0, c.width, c.height);
+    const src = imgShrink(await imgDecode(file), 1800);
+    const c = document.createElement('canvas'); c.width = src.w; c.height = src.h;
+    const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height); ctx.drawImage(src.img, 0, 0, c.width, c.height);
+    try{ src.close(); }catch(e){}
     const blob = await new Promise(res=> c.toBlob(res, 'image/jpeg', 0.82));
-    if(!blob || blob.size >= file.size && file.size < HW.MAX_BYTES) return file;
+    if(!blob) return file;
+    if(!heic && blob.size >= file.size && file.size < HW.MAX_BYTES) return file;
     return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type:'image/jpeg' });
   }catch(e){ return file; }
 }
@@ -6055,7 +6075,7 @@ async function handleAccountLogin(){
    Tezlik uchun oxirgi rasm localStorage'da ham saqlanadi (ft-avatar:<egasi>) va keyin serverdan yangilanadi.
    Rasmni olib tashlash — img:null yoziladi (o'chirish emas), shunda kelajakda RLS yoqilganda ham talaba o'z rasmini boshqara oladi.
    ESLATMA (RLS yoqilganda): "avatar:" prefiksiga yozish ruxsati qo'shilishi kerak (talaba o'z kaliti, admin hammasi). */
-const AV = { SIZE:160, CROP:240, MAX_FILE:12*1024*1024, mem:new Map(), inflight:{} };
+const AV = { SIZE:160, CROP:240, MAX_FILE:120*1024*1024, SRC_MAX:1600, mem:new Map(), inflight:{} };
 const AV_KEY = 'avatar:', AV_LS = 'ft-avatar:';
 function initialsOf(name){
   const p = String(name || '').trim().split(/\s+/).filter(Boolean);
@@ -6110,27 +6130,70 @@ function avHtml(owner, name, size, extra){
 }
 
 /* --- Rasm tanlash va qirqish --- */
-async function avLoadSource(file){
-  if(!file || !/^image\//.test(file.type || '')) throw new Error('type');
-  if(file.size > AV.MAX_FILE) throw new Error('size');
-  try{
-    const bmp = await createImageBitmap(file, { imageOrientation:'from-image' });
-    return { img:bmp, w:bmp.width, h:bmp.height, close:()=>{ try{ bmp.close(); }catch(e){} } };
-  }catch(e){
-    const url = URL.createObjectURL(file);
-    const im = await new Promise((res, rej)=>{ const i = new Image(); i.onload = ()=>res(i); i.onerror = ()=>rej(new Error('decode')); i.src = url; });
-    return { img:im, w:im.naturalWidth, h:im.naturalHeight, close:()=>URL.revokeObjectURL(url) };
-  }
+/* Rasm fayli ekanini aniqlash: telefon/kompyuter ba'zan turini (type) bo'sh yoki «octet-stream» beradi (HEIC, .jfif, galereya). Bunday fayllarni rad etmaymiz — ochib ko'ramiz. */
+const IMG_EXT_RE = /\.(jpe?g|jfif|pjpeg|png|webp|gif|bmp|avif|heic|heif|tiff?|svg)$/i;
+function imgLooksLike(file){
+  if(!file) return false;
+  const t = String(file.type || '').toLowerCase();
+  if(t.indexOf('image/') === 0) return true;
+  if(!t || t === 'application/octet-stream' || t === 'binary/octet-stream') return !/\.(pdf|docx?|xlsx?|pptx?|zip|rar|mp4|mov|mp3|txt|csv)$/i.test(file.name || '');
+  return false;
 }
+function imgIsHeic(file){ return /hei[cf]/i.test(String(file && file.type || '')) || /\.hei[cf]$/i.test(String(file && file.name || '')); }
+function imgRace(p, ms){ return Promise.race([ p, new Promise((_, rej)=> setTimeout(()=> rej(new Error('timeout')), ms)) ]); }
+/* Faylni ochadi: 1) tabiiy, 2) <img> orqali, 3) xotira yetmasa kichraytirib. Qaytaradi { img, w, h, close }. */
+async function imgDecode(file){
+  const tries = [
+    async()=>{ const b = await imgRace(createImageBitmap(file, { imageOrientation:'from-image' }), 30000); return { img:b, w:b.width, h:b.height, close:()=>{ try{ b.close(); }catch(e){} } }; },
+    async()=>{
+      const url = URL.createObjectURL(file);
+      try{
+        const im = await imgRace(new Promise((res, rej)=>{ const i = new Image(); i.onload = ()=>res(i); i.onerror = ()=>rej(new Error('decode')); i.src = url; }), 30000);
+        if(im.decode){ try{ await im.decode(); }catch(e){} }
+        return { img:im, w:im.naturalWidth, h:im.naturalHeight, close:()=>URL.revokeObjectURL(url) };
+      }catch(e){ URL.revokeObjectURL(url); throw e; }
+    },
+    async()=>{ const b = await imgRace(createImageBitmap(file, { resizeWidth:AV.SRC_MAX, resizeQuality:'medium' }), 30000); return { img:b, w:b.width, h:b.height, close:()=>{ try{ b.close(); }catch(e){} } }; }
+  ];
+  let last = null;
+  for(const t of tries){
+    try{ const r = await t(); if(r && r.w > 0 && r.h > 0) return r; if(r && r.close) r.close(); }catch(e){ last = e; }
+  }
+  throw new Error('decode');
+}
+/* Katta rasmni (12000×9000 kabi) silliq ishlashi uchun uzun tomoni maxSide gacha kichraytiradi */
+function imgShrink(src, maxSide){
+  const L = Math.max(src.w, src.h), f = Math.min(1, maxSide / L);
+  if(f >= 1) return src;
+  const cv = document.createElement('canvas'); cv.width = Math.max(1, Math.round(src.w * f)); cv.height = Math.max(1, Math.round(src.h * f));
+  const ctx = cv.getContext('2d'); ctx.imageSmoothingQuality = 'high'; ctx.drawImage(src.img, 0, 0, cv.width, cv.height);
+  try{ src.close(); }catch(e){}
+  return { img:cv, w:cv.width, h:cv.height, close:()=>{} };
+}
+async function avLoadSource(file){
+  if(!file || !imgLooksLike(file)) throw new Error('type');
+  if(file.size <= 0) throw new Error('empty');
+  if(file.size > AV.MAX_FILE) throw new Error('size');
+  let src;
+  try{ src = await imgDecode(file); }catch(e){ throw new Error(imgIsHeic(file) ? 'heic' : 'decode'); }
+  return imgShrink(src, AV.SRC_MAX);
+}
+const AV_ERR = {
+  type: "Bu fayl rasm emas. JPG yoki PNG rasm tanlang.",
+  size: "Rasm juda katta (120 MB dan oshmasin).",
+  empty: "Fayl bo'sh yoki to'liq yuklanmagan. Rasm telefoningizda borligini tekshirib, qayta tanlang.",
+  heic: "Bu rasm HEIC formatida va brauzer uni ocha olmadi. Telefon kamerasi sozlamasida «Eng mos» (JPG) formatni tanlang yoki rasmning ekran suratini oling.",
+  decode: "Rasmni ochib bo'lmadi. Boshqa rasm tanlang yoki uning ekran suratini oling."
+};
 function avEdit(owner, title, after, cancel){
   let inp = document.getElementById('avFileInput');
-  if(!inp){ inp = document.createElement('input'); inp.type = 'file'; inp.id = 'avFileInput'; inp.accept = 'image/*'; inp.style.display = 'none'; document.body.appendChild(inp); }
+  if(!inp){ inp = document.createElement('input'); inp.type = 'file'; inp.id = 'avFileInput'; inp.accept = 'image/*,.heic,.heif,.jfif'; inp.style.display = 'none'; document.body.appendChild(inp); }
   inp.value = '';
   inp.onchange = async ()=>{
     const f = inp.files && inp.files[0]; if(!f) return;
     let src;
     try{ src = await avLoadSource(f); }
-    catch(e){ showToast(e.message === 'size' ? "Rasm juda katta (12 MB gacha bo'lsin)." : "Rasmni o'qib bo'lmadi. Boshqa rasm tanlang.", true); return; }
+    catch(e){ showToast(AV_ERR[e.message] || AV_ERR.decode, true); return; }
     avCropDialog(owner, title, src, after, cancel);
   };
   inp.click();
@@ -6153,13 +6216,18 @@ function avCropDialog(owner, title, src, after, cancel){
     { label:'Bekor qilish', onClick: ()=>{ finish(); if(cancel) cancel(); } },
     { label:'Saqlash', primary:true, onClick: async ()=>{
       if(busy) return; busy = true;
-      const k = AV.SIZE / S, d = dim();
-      const out = document.createElement('canvas'); out.width = out.height = AV.SIZE;
-      const c2 = out.getContext('2d'); c2.fillStyle = '#fff'; c2.fillRect(0, 0, AV.SIZE, AV.SIZE); c2.imageSmoothingQuality = 'high';
-      c2.drawImage(src.img, ox * k, oy * k, d.w * k, d.h * k);
-      let q = 0.84, data = out.toDataURL('image/jpeg', q);
-      while(data.length > 45000 && q > 0.4){ q -= 0.1; data = out.toDataURL('image/jpeg', q); }
-      const ok = await avSave(owner, data);
+      let data;
+      try{
+        const k = AV.SIZE / S, d = dim();
+        const out = document.createElement('canvas'); out.width = out.height = AV.SIZE;
+        const c2 = out.getContext('2d'); c2.fillStyle = '#fff'; c2.fillRect(0, 0, AV.SIZE, AV.SIZE); c2.imageSmoothingQuality = 'high';
+        c2.drawImage(src.img, ox * k, oy * k, d.w * k, d.h * k);
+        let q = 0.84; data = out.toDataURL('image/jpeg', q);
+        while(data.length > 45000 && q > 0.3){ q -= 0.1; data = out.toDataURL('image/jpeg', q); }
+        if(!avValid(data)) throw new Error('bad');
+      }catch(e){ busy = false; showToast("Rasmni tayyorlab bo'lmadi. Boshqa rasm tanlang.", true); return; }
+      let ok = await avSave(owner, data);
+      if(!ok){ await new Promise(r=> setTimeout(r, 700)); ok = await avSave(owner, data); }
       if(!ok){ busy = false; showToast("Rasmni saqlab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.", true); return; }
       finish(); showToast("Profil rasmi saqlandi ✓");
       if(after) after(data);
@@ -8269,24 +8337,53 @@ async function finalizeLiveResultForStudent(live){
 }
 
 /* ============ ADMIN / OWNER FLOW ============ */
-const BASE_ADMIN_TABS = [
-  {id:'home', label:'Bosh sahifa', ic:'home'},
-  {id:'monitor', label:'Guruh nazorati', ic:'activity'},
-  {id:'tests', label:'Testlar', ic:'book'},
-  {id:'exams', label:'Imtihon', ic:'exam'},
-  {id:'practice', label:'Mashq', ic:'star'},
-  {id:'homework', label:'Uyga vazifa', ic:'upload'},
-  {id:'attendance', label:'Davomat', ic:'check'},
-  {id:'materials', label:"O'quv materiallari", ic:'folder'},
-  {id:'groups', label:'Guruhlar', ic:'users'},
-  {id:'accounts', label:'Talaba loginlari', ic:'shield'},
-  {id:'chats', label:'Savol-javob', ic:'help'},
-  {id:'log', label:'Jurnal', ic:'clock'},
-  {id:'results', label:'Natijalar', ic:'chart'},
-  {id:'analytics', label:'Tahlil', ic:'activity'},
-  {id:'block', label:'Bloklash', ic:'lock'},
-  {id:'help', label:'Yordam', ic:'help'}
+/* Yuqori panel ixchamlashtirildi: 5 ta asosiy bo'lim + (kerak bo'lsa) ikkinchi qatorda ichki bo'limlar.
+   Ichki bo'limlarning eski nomlari (switchAdminTab('homework') va h.k.) o'zgarmagan. «attendance» — «Guruh nazorati»ga yo'naltiriladi. */
+const ADMIN_SECTIONS = [
+  { id:'home',    label:'Bosh sahifa',    short:'Bosh',      ic:'home',     tabs:['home'] },
+  { id:'monitor', label:'Guruh nazorati', short:'Nazorat',   ic:'activity', tabs:['monitor'] },
+  { id:'lesson',  label:'Dars',           short:'Dars',      ic:'book',     tabs:['tests','exams','practice','homework','materials'] },
+  { id:'people',  label:'Talabalar',      short:'Talabalar', ic:'users',    tabs:['groups','results','chats','accounts','block'] },
+  { id:'system',  label:'Tizim',          short:'Tizim',     ic:'chart',    tabs:['analytics','log','help'] }
 ];
+const ADMIN_OWNER_SECTION = { id:'owner', label:'Rahbar nazorati', short:'Rahbar', ic:'shield', tabs:['owner'], owner:true };
+const ADMIN_SUBTAB = { tests:'Testlar', exams:'Imtihon', practice:'Mashq', homework:'Uyga vazifa', materials:'Materiallar', groups:'Guruhlar', results:'Natijalar', chats:'Savol-javob', accounts:'Loginlar', block:'Bloklash', analytics:'Tahlil', log:'Jurnal', help:'Yordam' };
+const ADMIN_SUBSHORT = { homework:'Vazifa', chats:'Savollar' };   // telefonda qisqa nom
+function adminSecOf(tab){ return ADMIN_SECTIONS.concat([ADMIN_OWNER_SECTION]).find(x=> x.tabs.includes(tab)) || null; }
+function adminShowTab(tab){
+  const sec = adminSecOf(tab);
+  state.adminSecLast = state.adminSecLast || {}; if(sec) state.adminSecLast[sec.id] = tab;
+  document.querySelectorAll('#adminTabsBar .tab').forEach(b=> b.classList.toggle('active', !!sec && b.dataset.sec === sec.id));
+  const sb = document.getElementById('adminSubBar'); let any = false;
+  if(sb){
+    sb.querySelectorAll('.tab').forEach(b=>{ const inSec = !!sec && b.dataset.sec === sec.id; b.classList.toggle('hidden', !inSec); b.classList.toggle('active', inSec && b.dataset.tab === tab); if(inSec) any = true; });
+    sb.classList.toggle('hidden', !any);
+  }
+  document.querySelectorAll('.admin-tab').forEach(el=> el.classList.add('hidden'));
+  const p = document.getElementById('adminTab-' + tab); if(p) p.classList.remove('hidden');
+}
+function adminOpenSec(id){
+  const sec = ADMIN_SECTIONS.concat([ADMIN_OWNER_SECTION]).find(x=> x.id === id); if(!sec) return;
+  const last = (state.adminSecLast || {})[id];
+  switchAdminTab(last && sec.tabs.includes(last) ? last : sec.tabs[0]);
+}
+/* ichki bo'limlardagi belgilar (yangi xabar, tekshirilmagan vazifa…) yig'ilib, asosiy bo'lim tugmasida ko'rinadi */
+function adminSecBadges(){
+  ADMIN_SECTIONS.forEach(sec=>{
+    let n = 0;
+    sec.tabs.forEach(t=>{ const b = document.querySelector(`#adminSubBar [data-tab="${t}"] .count-badge`); if(b && !b.classList.contains('hidden')){ const v = parseInt(b.textContent, 10); if(!isNaN(v)) n += v; } });
+    const el = document.getElementById('secBadge-' + sec.id); if(!el) return;
+    el.textContent = n > 99 ? '99+' : String(n); el.classList.toggle('hidden', !(n > 0));
+  });
+}
+function adminBuildBars(isOwner){
+  const secs = isOwner ? ADMIN_SECTIONS.concat([ADMIN_OWNER_SECTION]) : ADMIN_SECTIONS;
+  document.getElementById('adminTabsBar').innerHTML = secs.map(x=> `<button class="tab ${x.owner ? 'owner-tab' : ''}" data-sec="${x.id}" data-tab="${x.tabs[0]}" onclick="adminOpenSec('${x.id}')" aria-label="${escapeAttr(x.label)}">${icon(x.ic)}<span class="tl">${x.label}</span><span class="ts">${x.short}</span><span class="count-badge hidden" id="secBadge-${x.id}"></span></button>`).join('');
+  const badge = id=> id === 'chats' ? '<span class="count-badge hidden" id="chatsTabBadge"></span>'
+    : id === 'exams' ? '<span class="count-badge hidden" id="examsTabBadge" style="background:var(--gold,#C9A227);color:#1b1500;"></span>'
+    : id === 'homework' ? '<span class="count-badge hidden" id="hwTabBadge"></span>' : '';
+  document.getElementById('adminSubBar').innerHTML = secs.filter(x=> x.tabs.length > 1).map(x=> x.tabs.map(t=> `<button class="tab hidden" data-tab="${t}" data-sec="${x.id}" onclick="switchAdminTab('${t}')"><span class="tl">${ADMIN_SUBTAB[t]}</span><span class="ts">${ADMIN_SUBSHORT[t] || ADMIN_SUBTAB[t]}</span>${badge(t)}</button>`).join('')).join('');
+}
 function toggleCodeVisibility(inputId, btn){
   const input = document.getElementById(inputId);
   if(input.type === 'password'){
@@ -8496,10 +8593,9 @@ async function openAdminDashboard(){
   document.getElementById('dashboardTitle').textContent = isOwner ? "Rahbar paneli" : "Boshqaruv paneli";
   refreshStaffAvatar();
   // Rebuild the tab bar completely every time so Admin never inherits Rahbar-only tabs (and vice versa)
-  const tabs = isOwner ? [...BASE_ADMIN_TABS, {id:'owner', label:'Rahbar nazorati', owner:true, ic:'shield'}] : BASE_ADMIN_TABS;
   const defaultTab = 'home';
-  const tabsBar = document.getElementById('adminTabsBar');
-  tabsBar.innerHTML = tabs.map(t => `<button class="tab ${t.owner?'owner-tab':''} ${t.id===defaultTab?'active':''}" data-tab="${t.id}" onclick="switchAdminTab('${t.id}')">${icon(t.ic)}${t.label}${t.id==='chats'?'<span class="count-badge hidden" id="chatsTabBadge"></span>':''}${t.id==='exams'?'<span class="count-badge hidden" id="examsTabBadge" style="background:var(--gold,#C9A227);color:#1b1500;"></span>':''}${t.id==='homework'?'<span class="count-badge hidden" id="hwTabBadge"></span>':''}</button>`).join('');
+  state.adminSecLast = {};
+  adminBuildBars(isOwner);
   switchAdminTab(defaultTab);
   refreshAdminChatBadge(false);
   refreshPendingGrading(true);
@@ -8532,11 +8628,14 @@ async function openAdminDashboard(){
   }, {passive:false});
 })();
 function statKey(e,tab){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); switchAdminTab(tab); } }
-function switchAdminTab(tab){
-  if(tab==='owner' && state.role!=='rahbar') return; // guard: never allow non-owner to open owner panel
-  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
-  document.querySelectorAll('.admin-tab').forEach(el=>el.classList.add('hidden'));
-  document.getElementById(`adminTab-${tab}`).classList.remove('hidden');
+async function switchAdminTab(tab){
+  if(tab === 'attendance'){ tab = 'monitor'; state.gmFocus = 'att'; }          // eski nom: davomat endi «Guruh nazorati» ichida
+  if(tab === 'owner' && state.role !== 'rahbar') return; // guard: never allow non-owner to open owner panel
+  if(state.att && state.att.dirty && tab !== 'monitor' && navActiveAdminTab() === 'monitor'){
+    if(!(await customConfirm("Saqlanmagan davomat belgilari bor. Baribir o'tasizmi? (Belgilar saqlanmaydi)"))) return;
+    state.att.dirty = false; state.att.draft = null;
+  }
+  adminShowTab(tab);
   if(tab==='home') renderAdminHome();
   if(tab==='monitor') renderAdminMonitor();
   if(tab==='tests') renderAdminTests();
@@ -8547,7 +8646,6 @@ function switchAdminTab(tab){
   if(tab==='exams') renderAdminExams();
   if(tab==='practice') renderAdminPractice();
   if(tab==='homework'){ state.hwAdmin = { view:'list', id:null }; window._draftHw = null; renderAdminHomework(); }
-  if(tab==='attendance') renderAdminAttendance();
   if(tab==='materials') renderAdminMaterials();
   if(tab==='groups') renderAdminGroups();
   if(tab==='accounts') renderAdminAccounts();
@@ -8564,8 +8662,12 @@ function renderAdminHelp(){
   const el = document.getElementById('adminTab-help');
   const faq = [
     {
+      q: "Panellar qayerda joylashgan?",
+      a: `Yuqorida 5 ta asosiy bo'lim bor: <b>Bosh sahifa</b>; <b>Guruh nazorati</b> (davomat, xavf belgilari, hisobotlar); <b>Dars</b> (Testlar, Imtihon, Mashq, Uyga vazifa, Materiallar); <b>Talabalar</b> (Guruhlar, Natijalar, Savol-javob, Loginlar, Bloklash); <b>Tizim</b> (Tahlil, Jurnal, Yordam). Bo'limni bossangiz, uning ichki bo'limlari ikkinchi qatorda chiqadi. Tugmadagi qizil raqam — ichkarida e'tibor talab qiladigan narsa bor (masalan, tekshirilmagan vazifa, baholanmagan imtihon yoki o'qilmagan savol).`
+    },
+    {
       q: "Test qanday yaratiladi?",
-      a: `"Testlar" bo'limi → "+ Yangi test / Import" → "+ Bo'sh test yaratish" tugmasini bosing. Mavzu, sarlavha va savollarni kiriting, har bir savol uchun to'g'ri variantni belgilang va vaqtni sozlang (standart 30 soniya). "Saqlash"ni bosing. Yangi test avtomatik "Yopiq" holatda qo'shiladi — tekshirib bo'lgach "Ochish" tugmasi bilan talabalarga ko'rsating.`
+      a: `"Dars → Testlar" bo'limi → "+ Yangi test / Import" → "+ Bo'sh test yaratish" tugmasini bosing. Mavzu, sarlavha va savollarni kiriting, har bir savol uchun to'g'ri variantni belgilang va vaqtni sozlang (standart 30 soniya). "Saqlash"ni bosing. Yangi test avtomatik "Yopiq" holatda qo'shiladi — tekshirib bo'lgach "Ochish" tugmasi bilan talabalarga ko'rsating.`
     },
     {
       q: "Import formatlari qanday ishlaydi?",
@@ -8577,7 +8679,7 @@ function renderAdminHelp(){
     },
     {
       q: "Talabani qanday bloklayman?",
-      a: `"Bloklash" bo'limida, tizimga bir marta kirgan talabalar ro'yxatdan avtomatik ko'rinadi — shundan tanlab "Bloklash" tugmasini bosing. Bloklangan talaba boshqa kira olmaydi, admin xohlagan vaqtda blokdan chiqarishi mumkin.`
+      a: `"Talabalar → Bloklash" bo'limida, tizimga bir marta kirgan talabalar ro'yxatdan avtomatik ko'rinadi — shundan tanlab "Bloklash" tugmasini bosing. Bloklangan talaba boshqa kira olmaydi, admin xohlagan vaqtda blokdan chiqarishi mumkin.`
     },
     {
       q: "Rahbar va Admin farqi nima?",
@@ -8589,12 +8691,12 @@ function renderAdminHelp(){
     },
     {
       q: "Talaba testni faqat bir marta yecha oladimi?",
-      a: `Ha — har bir talaba (ism-familiya-guruh bo'yicha) bitta testni faqat bir marta topshira oladi. Agar qayta topshirishga ruxsat bermoqchi bo'lsangiz, "Natijalar" bo'limida o'sha talabaning natijasi yonidagi "Qayta topshirishga ruxsat" tugmasini bosing.`
+      a: `Ha — har bir talaba (ism-familiya-guruh bo'yicha) bitta testni faqat bir marta topshira oladi. Agar qayta topshirishga ruxsat bermoqchi bo'lsangiz, "Talabalar → Natijalar" bo'limida o'sha talabaning natijasi yonidagi "Qayta topshirishga ruxsat" tugmasini bosing.`
 
     },
     {
       q: "Mashq bo'limi nima va nazorat testlaridan nimasi bilan farq qiladi?",
-      a: `«Mashq» — talabalar mustaqil shug'ullanishi uchun alohida bo'lim. Mavzular bo'yicha savollarni siz «Mashq» panelida yaratasiz (yoki Excel/matn orqali import qilasiz, yoki mavjud testdan ko'chirasiz). Talaba xohlagancha ishlaydi, savolning o'zlashtirilishiga qarab ball, seriya (ketma-ket kunlar) va nishon oladi. Mashq <b>nazorat testlari, imtihonlar, sertifikat va asosiy reytingga umuman ta'sir qilmaydi</b> — uning reytingi ham alohida. Kuniga yig'iladigan ball 100 bilan cheklangan, shuning uchun ball «urib olinmaydi».`
+      a: `«Mashq» — talabalar mustaqil shug'ullanishi uchun alohida bo'lim. Mavzular bo'yicha savollarni siz «Dars → Mashq» panelida yaratasiz (yoki Excel/matn orqali import qilasiz, yoki mavjud testdan ko'chirasiz). Talaba xohlagancha ishlaydi, savolning o'zlashtirilishiga qarab ball, seriya (ketma-ket kunlar) va nishon oladi. Mashq <b>nazorat testlari, imtihonlar, sertifikat va asosiy reytingga umuman ta'sir qilmaydi</b> — uning reytingi ham alohida. Kuniga yig'iladigan ball 100 bilan cheklangan, shuning uchun ball «urib olinmaydi».`
     },
     {
       q: "Provodka trenajyori qanday ishlaydi?",
@@ -8602,11 +8704,11 @@ function renderAdminHelp(){
     },
     {
       q: "Uyga vazifa qanday beriladi va tekshiriladi?",
-      a: `«Uyga vazifa» panelida «Yangi vazifa»ni bosing: sarlavha, matn, muddat va kimlarga ko'rinishini tanlang. Talaba vazifani rasm, PDF, Word yoki Excel fayl qilib yuklaydi (rasmlar avtomatik kichraytiriladi). «Topshirganlar» bo'limida har bir ishni ochib, holatini («Qabul qilindi» / «Qayta ishlang»), ballini va izohini yozasiz. Muddatdan keyin topshirilgani «kechikkan» deb belgilanadi, lekin topshirishga to'sqinlik qilinmaydi. Qabul qilingan vazifani talaba qayta topshira olmaydi. Natijalarni Excel'ga yuklab olish mumkin. Yuklangan rasm, PDF, Word (.docx) va Excel fayllar sayt ichida ochiladi («Yuklab olish» tugmasi ham bor). Talaba tabida yangi vazifa yoki yangi baho kelganda belgi chiqadi; sizning «Uyga vazifa» tabingizda esa tekshirilmagan topshiriqlar soni ko'rinadi. Tekshirishni tezlatish uchun: «Tekshirilmagan» filtri, bir bosishda «Qabul», tayyor izoh shablonlari va «Tekshirilmaganlarning hammasini qabul qilish» tugmasi bor. «Yangi vazifa»da turini «Mashq (tizim o'zi tekshiradi)» qilib tanlasangiz, talaba mashq mavzusini yoki provodka amaliyotlarini belgilangan foizda o'zlashtirgach vazifa avtomatik «Bajarildi» bo'ladi — siz hech narsa tekshirmaysiz. Bajarmaganlar ro'yxatida har bir talabaning mashq natijasi (masalan, 2/5) ko'rinadi. Guruhning umumiy holatini «Guruh nazorati» bo'limida ko'rasiz.`
+      a: `«Dars → Uyga vazifa» panelida «Yangi vazifa»ni bosing: sarlavha, matn, muddat va kimlarga ko'rinishini tanlang. Talaba vazifani rasm, PDF, Word yoki Excel fayl qilib yuklaydi (rasmlar avtomatik kichraytiriladi). «Topshirganlar» bo'limida har bir ishni ochib, holatini («Qabul qilindi» / «Qayta ishlang»), ballini va izohini yozasiz. Muddatdan keyin topshirilgani «kechikkan» deb belgilanadi, lekin topshirishga to'sqinlik qilinmaydi. Qabul qilingan vazifani talaba qayta topshira olmaydi. Natijalarni Excel'ga yuklab olish mumkin. Yuklangan rasm, PDF, Word (.docx) va Excel fayllar sayt ichida ochiladi («Yuklab olish» tugmasi ham bor). Talaba tabida yangi vazifa yoki yangi baho kelganda belgi chiqadi; sizning «Uyga vazifa» tabingizda esa tekshirilmagan topshiriqlar soni ko'rinadi. Tekshirishni tezlatish uchun: «Tekshirilmagan» filtri, bir bosishda «Qabul», tayyor izoh shablonlari va «Tekshirilmaganlarning hammasini qabul qilish» tugmasi bor. «Yangi vazifa»da turini «Mashq (tizim o'zi tekshiradi)» qilib tanlasangiz, talaba mashq mavzusini yoki provodka amaliyotlarini belgilangan foizda o'zlashtirgach vazifa avtomatik «Bajarildi» bo'ladi — siz hech narsa tekshirmaysiz. Bajarmaganlar ro'yxatida har bir talabaning mashq natijasi (masalan, 2/5) ko'rinadi. Guruhning umumiy holatini «Guruh nazorati» bo'limida ko'rasiz.`
     },
     {
       q: "Davomat qanday belgilanadi?",
-      a: `«Davomat» panelida guruh va sanani tanlab, har bir talaba uchun «Keldi / Kelmadi / Sababli» tugmasini bosasiz va «Saqlash»ni bosasiz. Jonli seans tugaganda unga qo'shilgan talabalar o'sha kuni avtomatik «Keldi» deb belgilanadi (siz qo'lda belgilagan bo'lsangiz, o'zgarmaydi). Foiz = «Keldi» / («Keldi» + «Kelmadi»); «Sababli» foizga ta'sir qilmaydi. «Hisobot» bo'limida davr bo'yicha jadvalni ko'rib, Excel'ga yuklab olasiz. Talaba o'z davomatini bosh sahifada va «Natijalarim»da ko'radi.`
+      a: `«Guruh nazorati» sahifasining eng tepasida «Davomat» kartasi turadi: guruhni tanlang (sana — bugun), har bir talaba uchun «Keldi / Kelmadi / Sababli» tugmasini bosing va «Saqlash»ni bosing. Kelmagan yoki sababli talabaga izoh yozishingiz mumkin. Kartaning ostida guruh holati, diqqat talab qiladigan talabalar va «Batafsil jadvallar» turadi — shunda bir marta kirib, darsda hammasini ko'rib chiqasiz. Jonli seans tugaganda unga qo'shilgan talabalar o'sha kuni avtomatik «Keldi» deb belgilanadi (siz qo'lda belgilagan bo'lsangiz, o'zgarmaydi). Foiz = «Keldi» / («Keldi» + «Kelmadi»); «Sababli» foizga ta'sir qilmaydi. Davr bo'yicha jadvalni «Batafsil jadvallar → Davomat»da ko'rasiz, yuqoridagi «Excel» / «PDF» tugmalari bilan yuklab olasiz. Talaba o'z davomatini bosh sahifada va «Natijalarim»da ko'radi.`
     },
     {
       q: "Imtihon paytida qoidabuzarlik qanday qayd etiladi?",
@@ -10901,6 +11003,7 @@ function setBadge(id, n){
   const el = document.getElementById(id); if(!el) return;
   el.textContent = n>99 ? '99+' : String(n);
   el.classList.toggle('hidden', !(n>0));
+  if(/^(chats|exams|hw)TabBadge$/.test(id)){ try{ adminSecBadges(); }catch(e){} }
 }
 function updateDocTitle(n){
   const base = 'FINANCE TEAM';
