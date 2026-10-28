@@ -1094,6 +1094,45 @@ async function retryAfterAdminAuth(e){
   // "Keyinroq" bosilgandan keyin 30 soniya qayta so'ralmaydi
   return state._authPromise;
 }
+/* ---- Baza himoyasi (RLS) holatini tekshirish ----
+   Sessiyasiz (talaba kabi) so'rov bilan bitta SINOV yozuvini qo'shishga urinamiz. Qo'shilsa — himoya yo'q (sinov yozuvini darhol o'chiramiz);
+   rad etilsa — himoya yoqilgan. Mavjud ma'lumotga hech qachon tegilmaydi. */
+async function rlsProbe(force){
+  if(!force && state._rlsProbe && Date.now() - state._rlsProbe.t < 60000) return state._rlsProbe.v;
+  let v = 'unknown', tm = null;
+  try{
+    const key = 'rls-probe:' + Date.now() + ':' + Math.random().toString(36).slice(2, 7);
+    const base = SUPABASE_URL + '/rest/v1/kv_store';
+    const h = { apikey: SUPABASE_ANON_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' };
+    const ctl = new AbortController(); tm = setTimeout(()=> ctl.abort(), 8000);
+    const r = await fetch(base, { method: 'POST', headers: h, body: JSON.stringify({ key, value: 'probe' }), signal: ctl.signal });
+    if(r.status === 200 || r.status === 201 || r.status === 204){
+      v = 'off';
+      try{ await fetch(base + '?key=eq.' + encodeURIComponent(key), { method: 'DELETE', headers: h }); }catch(e){}
+    } else if(r.status === 401 || r.status === 403){ v = 'on'; }
+  }catch(e){ v = 'unknown'; }
+  if(tm) clearTimeout(tm);
+  state._rlsProbe = { v, t: Date.now() };
+  return v;
+}
+/* Admin kirgach: himoya yoqilgan bo'lsa va Supabase hisobi ulanmagan bo'lsa, bir marta so'raymiz (yozish paytida to'satdan chiqmasligi uchun).
+   "Keyinroq" bosilsa — birinchi saqlash paytida baribir so'raladi. */
+async function adminSessionGate(){
+  try{
+    if(!state.role || !supabaseClient.auth || state._gateAsked) return;
+    if(await getAdminSession()) return;
+    if(await rlsProbe() !== 'on') return;
+    for(let i = 0; i < 20; i++){            // boshqa oyna ochiq bo'lsa, u yopilishini kutamiz
+      const ov = document.getElementById('modalOverlay');
+      if(!ov || ov.classList.contains('hidden')) break;
+      await new Promise(r=> setTimeout(r, 1000));
+      if(!state.role) return;
+    }
+    if(!state.role || state._gateAsked || await getAdminSession()) return;
+    state._gateAsked = true;
+    await retryAfterAdminAuth({ code: '42501' });
+  }catch(e){}
+}
 async function storageSet(key, value){
   invalidateCaches(key);
   for(let attempt=0; attempt<=2; attempt++){
@@ -1298,7 +1337,8 @@ async function handleBackupRestore(evt){
   try{
     for(let i=0;i<rows.length;i+=100){
       const chunk = rows.slice(i,i+100).map(r=>({key:r.key, value:r.value}));
-      const { error } = await withTimeout(supabaseClient.from('kv_store').upsert(chunk), 30000);
+      let { error } = await withTimeout(supabaseClient.from('kv_store').upsert(chunk), 30000);
+      if(error && isAuthDenied(error) && await retryAfterAdminAuth(error)) ({ error } = await withTimeout(supabaseClient.from('kv_store').upsert(chunk), 30000));
       if(error) throw error;
     }
     showToast(`${rows.length} ta yozuv tiklandi ✓`);
@@ -1578,15 +1618,19 @@ function sanitizeFileName(name){
 }
 async function uploadMaterialFile(file){
   const path = `${Date.now()}_${sanitizeFileName(file.name)}`;
-  try{
-    const { error } = await withTimeout(supabaseClient.storage.from('materials').upload(path, file, { cacheControl: '3600', upsert: false }), 45000);
-    if(error) throw error;
-    const { data } = supabaseClient.storage.from('materials').getPublicUrl(path);
-    return { path, url: data.publicUrl };
-  }catch(e){
-    console.error('uploadMaterialFile error', e);
-    return null;
+  for(let attempt = 0; attempt < 2; attempt++){
+    try{
+      const { error } = await withTimeout(supabaseClient.storage.from('materials').upload(path, file, { cacheControl: '3600', upsert: false }), 45000);
+      if(error) throw error;
+      const { data } = supabaseClient.storage.from('materials').getPublicUrl(path);
+      return { path, url: data.publicUrl };
+    }catch(e){
+      if(attempt === 0 && isAuthDenied(e) && await retryAfterAdminAuth(e)) continue;   // hisob ulangach, bir marta qayta urinamiz
+      console.error('uploadMaterialFile error', e);
+      return null;
+    }
   }
+  return null;
 }
 async function deleteMaterialFile(path){
   if(!path) return true;
@@ -2116,7 +2160,9 @@ async function listLivePlayers(sessionId){
   return storageGetObjects(`live-join:${sessionId}:`, {fresh:true});
 }
 async function saveLiveAnswer(sessionId, qIndex, slug, data){
-  return await storageSet(`live-answer:${sessionId}:${qIndex}:${slug}`, JSON.stringify(data));
+  // Faqat yangi yozuv: javob bir marta qabul qilinadi (RLS ham shuni talab qiladi). Allaqachon bor bo'lsa — muvaffaqiyat.
+  const st = await storageInsertOnce(`live-answer:${sessionId}:${qIndex}:${slug}`, JSON.stringify(data));
+  return st === 'ok' || st === 'exists';
 }
 async function getLiveAnswer(sessionId, qIndex, slug){
   const raw = await storageGet(`live-answer:${sessionId}:${qIndex}:${slug}`);
@@ -8576,7 +8622,7 @@ async function migrateLegacyAdminCodes(){
   }catch(e){ console.error('migrateLegacyAdminCodes', e); }
 }
 function logoutAdmin(){
-  state.role = null;
+  state.role = null; state._gateAsked = false;
   // "Eslab qolish" belgilanmagan bo'lsa, Supabase sessiyasi ham yopiladi (umumiy kompyuterlar uchun xavfsizroq)
   let remember = true; try{ remember = localStorage.getItem('ft-admin-remember')!=='0'; }catch(e){}
   if(!remember && supabaseClient.auth){ try{ supabaseClient.auth.signOut(); }catch(e){} }
@@ -8600,6 +8646,7 @@ async function openAdminDashboard(){
   refreshAdminChatBadge(false);
   refreshPendingGrading(true);
   refreshAdminHwBadge(true);
+  setTimeout(adminSessionGate, 1200);
 }
 /* Panel tugmalarini sichqoncha bilan ushlab surish */
 (function initTabDrag(){
@@ -11571,6 +11618,30 @@ async function saveGroupTeacher(id){
   renderAdminGroups();
 }
 
+async function rlsCheckUi(force){
+  const b = document.getElementById('rlsBadge'), n = document.getElementById('rlsNote'); if(!b) return;
+  b.className = 'badge'; b.textContent = 'Tekshirilmoqda...'; if(n) n.textContent = '';
+  const v = await rlsProbe(!!force);
+  const b2 = document.getElementById('rlsBadge'); if(!b2) return;
+  const n2 = document.getElementById('rlsNote');
+  if(v === 'on'){ b2.className = 'badge badge-open'; b2.textContent = 'Yoqilgan ✓'; if(n2) n2.textContent = "Begona kishi ochiq kalit bilan bazani o'zgartira yoki o'chira olmaydi."; }
+  else if(v === 'off'){ b2.className = 'badge badge-closed'; b2.textContent = 'Yoqilmagan'; if(n2) n2.textContent = "Baza hozir himoyasiz: ochiq kalit bilan hamma narsani yozish mumkin. XAVFSIZLIK-REJA faylidagi SQL'ni Supabase'da ishga tushiring."; }
+  else { b2.className = 'badge'; b2.textContent = 'Aniqlanmadi'; if(n2) n2.textContent = "Internetni tekshirib, «Tekshirish»ni qayta bosing."; }
+}
+async function sbSessionRefresh(){
+  const b = document.getElementById('sbSessBadge'); if(!b) return;
+  const sess = await getAdminSession();
+  const btn = document.getElementById('sbSessBtn'), n = document.getElementById('sbSessNote');
+  b.className = 'badge ' + (sess ? 'badge-open' : 'badge-closed'); b.textContent = sess ? 'Ulangan' : 'Ulanmagan';
+  if(btn) btn.textContent = sess ? 'Chiqish' : 'Kirish';
+  if(n) n.textContent = sess ? ((sess.user && sess.user.email) ? sess.user.email : '') : "Himoya yoqilgach, test va sozlamalarni saqlash uchun shu hisob kerak.";
+}
+async function sbSessionAction(){
+  const sess = await getAdminSession();
+  if(sess){ try{ await supabaseClient.auth.signOut(); }catch(e){} }
+  else { await ensureAdminAuth(); }
+  sbSessionRefresh();
+}
 async function renderOwnerPanel(){
   const el = document.getElementById('adminTab-owner');
   const results = await fetchAllResults();
@@ -11614,6 +11685,13 @@ async function renderOwnerPanel(){
     ${state.config.vault ? `<div class="row-item"><span class="row-title">Admin saqlangan parollarni ko'ra oladimi?</span>
       ${state.config.vault.wrapAdmin ? `<span class="badge badge-open">Ha</span><button class="btn-ghost btn-small" onclick="disableAdminVaultAccess()">Bekor qilish</button>` : `<span class="badge badge-closed">Yo'q</span><button class="btn-owner btn-small" onclick="enableAdminVaultAccess()">Ruxsat berish</button>`}</div>` : ''}
 
+    <div class="lead" style="font-size:1.1rem;margin:26px 0 10px;">Baza himoyasi</div>
+    <p class="desc">Talaba brauzer orqali bazani o'zgartira yoki o'chira olmasligini tekshiradi. Hech qanday ma'lumotga tegilmaydi.</p>
+    <div class="row-item"><span class="row-title">Himoya holati</span><span class="badge" id="rlsBadge">Tekshirilmoqda...</span><button class="btn-ghost btn-small" onclick="rlsCheckUi(true)">Tekshirish</button></div>
+    <div class="row-meta" id="rlsNote" style="margin:-4px 0 10px;"></div>
+    <div class="row-item"><span class="row-title">Supabase hisobi (yozish uchun)</span><span class="badge" id="sbSessBadge">...</span><button class="btn-ghost btn-small" id="sbSessBtn" onclick="sbSessionAction()">Kirish</button></div>
+    <div class="row-meta" id="sbSessNote" style="margin:-4px 0 10px;"></div>
+
     ${ownerCenterHtml()}
 
     <div class="lead" style="font-size:1.1rem;margin:26px 0 10px;">Sertifikat sozlamalari</div>
@@ -11643,6 +11721,7 @@ async function renderOwnerPanel(){
   `;
   renderCertAssetsBox();
   avHydrate(el);
+  rlsCheckUi(); sbSessionRefresh();
 }
 async function saveCertSettings(){
   const prev = state.config.certificate;
