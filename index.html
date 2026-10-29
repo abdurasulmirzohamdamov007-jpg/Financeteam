@@ -1200,7 +1200,9 @@ async function storageGetRows(prefix, opts){
   const limit = opts.limit || Infinity;
   let all = [];
   for(let from=0; all.length<limit; from+=PAGE){
-    let q = supabaseClient.from('kv_store').select('key,value').like('key', prefix+'%').order('key', { ascending: !opts.descending });
+    let q = supabaseClient.from('kv_store').select('key,value');
+    if(prefix) q = q.like('key', prefix+'%');
+    q = q.order('key', { ascending: !opts.descending });
     q = q.range(from, from+PAGE-1);
     const { data, error } = await withTimeout(q, 20000);
     if(error) throw error;
@@ -1304,10 +1306,33 @@ function renderLogRows(){
 }
 
 /* ============ BACKUP / RESTORE (Rahbar) ============ */
+/* Zaxira bo'sh chiqqanda: bazadan o'qishning turli usullarini sinab, natijani ko'rsatadi (sababini topish uchun) */
+async function backupDiag(){
+  const L = [];
+  const tryQ = async (name, f)=>{
+    try{
+      const r = await withTimeout(f(), 15000);
+      L.push(name + ': ' + (r.error ? 'xato — ' + (r.error.message || r.error.code || '?') : (r.count != null ? r.count : (r.data || []).length) + ' ta'));
+    }catch(e){ L.push(name + ': xato — ' + ((e && e.message) || e)); }
+  };
+  await tryQ('Jami yozuvlar soni', ()=> supabaseClient.from('kv_store').select('key', { count:'exact', head:true }));
+  await tryQ('Filtrsiz o\'qish', ()=> supabaseClient.from('kv_store').select('key').limit(50));
+  await tryQ('app-config', ()=> supabaseClient.from('kv_store').select('key').eq('key', 'app-config'));
+  const sess = await getAdminSession();
+  L.push('Supabase hisobi: ' + (sess ? 'ulangan' : 'ulanmagan'));
+  return L;
+}
 async function downloadFullBackup(){
   showToast("Zaxira tayyorlanmoqda...");
   try{
     const rows = await storageGetRows('');
+    if(rows.length === 0){
+      const diag = await backupDiag();
+      showModalHtml(`<div class="lead" style="font-size:1.05rem;margin-bottom:6px;">Zaxira bo'sh chiqdi</div>
+        <p class="desc" style="margin:0 0 8px;">Bazadan yozuv o'qilmadi, shuning uchun fayl yuklanmadi (bo'sh fayl yolg'on xotirjamlik beradi). Pastdagi satrlarni menga yuboring:</p>
+        <div style="font-family:var(--mono,monospace);font-size:0.85rem;line-height:1.6;">${diag.map(escapeHtml).join('<br>')}</div>`);
+      return;
+    }
     const payload = { format:'financeteam-backup', version:1, createdAt:new Date().toISOString(), rows: rows.filter(r=>!r.key.startsWith('log:')) };
     const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
     const a = document.createElement('a');
