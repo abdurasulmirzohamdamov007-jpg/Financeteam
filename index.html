@@ -282,7 +282,7 @@
   .live-opt.revealed-correct{outline:4px solid var(--teal);}
   .live-opt.revealed-wrong{opacity:0.35;}
   .live-lobby-players{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;}
-  .live-player-chip{background:rgba(47,199,174,0.14);border:1px solid rgba(47,199,174,0.3);color:var(--teal);padding:7px 14px;border-radius:20px;font-size:0.85rem;font-weight:600;}
+  .live-player-chip{background:rgba(47,199,174,0.14);border:1px solid rgba(47,199,174,0.3);color:var(--teal);padding:7px 14px;border-radius:20px;font-size:0.85rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;}
   .live-lb-row{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:10px;background:rgba(0,0,0,0.14);margin-bottom:8px;}
   .live-lb-rank{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:1.1rem;color:var(--teal);width:28px;}
   .live-lb-name{flex:1;font-weight:600;}
@@ -336,7 +336,10 @@
   .gm-chip{display:inline-block;font-size:0.74rem;line-height:1.3;padding:3px 9px;border-radius:999px;margin:3px 5px 3px 0;background:rgba(255,255,255,0.07);color:var(--ink-soft);}
   .gm-chip.r{background:rgba(229,88,75,0.16);color:var(--red);} .gm-chip.y{background:rgba(224,180,59,0.16);color:var(--gm-y);}
   :root[data-theme="light"] .gm-chip{background:#E6EEEB;} :root[data-theme="light"] .gm-chip.r{background:#FBE4E1;} :root[data-theme="light"] .gm-chip.y{background:#F6ECCB;}
-  .gm-who{display:inline-flex;align-items:center;gap:8px;min-width:0;}
+  .gm-who,.av-who{display:inline-flex;align-items:center;gap:8px;min-width:0;max-width:100%;}
+  .av-who .av-nm{min-width:0;overflow-wrap:break-word;}
+  @media (max-width:640px){ .av-who{gap:6px;} .lb-table .av-who .av{--s:24px !important;} .lb-table th,.lb-table td{padding-left:5px;padding-right:5px;} }
+  .live-lb-name .av-who{font-weight:600;}
   .gm-name{background:none;border:none;padding:0;margin:0;font:inherit;color:var(--ink);text-align:left;cursor:pointer;font-weight:600;}
   .gm-name:hover{color:var(--teal);text-decoration:underline;}
   .gm-attn{align-items:flex-start;gap:10px;} .gm-attn .gm-dot{margin-top:9px;}
@@ -3327,7 +3330,7 @@ async function prRenderBoard(body){
   body.innerHTML = `<div class="tabs" style="margin-bottom:10px;">${sw('mode','week','Shu hafta')}${sw('mode','all','Umumiy')}${sw('scope','group','Mening guruhim')}${sw('scope','center','Butun markaz')}</div>
     <p class="desc">Mashq balli bo'yicha reyting. Bu <b>nazorat testlari reytingidan alohida</b> — u yerga ta'sir qilmaydi.${meIdx>=0?` Sizning o'rningiz: <strong style="color:var(--teal);">${meIdx+1}</strong> / ${all.length}.`:''}</p>
     ${list.length===0?`<div class="empty">Hali hech kim ball to'plamagan. Birinchi bo'ling!</div>`:`<div class="tbl-wrap"><table class="lb-table"><thead><tr><th>O'rin</th><th>O'quvchi</th>${B.scope==='center'?'<th>Guruh</th>':''}<th>Ball</th></tr></thead><tbody>
-      ${list.map(r=>`<tr style="${r.id===myId?'font-weight:700;color:var(--teal);':''}"><td><span class="rank-pill rank-${r.rank<=3?r.rank:'n'}">${r.rank}</span></td><td>${escapeHtml(shown(r))}${r.id===myId?' (siz)':''}</td>${B.scope==='center'?`<td>${escapeHtml(r.group||'—')}</td>`:''}<td>${r.pts}</td></tr>`).join('')}
+      ${list.map(r=>`<tr style="${r.id===myId?'font-weight:700;color:var(--teal);':''}"><td><span class="rank-pill rank-${r.rank<=3?r.rank:'n'}">${r.rank}</span></td><td>${avWho(r.name, 28, shown(r), r.id)}${r.id===myId?' (siz)':''}</td>${B.scope==='center'?`<td>${escapeHtml(r.group||'—')}</td>`:''}<td>${r.pts}</td></tr>`).join('')}
       </tbody></table></div>`}`;
 }
 
@@ -3933,7 +3936,7 @@ function attDrawMark(){
   holder.innerHTML = `<div class="att-sum"><span class="k">Keldi ${cnt.keldi}</span><span class="n">Kelmadi ${cnt.kelmadi}</span><span class="s">Sababli ${cnt.sababli}</span>${unmarked ? `<span class="u">Belgilanmagan ${unmarked}</span>` : (ids.length ? `<span class="ok">Hammasi belgilangan ✓</span>` : '')}</div>
     ${ids.length === 0 ? `<div class="empty" style="padding:18px;">Bu guruhda hali talaba yo'q. «Talaba qo'shish» orqali ro'yxatga qo'shing.</div>` : `<div class="att-list">${ids.map(id=>{
       const m = A.draft[id] || {}, showNote = m.status === 'kelmadi' || m.status === 'sababli' || !!m.note;
-      return `<div class="att-row"><span class="att-nm">${escapeHtml(A.roster.get(id))}${m.auto ? ` <span class="row-meta">(jonli seansdan)</span>` : ''}</span>
+      return `<div class="att-row"><span class="att-nm">${avWho(A.roster.get(id), 26)}${m.auto ? ` <span class="row-meta">(jonli seansdan)</span>` : ''}</span>
         <span class="att-btns">${btn(id,'keldi')}${btn(id,'kelmadi')}${btn(id,'sababli')}</span>
         ${showNote ? `<input type="text" class="att-note" placeholder="Sababi (ixtiyoriy)" value="${escapeAttr(m.note||'')}" oninput="attNote(${jsArg(id)},this.value)">` : ''}</div>`; }).join('')}</div>`}
     <div class="att-foot">
@@ -4195,13 +4198,7 @@ function gmStrip(marks, n){
   return `<span class="gm-strip" aria-label="Oxirgi darslar">${m.map(x=> `<i class="${x.status === 'keldi' ? 'k' : x.status === 'kelmadi' ? 'n' : 's'}" title="${escapeAttr(gmFmtDay(x.date) + ' — ' + ATT_STATUS[x.status])}"></i>`).join('')}</span>`;
 }
 function gmHydrate(root){ (root || document).querySelectorAll('[data-av]').forEach(el=>{ const v = avPeek(el.getAttribute('data-av')); avSet(el, v === undefined ? null : v); }); }
-async function gmLoadAvatars(force){
-  const G = gmState();
-  if(!force && Date.now() - G.avT < GM.AV_TTL) return;
-  const r = await gmRows('avatar:'); if(!r.ok) return;
-  G.avT = Date.now();
-  r.rows.forEach(o=>{ const id = (o._key || '').slice(7); if(!id || /^(staff|teacher)-/.test(id)) return; avRemember(id, avValid(o.img) ? o.img : null); });
-}
+async function gmLoadAvatars(force){ await avLoadAll(!!force); }
 
 async function renderAdminMonitor(){
   const el = document.getElementById('adminTab-monitor'), G = gmState(), groups = gmGroupNames();
@@ -5301,7 +5298,7 @@ function hwAdminDrawDetail(){
     <div id="hwBulk" class="${c.pend > 1 ? '' : 'hidden'}" style="margin-bottom:12px;"><button class="btn-ghost btn-small" onclick="hwAdminBulk()">${icon('check')}Tekshirilmaganlarning hammasini qabul qilish (<span id="hwBulkN">${c.pend}</span>)</button></div>
     <div id="hwEmpty" class="empty hidden"></div>
     <div id="hwCards">${state.hwSubs.map((s,i)=> hwAdminCard(s, i)).join('')}</div>`}
-    ${D.missing.length ? `<div class="lead" style="font-size:1rem;margin:18px 0 8px;">Topshirmaganlar (${D.missing.length})</div><div class="live-lobby-players">${D.missing.map(m=>`<span class="live-player-chip">${escapeHtml(m.name)}${m.group?` <span class="row-meta">· ${escapeHtml(m.group)}</span>`:''}${m.prog?` <span class="row-meta">· ${m.prog.have}/${m.prog.need}</span>`:''}</span>`).join('')}</div>
+    ${D.missing.length ? `<div class="lead" style="font-size:1rem;margin:18px 0 8px;">Topshirmaganlar (${D.missing.length})</div><div class="live-lobby-players">${D.missing.map(m=>`<span class="live-player-chip">${avWho(m.name, 22)}${m.group?` <span class="row-meta">· ${escapeHtml(m.group)}</span>`:''}${m.prog?` <span class="row-meta">· ${m.prog.have}/${m.prog.need}</span>`:''}</span>`).join('')}</div>
       <div style="margin-top:10px;"><button class="btn-ghost btn-small" onclick="hwAdminRemind()">${icon('send')}Eslatma matnini nusxalash</button></div>` : ''}`;
   hwApplyFilter();
 }
@@ -5321,9 +5318,9 @@ function hwAdminUpdateCounts(){
   const n = document.getElementById('hwBulkN'); if(n) n.textContent = c.pend;
 }
 function hwAdminCard(s, i){
-  if(s.auto) return `<div class="qeditor hw-card" id="hwcard-${i}" data-st="${s.status}"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;"><b>${escapeHtml(s.name)}</b> <span class="row-meta">${escapeHtml(s.group||'')} · ${hwFmtDate(s.submittedAt)}${s.late?' · <span style="color:var(--red);">muddatdan keyin</span>':''}</span><span class="badge badge-done">Avto: bajarildi</span></div><p class="row-meta" style="margin:8px 0 0;">Mashq natijalaridan avtomatik tekshirildi${s.autoInfo?` (${s.autoInfo.have}/${s.autoInfo.need})`:''}. Tekshirish shart emas.</p></div>`;
+  if(s.auto) return `<div class="qeditor hw-card" id="hwcard-${i}" data-st="${s.status}"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;"><b>${avWho(s.name, 30)}</b> <span class="row-meta">${escapeHtml(s.group||'')} · ${hwFmtDate(s.submittedAt)}${s.late?' · <span style="color:var(--red);">muddatdan keyin</span>':''}</span><span class="badge badge-done">Avto: bajarildi</span></div><p class="row-meta" style="margin:8px 0 0;">Mashq natijalaridan avtomatik tekshirildi${s.autoInfo?` (${s.autoInfo.have}/${s.autoInfo.need})`:''}. Tekshirish shart emas.</p></div>`;
   return `<div class="qeditor hw-card" id="hwcard-${i}" data-st="${s.status}"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;">
-      <b>${escapeHtml(s.name)}</b> <span class="row-meta">${escapeHtml(s.group||'')} · ${hwFmtDate(s.submittedAt)}${s.attempts>1?` · ${s.attempts}-urinish`:''}${s.late?' · <span style="color:var(--red);">kechikkan</span>':''}</span>
+      <b>${avWho(s.name, 30)}</b> <span class="row-meta">${escapeHtml(s.group||'')} · ${hwFmtDate(s.submittedAt)}${s.attempts>1?` · ${s.attempts}-urinish`:''}${s.late?' · <span style="color:var(--red);">kechikkan</span>':''}</span>
       <span class="badge ${s.status==='qabul'?'badge-done':s.status==='qayta'?'badge-closed':'badge-open'}">${HW_STATUS[s.status]||s.status}</span></div>
     <div class="hw-files" style="margin:10px 0;">${hwFilesHtml(s.files)}</div>
     ${s.note ? `<p class="desc" style="margin:0 0 8px;"><b>Talaba izohi:</b> ${escapeHtml(s.note)}</p>` : ''}
@@ -5689,7 +5686,7 @@ async function prAdminActivity(){
     .sort((a,b)=> b.pts-a.pts);
   holder.innerHTML = `<p class="desc">Talabalarning mashq faolligi (ball, seriya, o'zlashtirilgan savollar). Nazorat natijalariga aloqasi yo'q.</p>
     <div class="tbl-wrap"><table><thead><tr><th>#</th><th>O'quvchi</th><th>Guruh</th><th>Ball</th><th>Shu hafta</th><th>Seriya</th><th>O'zlashtirgan</th><th>Javoblar</th><th>Aniqlik</th><th>Provodka</th><th>Oxirgi faollik</th></tr></thead><tbody>
-    ${data.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.group)}</td><td><b>${r.pts}</b></td><td>${r.wk}</td><td>${r.streak} kun</td><td>${r.mastered}</td><td>${r.ans}</td><td>${r.acc===null?'—':r.acc+'%'}</td><td>${r.prov}</td><td>${r.last?new Date(r.last).toLocaleDateString('uz-UZ'):'—'}</td></tr>`).join('')}
+    ${data.map((r,i)=>`<tr><td>${i+1}</td><td>${avWho(r.name, 26)}</td><td>${escapeHtml(r.group)}</td><td><b>${r.pts}</b></td><td>${r.wk}</td><td>${r.streak} kun</td><td>${r.mastered}</td><td>${r.ans}</td><td>${r.acc===null?'—':r.acc+'%'}</td><td>${r.prov}</td><td>${r.last?new Date(r.last).toLocaleDateString('uz-UZ'):'—'}</td></tr>`).join('')}
     </tbody></table></div>`;
 }
 
@@ -6157,7 +6154,7 @@ function avValid(img){ return typeof img === 'string' && img.length < 80000 && /
 // Sinxron: oxirgi ma'lum rasm (xotira yoki localStorage). undefined — hali bilinmaydi, null — rasm yo'q.
 function avPeek(owner){
   const m = AV.mem.get(owner); if(m) return m.img;
-  try{ const v = localStorage.getItem(AV_LS + owner); if(v && avValid(v)) return v; }catch(e){}
+  try{ const v = localStorage.getItem(AV_LS + owner); if(v && avValid(v)){ AV.mem.set(owner, { img: v, t: 0 }); return v; } }catch(e){}
   return undefined;
 }
 function avRemember(owner, img){
@@ -6165,6 +6162,11 @@ function avRemember(owner, img){
   try{ if(img) localStorage.setItem(AV_LS + owner, img); else localStorage.removeItem(AV_LS + owner); }catch(e){}
 }
 async function avGet(owner, force){
+  // Boshqa talabalar: ommaviy yuklash (avLoadAll) tugagan bo'lsa, har biri uchun alohida so'rov yubormaymiz.
+  if(!force && !avIsStaff(owner) && !avIsMine(owner)){
+    if(AV_ALL.p){ try{ await AV_ALL.p; }catch(e){} }
+    if(avAllSettled()){ const m0 = AV.mem.get(owner); if(m0) return m0.img; const o0 = avPeek(owner); return o0 === undefined ? null : o0; }
+  }
   const m = AV.mem.get(owner);
   if(m && !force && Date.now() - m.t < 60000) return m.img;
   if(AV.inflight[owner]) return AV.inflight[owner];
@@ -6182,23 +6184,125 @@ async function avGet(owner, force){
 async function avSave(owner, img){
   if(img !== null && !avValid(img)) return false;
   const ok = await storageSet(AV_KEY + owner, JSON.stringify({ v:1, img: img || null, t: Date.now() }));
-  if(ok) avRemember(owner, img);
+  if(ok){ avRemember(owner, img); if(!avIsStaff(owner)) avBump(); }
   return ok;
+}
+/* data: manzilini qisqa blob: manzilga aylantiramiz (yuzlab qatorli jadvalda DOM og'ir bo'lmasligi uchun). Bo'lmasa — o'zi. */
+const AV_URL = new Map();
+function avUrl(img){
+  if(!img || img.indexOf('data:') !== 0 || typeof URL === 'undefined' || !URL.createObjectURL) return img;
+  const c = AV_URL.get(img); if(c) return c;
+  if(AV_URL.size >= 300) return img;
+  try{
+    const comma = img.indexOf(','), mime = img.slice(5, img.indexOf(';')), bin = atob(img.slice(comma + 1)), arr = new Uint8Array(bin.length);
+    for(let k = 0; k < bin.length; k++) arr[k] = bin.charCodeAt(k);
+    const u = URL.createObjectURL(new Blob([arr], { type: mime }));
+    AV_URL.set(img, u);
+    return u;
+  }catch(e){ return img; }
 }
 function avSet(el, img){
   if(!el) return;
-  if(img){ el.style.backgroundImage = `url("${img}")`; el.classList.add('has-img'); }
+  if(img){ el.style.backgroundImage = `url("${avUrl(img)}")`; el.classList.add('has-img'); }
   else { el.style.backgroundImage = ''; el.classList.remove('has-img'); }
 }
 function avApply(el, owner){
   if(!el || !owner) return;
+  el.setAttribute('data-avd', '1');
   const c = avPeek(owner); avSet(el, c === undefined ? null : c);
   avGet(owner).then(img=>{ if(el.isConnected) avSet(el, img); }).catch(()=>{});
 }
 function avHydrate(root){ (root || document).querySelectorAll('[data-av]').forEach(el=> avApply(el, el.getAttribute('data-av'))); }
 function avHtml(owner, name, size, extra){
-  return `<span class="av ${extra || ''}" data-av="${escapeAttr(owner)}" style="--s:${size || 40}px" aria-hidden="true">${escapeHtml(initialsOf(name))}</span>`;
+  // Bilingan rasm bo'lsa, darhol qo'yiladi (qayta chizilganda "harf → rasm" miltillashi bo'lmaydi)
+  const c = avPeek(owner);
+  const has = !!c;
+  return `<span class="av ${has ? 'has-img ' : ''}${extra || ''}" data-av="${escapeAttr(owner)}" style="--s:${size || 40}px${has ? `;background-image:url(&quot;${escapeAttr(avUrl(c))}&quot;)` : ''}" aria-hidden="true">${escapeHtml(initialsOf(name))}</span>`;
 }
+/* ---- Hamma talabalarning rasmi hamma uchun ----
+   Barcha rasmlar BITTA so'rov bilan (avatar: prefiksi) olinadi, xotira va localStorage'ga yoziladi va 10 daqiqa yangi hisoblanadi.
+   Ro'yxatlarda ism yonida rasm: avWho(ism). Sahifaga qo'yilgan har bir [data-av] doircha o'zi rasmga o'tadi (avWatchStart). */
+const AV_ALL = { t:0, p:null, bad:0, vc:0, ver:'', TTL:600000, VER_TTL:45000, LS:'ft-avatar-all-t', LSV:'ft-avatar-ver' };
+const AV_VER_KEY = 'avatar:_ver';       // kichik "o'zgarish belgisi": kimdir rasm qo'ysa/o'zgartirsa/olib tashlasa yangilanadi
+function avVerOf(o){ return o && typeof o === 'object' ? String(o.t || '') + ':' + String(o.n || '') : ''; }
+function avBump(){
+  const o = { t: Date.now(), n: Math.random().toString(36).slice(2, 8) };
+  storageSet(AV_VER_KEY, JSON.stringify(o)).then(ok=>{
+    if(!ok) return;
+    AV_ALL.ver = avVerOf(o);              // o'zimizning o'zgarishimiz uchun hammasini qayta yuklamaymiz
+    try{ localStorage.setItem(AV_ALL.LSV, AV_ALL.ver); }catch(e){}
+  }).catch(()=>{});
+}
+function avIsStaff(owner){ return /^(staff|teacher)-/.test(String(owner || '')); }
+function avIsMine(owner){ return !!(state.studentName && !state.role && owner === myIdentity()); }
+function avAllFresh(){ return AV_ALL.t > 0 && Date.now() - AV_ALL.t < AV_ALL.TTL; }
+function avAllSettled(){ return avAllFresh() || (AV_ALL.bad > 0 && Date.now() - AV_ALL.bad < 30000); }
+function avLoadAll(force){
+  if(!AV_ALL.t){
+    try{ const t = +localStorage.getItem(AV_ALL.LS); if(t > 0 && t <= Date.now() + 60000){ AV_ALL.t = t; AV_ALL.ver = localStorage.getItem(AV_ALL.LSV) || ''; } }catch(e){}
+  }
+  const fresh = avAllFresh();
+  if(!force && fresh && Date.now() - AV_ALL.vc < AV_ALL.VER_TTL) return Promise.resolve();
+  if(AV_ALL.p) return AV_ALL.p;
+  AV_ALL.p = (async()=>{
+    if(!force && fresh){
+      // Kesh yangi: faqat kichik "o'zgarish belgisi"ni tekshiramiz. O'zgarmagan bo'lsa — rasmlarni qayta yuklamaymiz.
+      const vr = await storageGetStrict(AV_VER_KEY);
+      if(!vr.ok){ AV_ALL.vc = Date.now(); return; }
+      let v = ''; if(vr.value){ try{ v = avVerOf(JSON.parse(vr.value)); }catch(e){} }
+      if(v === AV_ALL.ver){ AV_ALL.vc = Date.now(); return; }
+    }
+    const t0 = Date.now();
+    const r = await gmRows(AV_KEY);
+    if(!r.ok){ AV_ALL.bad = Date.now(); return; }
+    const seen = new Set();
+    let ver = '';
+    r.rows.forEach(o=>{
+      const id = String(o._key || '').slice(AV_KEY.length);
+      if(id === '_ver'){ ver = avVerOf(o); return; }
+      if(!id || avIsStaff(id)) return;
+      seen.add(id);
+      const m = AV.mem.get(id); if(m && m.t > t0) return;            // so'rov paytida o'zi yangilagan rasmni eskisi bilan almashtirmaymiz
+      avRemember(id, avValid(o.img) ? o.img : null);
+    });
+    // Serverda endi yo'q rasmlarni keshdan ham olib tashlaymiz
+    try{
+      for(let i = localStorage.length - 1; i >= 0; i--){
+        const k = localStorage.key(i);
+        if(k && k.indexOf(AV_LS) === 0){ const id = k.slice(AV_LS.length); if(!avIsStaff(id) && !seen.has(id)){ localStorage.removeItem(k); AV.mem.set(id, { img: null, t: Date.now() }); } }
+      }
+    }catch(e){}
+    AV_ALL.t = Date.now(); AV_ALL.vc = AV_ALL.t; AV_ALL.bad = 0; AV_ALL.ver = ver;
+    try{ localStorage.setItem(AV_ALL.LS, String(AV_ALL.t)); localStorage.setItem(AV_ALL.LSV, ver); }catch(e){}
+    document.querySelectorAll('[data-av]').forEach(el=>{
+      const o = el.getAttribute('data-av'); if(!o || avIsStaff(o)) return;
+      const v = avPeek(o); avSet(el, v === undefined ? null : v);
+    });
+  })().catch(()=>{ AV_ALL.bad = Date.now(); }).finally(()=>{ AV_ALL.p = null; });
+  return AV_ALL.p;
+}
+// Ro'yxat uchun: rasm + ism. owner berilmasa, ismdan olinadi. shownName — ekranda ko'rinadigan (qisqartirilgan) ism.
+function avWho(name, size, shownName, owner){
+  const nm = String(name || '');
+  return `<span class="av-who">${avHtml(owner || studentIdentity(nm), nm, size || 26)}<span class="av-nm">${escapeHtml(shownName === undefined || shownName === null ? nm : shownName)}</span></span>`;
+}
+function avWatchStart(){
+  if(AV.watching || typeof MutationObserver === 'undefined' || !document.body) return;
+  AV.watching = true;
+  let tm = 0;
+  const run = ()=>{
+    tm = 0;
+    const els = document.querySelectorAll('[data-av]:not([data-avd])');
+    if(!els.length) return;
+    let others = false;
+    els.forEach(el=>{ const o = el.getAttribute('data-av'); if(o && !avIsStaff(o) && !avIsMine(o)) others = true; });
+    if(others) avLoadAll();
+    els.forEach(el=> avApply(el, el.getAttribute('data-av')));
+  };
+  new MutationObserver(()=>{ if(!tm) tm = setTimeout(run, 40); }).observe(document.body, { childList:true, subtree:true });
+}
+avWatchStart();
+document.addEventListener('DOMContentLoaded', avWatchStart);
 
 /* --- Rasm tanlash va qirqish --- */
 /* Rasm fayli ekanini aniqlash: telefon/kompyuter ba'zan turini (type) bo'sh yoki «octet-stream» beradi (HEIC, .jfif, galereya). Bunday fayllarni rad etmaymiz — ochib ko'ramiz. */
@@ -7147,7 +7251,7 @@ async function showLeaderboard(scope){
         ${list.map(r=>`
           <tr style="${r.id===myId?'font-weight:700;color:var(--teal);':''}">
             <td><span class="rank-pill rank-${r.rank<=3?r.rank:'n'}">${r.rank}</span></td>
-            <td>${escapeHtml(shown(r))}${r.id===myId?' (siz)':''}</td>
+            <td>${avWho(r.name, 28, shown(r), r.id)}${r.id===myId?' (siz)':''}</td>
             ${sc==='center'?`<td>${escapeHtml(r.group||'—')}</td>`:''}
             <td>${r.count}</td>
             <td class="pct-cell ${r.avg<60?'pct-low':'pct-ok'}">${r.avg}%</td>
@@ -8859,7 +8963,7 @@ async function renderAdminHome(){
     ${recent.length===0 ? '<div class="empty">Hali hech qanday faollik yo\'q — birinchi talaba test topshirganda shu yerda ko\'rinadi.</div>' : recent.map(r=>`
       <div class="home-activity-row">
         ${icon('check')}
-        <span style="flex:1;">${escapeHtml(r.studentName)} — <span style="color:var(--ink-soft);">${escapeHtml(r.topic)}</span></span>
+        <span style="flex:1;">${avWho(r.studentName, 24)} — <span style="color:var(--ink-soft);">${escapeHtml(r.topic)}</span></span>
         <span class="pct-cell ${r.percentage<60?'pct-low':'pct-ok'}">${r.percentage}%</span>
         <span style="color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;font-size:0.78rem;">${new Date(r.timestamp).toLocaleDateString('uz-UZ')}</span>
       </div>`).join('')}
@@ -9172,7 +9276,7 @@ async function buildExamResultsHtml(examId){
     const openCell = r.openMax===0 ? '—' : (r.openGraded ? `${r.openScore}/${r.openMax}` : `<span style="color:var(--gold,#C9A227);">Kutilmoqda</span>`);
     const gradeBtn = r.openMax===0 ? '' : `<button class="btn-ghost btn-small" onclick="openExamGrading('${examId}','${slug}')">${r.openGraded?"Qayta ko'rish":'Baholash'}</button>`;
     html += `<tr>
-      <td>${escapeHtml(r.studentName)}</td>
+      <td>${avWho(r.studentName, 26)}</td>
       <td>${escapeHtml(r.studentGroup||'—')}</td>
       <td>${openCell}</td>
       <td>${r.mcqScore}/${r.mcqMax}</td>
@@ -9195,7 +9299,7 @@ async function openExamGrading(examId, slug){
   const ex = state.examConfig.exams.find(e=>e.id===examId);
   const openSec = ex ? ex.sections.find(s=>s.type==='open') : null;
   let html = `<div class="card" style="margin-top:16px;">
-    <div class="lead" style="margin-bottom:4px;">${escapeHtml(record.studentName)} — Ochiq savollarni baholash</div>
+    <div class="lead" style="margin-bottom:4px;">${avWho(record.studentName, 34)} — Ochiq savollarni baholash</div>
     <p class="desc" style="margin-bottom:16px;">Har bir savolga 0 dan 5 gacha ball qo'ying, ixtiyoriy izoh yozishingiz mumkin.</p>`;
   record.openAnswersText.forEach((ans,i)=>{
     const qText = openSec && openSec.questions[i] ? openSec.questions[i].text : `Savol ${i+1}`;
@@ -9978,7 +10082,7 @@ async function renderLiveHostLobby(live){
   // Keyingi so'rovlarda faqat qo'shilganlar ro'yxati yangilanadi (QR-kod va havola qayta chizilmaydi)
   const cnt = document.getElementById('hostLobbyCount'); if(cnt) cnt.textContent = `Hozircha ${players.length} kishi qo'shildi.`;
   const box = document.getElementById('hostLobbyPlayers');
-  if(box) box.innerHTML = players.map(p=>`<span class="live-player-chip">${escapeHtml(p.name)}</span>`).join('') || '<span class="desc">Hali hech kim qo\'shilmadi...</span>';
+  if(box) box.innerHTML = players.map(p=>`<span class="live-player-chip">${avWho(p.name, 22)}</span>`).join('') || '<span class="desc">Hali hech kim qo\'shilmadi...</span>';
   const btn = document.getElementById('hostStartBtn'); if(btn) btn.disabled = players.length===0;
 }
 function copyJoinUrl(url){
@@ -10104,7 +10208,7 @@ async function renderLiveHostReveal(live){
     ${leaderboard.slice(0,5).map((p,i)=>`
       <div class="live-lb-row">
         <span class="live-lb-rank">${i+1}</span>
-        <span class="live-lb-name">${escapeHtml(p.name)}</span>
+        <span class="live-lb-name">${avWho(p.name, 34)}</span>
         <span class="live-lb-score">${p.score}</span>
       </div>`).join('') || '<div class="desc">Hali natija yo\'q</div>'}
     <div style="text-align:center;margin-top:22px;">
@@ -10140,7 +10244,7 @@ async function hostEndSession(){
     ${finalLb.map((p,i)=>`
       <div class="live-lb-row">
         <span class="live-lb-rank">${i+1}</span>
-        <span class="live-lb-name">${escapeHtml(p.name)}</span>
+        <span class="live-lb-name">${avWho(p.name, 34)}</span>
         <span class="live-lb-score">${p.score}</span>
       </div>`).join('') || '<div class="desc">Hali natija yo\'q</div>'}
     <div style="text-align:center;margin-top:22px;">
@@ -10242,7 +10346,7 @@ function drawResultsView(results){
   if(view==='students'){
     rows = summarizeBy(results, r=>studentIdentity(r.studentName)).sort((a,b)=>b.avg-a.avg);
     head = `<th>#</th><th>O'quvchi</th><th>Guruh</th><th>Topshirgan</th><th>O'rtacha</th><th>Eng yaxshi</th>`;
-    holder.innerHTML = `<div class="tbl-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.group)}</td><td>${r.count}</td><td>${pctBar(r.avg)}</td><td>${r.best}%</td></tr>`).join('')}</tbody></table></div>`;
+    holder.innerHTML = `<div class="tbl-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${avWho(r.name, 26)}</td><td>${escapeHtml(r.group)}</td><td>${r.count}</td><td>${pctBar(r.avg)}</td><td>${r.best}%</td></tr>`).join('')}</tbody></table></div>`;
   } else if(view==='groups'){
     rows = summarizeBy(results, r=>r.studentGroup).sort((a,b)=>b.avg-a.avg);
     holder.innerHTML = `<p class="desc">Guruh qatorini bossangiz, shu guruhning barcha urinishlari ochiladi.</p><div class="tbl-wrap"><table><thead><tr><th>#</th><th>Guruh</th><th>Talabalar</th><th>Urinishlar</th><th>O'rtacha</th><th>O'tish (≥60%)</th></tr></thead><tbody>${rows.map((r,i)=>`<tr style="cursor:pointer;" onclick="drillResults('group',${jsArg(r.key)})"><td>${i+1}</td><td>${escapeHtml(r.key)}</td><td>${r.students}</td><td>${r.count}</td><td>${pctBar(r.avg)}</td><td>${r.pass}%</td></tr>`).join('')}</tbody></table></div>`;
@@ -10278,7 +10382,7 @@ function drawResultsTable(results){
   const sorted = [...results].sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp));
   body.innerHTML = sorted.map(r=>`
     <tr>
-      <td>${escapeHtml(r.studentName)}</td>
+      <td>${avWho(r.studentName, 26)}</td>
       <td>${escapeHtml(r.studentGroup||'—')}</td>
       <td>${escapeHtml(r.topic)}</td>
       <td class="pct-cell ${r.percentage<60?'pct-low':'pct-ok'}">${r.score}/${r.total} (${r.percentage}%)</td>
@@ -10441,7 +10545,7 @@ function anInactiveDraw(){
     </div>
     <div class="row-meta" id="anInSummary" style="margin-bottom:8px;"><b>${rows.length}</b> ta talaba ${f.days} kundan beri faol emas (jami ${scope.length} ta talabadan)${never?`, shundan <b>${never}</b> tasi hali kirmagan`:''}.</div>
     ${rows.length ? `<div class="tbl-wrap"><table id="anInTable"><thead><tr><th>Talaba</th><th>Guruh</th><th>Oxirgi faollik</th></tr></thead><tbody>
-      ${shown.map(p=>`<tr><td>${escapeHtml(p.name)}</td><td>${escapeHtml(p.group||'—')}</td><td style="white-space:normal;">${p.last ? `<span style="color:${anInDays(p.last)>30?'var(--red)':'inherit'};">${anInAgo(p.last)}</span><br><span class="row-meta">${escapeHtml(new Date(p.last).toLocaleDateString('uz-UZ'))} · ${escapeHtml(AN_IN_KINDS[p.kind]||'')}</span>` : `<span style="color:var(--red);">Hali kirmagan</span>`}</td></tr>`).join('')}
+      ${shown.map(p=>`<tr><td>${avWho(p.name, 26)}</td><td>${escapeHtml(p.group||'—')}</td><td style="white-space:normal;">${p.last ? `<span style="color:${anInDays(p.last)>30?'var(--red)':'inherit'};">${anInAgo(p.last)}</span><br><span class="row-meta">${escapeHtml(new Date(p.last).toLocaleDateString('uz-UZ'))} · ${escapeHtml(AN_IN_KINDS[p.kind]||'')}</span>` : `<span style="color:var(--red);">Hali kirmagan</span>`}</td></tr>`).join('')}
       </tbody></table></div>${rows.length > shown.length ? `<div class="row-meta" style="margin-top:6px;">Yana ${rows.length - shown.length} ta talaba bor — hammasi Excel faylida.</div>` : ''}`
       : `<div class="empty">Hamma talaba so'nggi ${f.days} kunda faol bo'lgan 🎉</div>`}
   </div>`;
@@ -10552,7 +10656,7 @@ function drawAnalytics(){
   const srows = Object.entries(byStudent).map(([id,recs])=>{ const sorted=[...recs].sort((x,y)=>new Date(x.timestamp)-new Date(y.timestamp)); const name = sorted[sorted.length-1].studentName; return { name, group:recs[0].studentGroup||'—', avg:avgOf(recs.map(r=>r.percentage)), count:recs.length, last:new Date(sorted[sorted.length-1].timestamp).getTime(), trend: sorted.length>=2 ? sorted[sorted.length-1].percentage-sorted[0].percentage : 0 }; });
   const risk = srows.filter(s=>s.avg<60).sort((a,b)=>a.avg-b.avg).slice(0,8);
   const top = [...srows].sort((a,b)=>b.avg-a.avg || b.count-a.count).slice(0,5);
-  const stuRow = (s, extra)=> `<div class="row-item" style="cursor:pointer;" onclick="anPickStudent(${jsArg(s.name)})"><span class="row-title">${escapeHtml(s.name)}<br><span class="row-meta">${escapeHtml(s.group)} · ${s.count} ta urinish${extra||''}</span></span><span style="min-width:150px;">${pctBar(s.avg)}</span></div>`;
+  const stuRow = (s, extra)=> `<div class="row-item" style="cursor:pointer;" onclick="anPickStudent(${jsArg(s.name)})"><span class="row-title">${avWho(s.name, 30)}<br><span class="row-meta">${escapeHtml(s.group)} · ${s.count} ta urinish${extra||''}</span></span><span style="min-width:150px;">${pctBar(s.avg)}</span></div>`;
   // ---- hardest questions ----
   const qs = computeQuestionErrorStats(list).slice(0,8);
   html += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:14px 0;">
@@ -10590,7 +10694,7 @@ function drawAnalytics(){
     const i = state.an.bin, lo = i*20, hi = i===4?100:lo+19;
     const rows = list.filter(r=>r.percentage>=lo && r.percentage<=hi).sort((a,b)=>b.percentage-a.percentage);
     document.getElementById('anDetail').innerHTML = `<div style="border:1px solid var(--edge);border-radius:14px;padding:16px;margin-bottom:14px;"><div style="font-weight:700;margin-bottom:8px;">${binLabels[i]} oralig'idagi urinishlar (${rows.length})</div>
-      <div class="tbl-wrap"><table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Mavzu</th><th>Natija</th><th>Sana</th></tr></thead><tbody>${rows.slice(0,50).map(r=>`<tr><td>${escapeHtml(r.studentName)}</td><td>${escapeHtml(r.studentGroup||'—')}</td><td>${escapeHtml(r.topic)}</td><td class="pct-cell ${r.percentage<60?'pct-low':'pct-ok'}">${r.percentage}%</td><td>${new Date(r.timestamp).toLocaleDateString('uz-UZ')}</td></tr>`).join('')}</tbody></table></div></div>`;
+      <div class="tbl-wrap"><table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Mavzu</th><th>Natija</th><th>Sana</th></tr></thead><tbody>${rows.slice(0,50).map(r=>`<tr><td>${avWho(r.studentName, 26)}</td><td>${escapeHtml(r.studentGroup||'—')}</td><td>${escapeHtml(r.topic)}</td><td class="pct-cell ${r.percentage<60?'pct-low':'pct-ok'}">${r.percentage}%</td><td>${new Date(r.timestamp).toLocaleDateString('uz-UZ')}</td></tr>`).join('')}</tbody></table></div></div>`;
   }
   if(state.an.student) anShowStudent(state.an.student);
 }
@@ -10603,7 +10707,7 @@ function anShowStudent(name){
   const tmap = {}; recs.forEach(r=>{ (tmap[r.topic]=tmap[r.topic]||[]).push(r.percentage); });
   const weak = Object.entries(tmap).map(([t,a])=>({t,avg:avgOf(a)})).sort((a,b)=>a.avg-b.avg).slice(0,3);
   holder.innerHTML = `<div style="border:1px solid var(--teal);border-radius:14px;padding:16px;margin-bottom:14px;">
-    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;"><div style="font-weight:700;">${escapeHtml(name)} — shaxsiy progress</div><button class="btn-ghost btn-small" onclick="anPickStudent(${jsArg(name)})">Yopish</button></div>
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;"><div style="font-weight:700;">${avWho(name, 30)} — shaxsiy progress</div><button class="btn-ghost btn-small" onclick="anPickStudent(${jsArg(name)})">Yopish</button></div>
     <div class="row-meta" style="margin-bottom:8px;">${recs.length} ta urinish · o'rtacha ${avgOf(recs.map(r=>r.percentage))}% · eng zaif mavzular: ${weak.map(w=>`${escapeHtml(w.t)} (${w.avg}%)`).join(', ')}</div>
     <canvas id="anStu" style="max-height:240px;"></canvas></div>`;
   anMake('anStu', { type:'line', data:{ labels:recs.map(r=>`${r.topic} · ${new Date(r.timestamp).toLocaleDateString('uz-UZ')}`), datasets:[{ data:recs.map(r=>r.percentage), borderColor:C.teal, backgroundColor:C.teal+'33', fill:true, tension:0.3, pointRadius:5, pointBackgroundColor:recs.map(r=>r.percentage<60?C.red:C.teal) }] },
@@ -11142,7 +11246,7 @@ async function renderAdminChats(){
           const last = t.messages[t.messages.length-1];
           const u = chatUnreadCount(t,'admin');
           return `<div class="row-item" style="cursor:pointer;display:block;${state.adminChatOpenSlug===t._slug?'border-color:var(--teal);':''}" onclick="openAdminChatThread(${jsArg(t._slug)})">
-            <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>${escapeHtml(t.studentName||t._slug)}</strong>${u?`<span class="count-badge" style="margin:0;">${u}</span>`:''}</div>
+            <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>${avWho(t.studentName||t._slug, 28)}</strong>${u?`<span class="count-badge" style="margin:0;">${u}</span>`:''}</div>
             <div class="row-meta" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${last?(last.from==='admin'?'Siz: ':'')+escapeHtml(last.text):''}</div>
             <div class="row-meta">${timeAgo(t.lastMessageAt)}</div>
           </div>`;
@@ -11164,7 +11268,7 @@ async function renderAdminChatThread(){
   if(!t || !box) return;
   box.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-      <div class="lead" style="font-size:1rem;margin:0;">${escapeHtml(t.studentName||t._slug)} <span class="row-meta">${escapeHtml(t.studentGroup||'')}</span></div>
+      <div class="lead" style="font-size:1rem;margin:0;">${avWho(t.studentName||t._slug, 34)} <span class="row-meta">${escapeHtml(t.studentGroup||'')}</span></div>
       <div style="display:flex;gap:6px;">
         <button class="btn-ghost btn-small" onclick="toggleChatArchive(${jsArg(t._slug)})">${t.archived?"Arxivdan chiqarish":"Arxivlash"}</button>
         <button class="btn-danger btn-small" onclick="deleteChatThread(${jsArg(t._slug)})">${icon('trash')}O'chirish</button>
@@ -11341,7 +11445,7 @@ async function renderAdminAccounts(){
     accounts.filter(a=> gf==='*' || (a.group||'')===gf).sort((a,b)=>(a.group||'').localeCompare(b.group||'') || a.fullName.localeCompare(b.fullName)).forEach(a=>{
       const known = knownPassword(a);
       html += `<div class="row-item">
-        <span class="row-title">${escapeHtml(a.fullName)} ${a.blocked?'<span class="badge badge-closed" style="margin-left:6px;">Bloklangan</span>':''}
+        <span class="row-title">${avWho(a.fullName, 30)} ${a.blocked?'<span class="badge badge-closed" style="margin-left:6px;">Bloklangan</span>':''}
           <br><span class="row-meta">Login: <b>${escapeHtml(a.login)}</b> · Parol: ${known ? `<b>${escapeHtml(known)}</b>` : (a.pwEnc ? "<i>saqlangan — ko'rish uchun rahbar ruxsat berishi kerak</i>" : '<i>shifrlangan (ko\'rib bo\'lmaydi — «Parolni yangilash» bosing)</i>')} · Guruh: ${escapeHtml(a.group||'—')}</span></span>
         ${known ? `<button class="btn-ghost btn-small" onclick="copyAccountCreds('${a.id}')">${icon('link')}Nusxalash</button>` : ''}
         <button class="btn-ghost btn-small" onclick="resetAccountPassword('${a.id}')">Parolni yangilash</button>
