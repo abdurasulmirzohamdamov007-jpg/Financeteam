@@ -1413,7 +1413,7 @@ function genPassword(){
   return p;
 }
 
-async function loadConfig(){
+async function _loadConfigRaw(){
   const r = await storageGetStrict('app-config');
   const raw = r.value;
   if(!r.ok){
@@ -1442,7 +1442,12 @@ async function saveConfig(cfg){
     showToast("Ma'lumotlar yuklanmagani uchun saqlash to'xtatildi (mavjud ma'lumot buzilmasligi uchun). Internetni tekshirib, sahifani yangilang.", true);
     return false;
   }
-  const ok = await storageSet('app-config', JSON.stringify(cfg));
+  let out = cfg;
+  if(cfg.secure){                                   // serverda baholash yoqilgan: kalitlar alohida yozuvda, config'da yo'q
+    if(!(await secSyncTests(cfg))){ showToast("Javob kalitlarini saqlab bo'lmadi. Supabase hisobi bilan kirganingizni tekshiring.", true); return false; }
+    out = Object.assign({}, cfg, { tests: secStripTests(cfg.tests) });
+  }
+  const ok = await storageSet('app-config', JSON.stringify(out));
   if(!ok){
     const noAuth = state.role && supabaseClient.auth && !(await getAdminSession());
     showToast(noAuth ? "Saqlab bo'lmadi: Supabase admin hisobi bilan kirilmagan. Chiqib, qayta kiring va email/parolni kiriting." : "Xatolik: saqlashda muammo yuz berdi. Birozdan so'ng qayta urinib ko'ring.", true);
@@ -1578,6 +1583,195 @@ async function storageInsertOnce(key, value){
   }
   return 'fail';
 }
+/* ============ SERVERDA BAHOLASH: javob kalitlari serverda, talabada emas ============
+   `cfg.secure` yoqilgach to'g'ri javoblar (correct / correctDt / correctKt / modelAnswer) app-config va exam-config'da turmaydi:
+   ular `secret:test:<id>` va `secret:exam:<id>` yozuvlarida saqlanadi (faqat admin o'qiy oladi: baholash.sql).
+   Admin kirganda kalitlar xotiradagi config'ga qo'shiladi, saqlashda esa qayta ajratiladi.
+   Talaba natijani ft_submit_test / ft_submit_exam orqali yuboradi — ball serverda hisoblanadi. */
+const SEC = { T:'secret:test:', E:'secret:exam:', rows:null, rowsT:0 };
+function secIsNum(x){ return typeof x === 'number' && Number.isInteger(x) && x >= 0; }
+function secSec(ex, type){ return ((ex && ex.sections) || []).find(s=>s.type===type) || null; }
+function secureTests(){ return !!(state.config && state.config.secure); }
+function secureExams(){ return !!(state.examConfig && state.examConfig.secure); }
+function testKeysComplete(t){
+  return !!t && Array.isArray(t.questions) && t.questions.every(q=> q && Array.isArray(q.options) && secIsNum(q.correct) && q.correct < q.options.length);
+}
+function examKeysComplete(ex){
+  const m = secSec(ex, 'mcq'), p = secSec(ex, 'practical');
+  return (!m || (m.questions||[]).every(q=> secIsNum(q.correct) && q.correct < (q.options||[]).length))
+      && (!p || (p.questions||[]).every(q=> /^\d{4}$/.test(String(q.correctDt||'')) && /^\d{4}$/.test(String(q.correctKt||''))));
+}
+function secTestOf(t){
+  return { v:1, topic:t.topic||'', title:t.title||'', q:(t.questions||[]).map(q=>({ x:q.text, c:q.correct, ct:q.options[q.correct], t:q.timeSeconds||30, n:q.options.length })) };
+}
+function secExamOf(ex){
+  const m = secSec(ex, 'mcq'), p = secSec(ex, 'practical'), o = secSec(ex, 'open');
+  return { v:1, title:ex.title||'',
+    mcq:(m ? m.questions : []).map(q=> q.correct),
+    prac:(p ? p.questions : []).map(q=>({ dt:String(q.correctDt||'').trim(), kt:String(q.correctKt||'').trim() })),
+    open:(o ? (o.questions||[]).length : 0),
+    ma:(o ? (o.questions||[]) : []).map(q=> String(q.modelAnswer||'')) };
+}
+function secStripTests(tests){
+  return (tests||[]).map(t=> Object.assign({}, t, { questions:(t.questions||[]).map(q=>{ const c = Object.assign({}, q); delete c.correct; return c; }) }));
+}
+function secStripExams(exams){
+  return (exams||[]).map(ex=> Object.assign({}, ex, { sections:(ex.sections||[]).map(sc=> Object.assign({}, sc, { questions:(sc.questions||[]).map(q=>{ const c = Object.assign({}, q); delete c.correct; delete c.correctDt; delete c.correctKt; delete c.modelAnswer; return c; }) })) }));
+}
+/* Serverdagi hamma kalit yozuvlari {key: qiymat}. Faqat admin sessiyasi bilan to'liq keladi (talabaga RLS bo'sh qaytaradi). 20 soniya eslab qolinadi. */
+async function secLoadRows(force){
+  if(!force && SEC.rows && Date.now() - SEC.rowsT < 20000) return SEC.rows;
+  const map = {};
+  try{
+    (await storageGetRows('secret:')).forEach(r=>{ map[r.key] = r.value; });
+  }catch(e){ return SEC.rows || map; }
+  SEC.rows = map; SEC.rowsT = Date.now();
+  return map;
+}
+function secAttachTests(cfg, rows){
+  (cfg.tests||[]).forEach(t=>{
+    if(testKeysComplete(t)) return;
+    const raw = rows[SEC.T + t.id]; if(!raw) return;
+    let k; try{ k = JSON.parse(raw); }catch(e){ return; }
+    if(!k || !Array.isArray(k.q) || k.q.length !== (t.questions||[]).length) return;
+    if(!t.questions.every((q,i)=> k.q[i] && k.q[i].x === q.text && secIsNum(k.q[i].c))) return;   // test boshqa joyda o'zgargan bo'lsa, kalit qo'shilmaydi
+    t.questions.forEach((q,i)=>{ q.correct = k.q[i].c; });
+  });
+}
+function secAttachExams(ec, rows){
+  (ec.exams||[]).forEach(ex=>{
+    const raw = rows[SEC.E + ex.id]; if(!raw) return;
+    let k; try{ k = JSON.parse(raw); }catch(e){ return; }
+    const m = secSec(ex, 'mcq'), p = secSec(ex, 'practical'), o = secSec(ex, 'open');
+    if(!k || (m && (!Array.isArray(k.mcq) || k.mcq.length !== (m.questions||[]).length)) || (p && (!Array.isArray(k.prac) || k.prac.length !== (p.questions||[]).length))) return;
+    if(m) m.questions.forEach((q,i)=>{ q.correct = k.mcq[i]; });
+    if(p) p.questions.forEach((q,i)=>{ q.correctDt = (k.prac[i] && k.prac[i].dt) || ''; q.correctKt = (k.prac[i] && k.prac[i].kt) || ''; });
+    if(o && Array.isArray(k.ma)) (o.questions||[]).forEach((q,i)=>{ if(typeof k.ma[i] === 'string') q.modelAnswer = k.ma[i]; });
+  });
+}
+async function loadConfig(){
+  const cfg = await _loadConfigRaw();
+  if(state.role && cfg && cfg.secure && !cfg._loadFailed){ try{ secAttachTests(cfg, await secLoadRows()); }catch(e){} }
+  return cfg;
+}
+async function loadExamConfig(){
+  const ec = await _loadExamConfigRaw();
+  if(state.role && ec && ec.secure && !ec._loadFailed){ try{ secAttachExams(ec, await secLoadRows()); }catch(e){} }
+  return ec;
+}
+/* O'zgargan kalitlarnigina yozadi (har saqlashda hammasini qayta yozmaydi). To'liq bo'lmagan test/imtihonga tegmaydi. */
+async function secSyncTests(cfg){
+  const rows = await secLoadRows();
+  for(const t of (cfg.tests||[])){
+    if(!(t.questions||[]).length || !testKeysComplete(t)) continue;
+    const v = JSON.stringify(secTestOf(t));
+    if(rows[SEC.T + t.id] === v) continue;
+    if(!(await storageSet(SEC.T + t.id, v))) return false;
+    rows[SEC.T + t.id] = v;
+  }
+  return true;
+}
+async function secSyncExams(ec){
+  const rows = await secLoadRows();
+  for(const ex of (ec.exams||[])){
+    if(!examKeysComplete(ex)) continue;
+    const v = JSON.stringify(secExamOf(ex));
+    if(rows[SEC.E + ex.id] === v) continue;
+    if(!(await storageSet(SEC.E + ex.id, v))) return false;
+    rows[SEC.E + ex.id] = v;
+  }
+  return true;
+}
+/* Admin kalitlarini xotiradagi config'larga qayta qo'shadi (kirgandan keyin yoki kalit yetishmasa) */
+async function secReattach(){
+  const rows = await secLoadRows(true);
+  if(state.config && state.config.secure) secAttachTests(state.config, rows);
+  if(state.examConfig && state.examConfig.secure) secAttachExams(state.examConfig, rows);
+}
+function secNeedKeys(){
+  if(!state.role) return false;
+  const a = state.config && state.config.secure && (state.config.tests||[]).some(t=> !testKeysComplete(t));
+  const b = state.examConfig && state.examConfig.secure && (state.examConfig.exams||[]).some(e=> !examKeysComplete(e));
+  return !!(a || b);
+}
+/* Kalitlar kerak bo'lgan joyda (muharrir, Excel, jonli seans) chaqiriladi. true — davom etish mumkin. */
+async function secEnsureKeys(){
+  if(!secNeedKeys()) return true;
+  await ensureAdminAuth();
+  await secReattach();
+  if(!secNeedKeys()) return true;
+  await customAlert("Javob kalitlari serverdan o'qilmadi. Chiqib, Supabase hisobi (email/parol) bilan qayta kiring. Agar bu test boshqa qurilmada o'zgartirilgan bo'lsa, uni qayta tahrirlab, to'g'ri javoblarni belgilab saqlang.");
+  return false;
+}
+/* ---- Talaba tomoni: serverga yuborish ---- */
+async function srvRpc(fn, args){
+  let last = null;
+  for(let a = 0; a < 3; a++){
+    try{
+      const { data, error } = await withTimeout(supabaseClient.rpc(fn, args), 20000);
+      if(error){
+        const msg = String(error.message||'') + ' ' + String(error.code||'');
+        if(error.code === 'PGRST202' || error.code === '42883' || /could not find the function|does not exist/i.test(msg)) return { status:'error', error:'no_function' };
+        last = error;
+      } else if(data && typeof data === 'object') return data;
+      else last = new Error('bad_response');
+    }catch(e){ last = e; }
+    await new Promise(r=> setTimeout(r, 400 * (a + 1)));
+  }
+  return { status:'error', error:'network', msg:String((last && last.message) || last || '') };
+}
+function srvErrText(r){
+  const e = r && r.error;
+  if(e === 'no_function') return "Server hali tayyor emas (baholash.sql ishga tushirilmagan). Administratorga xabar bering.";
+  if(e === 'no_key') return "Bu test uchun javob kaliti serverda topilmadi. Administratorga xabar bering.";
+  if(e === 'count_mismatch' || e === 'bad_answers') return "Test siz yechayotganingizda o'zgartirilgan ko'rinadi. Administratorga xabar bering.";
+  if(e === 'network') return "Internet bilan aloqa yo'q. Javoblaringiz telefonda saqlangan — internetni tekshirib, qayta urining.";
+  return "Natijani yuborishda xatolik yuz berdi. Qayta urinib ko'ring.";
+}
+function srvSubmitTest(testId, answers, extra){
+  return srvRpc('ft_submit_test', { p_test:testId, p_ident:myIdentity(), p_name:state.studentName, p_group:state.studentGroup || '', p_answers:answers, p_extra:extra || {} });
+}
+/* Natija qabul qilinmaguncha qayta urinish taklif qilinadi. null — talaba «Keyinroq» ni tanladi (javoblar qoralamada qoladi). */
+async function srvSubmitWithRetry(testId, answers, extra){
+  for(;;){
+    const r = await srvSubmitTest(testId, answers, extra);
+    if((r.status === 'ok' || r.status === 'exists') && r.record) return r.record;
+    const again = await new Promise(res=> showModal(srvErrText(r), [
+      { label:'Keyinroq', onClick:()=>{ closeModal(); res(false); } },
+      { label:'Qayta urinish', primary:true, onClick:()=>{ closeModal(); res(true); } }
+    ]));
+    if(!again) return null;
+  }
+}
+async function finishTestServer(test){
+  const qs = state.shuffledQuestions;
+  const answers = qs.map((sq,i)=>{
+    const a = state.answers[i] || {};
+    const has = a.answered && Number.isInteger(a.selected) && a.selected >= 0;
+    return { q: sq._qi, s: has ? a.selected : null, o: sq._ord, ms: Math.max(0, Math.round(Number(a.timeTakenMs) || 0)) };
+  });
+  const vio = proctorFinish();
+  document.getElementById('takeTestBody').innerHTML = `<div class="loading">Javoblar yuborilmoqda, biroz kuting...</div>`;
+  const record = await srvSubmitWithRetry(test.id, answers, vio ? { violations: vio } : {});
+  state._draftCtx = null;
+  if(!record){ await renderTestList(); return; }          // qoralama qoladi: qaytib kirib, qayta yuborish mumkin
+  draftClear('test', test.id);
+  await showResult(record);
+}
+/* Imtihon: MCQ (tanlangan variant), amaliy (Dt/Kt) va ochiq javoblar serverga ketadi; ball serverda hisoblanadi */
+async function srvExamSave(ex, openSec, mcqSec, practicalSec, vio){
+  if(vio) state._examVioKeep = vio;
+  const mA = state.examAnswers[mcqSec.id] || {}, pA = state.examAnswers[practicalSec.id] || {}, oA = state.examAnswers[openSec.id] || {};
+  const r = await srvRpc('ft_submit_exam', {
+    p_exam:ex.id, p_ident:myIdentity(), p_name:state.studentName, p_group:state.studentGroup || '',
+    p_mcq: mcqSec.questions.map((q,qi)=> Number.isInteger(mA[qi]) ? mA[qi] : null),
+    p_prac: practicalSec.questions.map((q,qi)=>{ const a = pA[qi] || {}; return { dt:String(a.dt||''), kt:String(a.kt||'') }; }),
+    p_open: openSec.questions.map((q,qi)=> String(oA[qi]||'').trim()),
+    p_extra: state._examVioKeep ? { violations: state._examVioKeep } : {}
+  });
+  if(r.status === 'ok' || r.status === 'exists'){ state._examVioKeep = null; return { status:r.status, record:r.record }; }
+  return { status:'fail', error:r.error, text:srvErrText(r) };
+}
 async function saveAttemptOnce(kind, id, record){
   const key = (kind==='test' ? 'result:' : 'exam-result:') + id + ':' + studentIdentity(record.studentName);
   const st = await storageInsertOnce(key, JSON.stringify(record));
@@ -1586,7 +1780,7 @@ async function saveAttemptOnce(kind, id, record){
 }
 
 /* ============ EXAM MODULE — STORAGE HELPERS (separate from app-config, never touches Tests) ============ */
-async function loadExamConfig(){
+async function _loadExamConfigRaw(){
   const r = await storageGetStrict('exam-config');
   const raw = r.value;
   if(!r.ok) return { exams: [], _loadFailed:true };
@@ -1601,7 +1795,12 @@ async function loadExamConfig(){
 }
 async function saveExamConfig(cfg){
   if(cfg._loadFailed){ showToast("Imtihon ma'lumotlari yuklanmagani uchun saqlash to'xtatildi. Sahifani yangilang.", true); return false; }
-  const ok = await storageSet('exam-config', JSON.stringify(cfg));
+  let out = cfg;
+  if(cfg.secure){
+    if(!(await secSyncExams(cfg))){ showToast("Imtihon kalitlarini saqlab bo'lmadi. Supabase hisobi bilan kirganingizni tekshiring.", true); return false; }
+    out = Object.assign({}, cfg, { exams: secStripExams(cfg.exams) });
+  }
+  const ok = await storageSet('exam-config', JSON.stringify(out));
   if(!ok) showToast("Xatolik: imtihon ma'lumotini saqlashda muammo yuz berdi.", true);
   return ok;
 }
@@ -7366,7 +7565,9 @@ function buildMistakePool(testRows){
       if(!q) return; // savol keyin tahrirlangan/o'chirilgan
       const key = row.test.id+'|'+q.text;
       if(seen.has(key)) return; seen.add(key);
-      pool.push({ text:q.text, options:q.options.slice(), correct:q.correct, topic:row.test.topic });
+      const cor = secIsNum(q.correct) ? q.correct : q.options.indexOf(d.correctText);
+      if(!secIsNum(cor)) return;
+      pool.push({ text:q.text, options:q.options.slice(), correct:cor, topic:row.test.topic });
     });
   });
   return pool;
@@ -7555,6 +7756,19 @@ async function submitExamForGrading(){
   const openSec = ex.sections.find(s=>s.type==='open');
   const mcqSec = ex.sections.find(s=>s.type==='mcq');
   const practicalSec = ex.sections.find(s=>s.type==='practical');
+  if(secureExams()){                                       // ball serverda hisoblanadi
+    const sv = await srvExamSave(ex, openSec, mcqSec, practicalSec, vio);
+    const okS = sv.status === 'ok' || sv.status === 'exists';
+    if(okS){ draftClear('exam', ex.id); state._draftCtx = null; }
+    document.getElementById('examResultBody').innerHTML = okS ? `
+      <div class="lead" style="text-align:center;">Imtihon topshirildi ✓</div>
+      <p class="desc" style="text-align:center;">Javoblaringiz qabul qilindi va baholandi. Natijalar administrator tomonidan ko'rsatilganda ko'rishingiz mumkin bo'ladi.</p>
+      <div style="text-align:center;margin-top:20px;"><button class="btn-primary" onclick="renderTestList()">Testlar ro'yxatiga qaytish</button></div>` : `
+      <div class="lead" style="text-align:center;color:var(--red);">Javoblar yuborilmadi</div>
+      <p class="desc" style="text-align:center;">${escapeHtml(sv.text)}</p>
+      <div style="text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"><button class="btn-primary" onclick="submitExamForGrading()">Qayta yuborish</button></div>`;
+    return;
+  }
 
   let mcqScore = 0;
   const mcqAnswers = state.examAnswers[mcqSec.id] || {};
@@ -7906,7 +8120,8 @@ function lockAnswer(oIdx){
   const elapsedMs = Date.now() - state.qStartTime;
   const timeLimitMs = state.qTimeLimit*1000;
   const cappedElapsed = Math.min(elapsedMs, timeLimitMs);
-  const isCorrect = oIdx !== null && oIdx === q.correct;
+  const secure = secureTests();                          // serverda baholash: to'g'ri javob talabada yo'q, natija oxirida ko'rsatiladi
+  const isCorrect = !secure && oIdx !== null && oIdx === q.correct;
   const answered = oIdx !== null;
   // Kahoot-style speed scoring: 1000 pts for an instant correct answer, decaying to 500 pts
   // at the very last moment; wrong or unanswered scores 0. This is what drives the ranking.
@@ -7915,7 +8130,7 @@ function lockAnswer(oIdx){
     const remainingFrac = Math.max(0, 1 - (cappedElapsed/timeLimitMs));
     points = Math.round(500 + 500*remainingFrac);
   }
-  if(isCorrect) playCorrectSound(); else playWrongSound();
+  if(!secure){ if(isCorrect) playCorrectSound(); else playWrongSound(); }
   state.answers.push({
     qIndex: idx, selected: oIdx, isCorrect, answered, timeTakenMs: cappedElapsed, points,
     questionText: q.text, correctText: q.options[q.correct]
@@ -7925,6 +8140,7 @@ function lockAnswer(oIdx){
   q.options.forEach((_,oi)=>{
     const el = document.getElementById(`opt-${oi}`);
     if(!el) return;
+    if(secure){ if(oi===oIdx) el.classList.add('selected'); return; }
     if(oi===q.correct) el.classList.add('correct');
     else if(oi===oIdx) el.classList.add('wrong');
   });
@@ -7936,7 +8152,7 @@ function lockAnswer(oIdx){
     } else {
       finishTest();
     }
-  }, 900);
+  }, secure ? 350 : 900);
 }
 async function exitTest(){
   if(!(await customConfirm("Testni yakunlamasdan chiqmoqchimisiz? Hozirgi savol javobsiz hisoblanadi. Javoblaringiz shu qurilmada saqlanadi, keyin qolgan savollardan davom ettira olasiz."))) return;
@@ -7948,6 +8164,7 @@ async function exitTest(){
 function backToList(){ clearInterval(state.qTimer); draftSave(); state._draftCtx = null; proctorFinish(); renderTestList(); }
 async function finishTest(){
   const test = state.config.tests.find(t=>t.id===state.currentTestId);
+  if(secureTests()){ await finishTestServer(test); return; }
   const total = state.shuffledQuestions.length;
   const correctCount = state.answers.filter(a=>a.isCorrect).length;
   const totalScore = state.answers.reduce((a,b)=>a+b.points,0);
@@ -8416,13 +8633,15 @@ function handleLiveAnswerTap(oIdx){
   state.liveAnswered = true;
   const timeLimitMs = (q.timeSeconds||30)*1000;
   const elapsed = Math.min(Math.max(0, Date.now() - (live.questionStartedAt||Date.now())), timeLimitMs);
-  const isCorrect = oIdx === q.correct;
+  const secure = secureTests();                        // serverda baholash: to'g'ri javobni host ochganda bilinadi
+  const isCorrect = !secure && oIdx === q.correct;
   let points = 0;
   if(isCorrect){
     const remainingFrac = Math.max(0, 1 - (elapsed/timeLimitMs));
     points = Math.round(500 + 500*remainingFrac);
   }
-  const rec = { qIndex: live.qIndex, selected: oIdx, isCorrect, answered:true, timeTakenMs: elapsed, points };
+  const rec = secure ? { qIndex: live.qIndex, selected: oIdx, answered:true, timeTakenMs: elapsed }
+                     : { qIndex: live.qIndex, selected: oIdx, isCorrect, answered:true, timeTakenMs: elapsed, points };
   state.liveMyAnswers[live.qIndex] = rec;
   // 1) Ekran DARHOL o'zgaradi (serverni kutmaymiz)
   const letters = ['A','B','C','D'];
@@ -8435,6 +8654,16 @@ function handleLiveAnswerTap(oIdx){
     </div>`;
   // 2) Serverga orqada yuboriladi
   sendLiveAnswer(live.sessionId, live.qIndex, rec);
+}
+/* Jonli seans: yoqilgan rejimda javob yozuvida faqat tanlov va vaqt bor; to'g'ri/xato va ball shu yerda hisoblanadi
+   (hostda kalit bor; talabada esa host javobni ochganda `live.correct` keladi). Formula serverdagi bilan bir xil. */
+function liveEval(a, q, cor){
+  if(!a) return { isCorrect:false, points:0 };
+  if(!secureTests() || !secIsNum(cor)) return { isCorrect:!!a.isCorrect, points:a.points || 0 };
+  const lim = ((q && q.timeSeconds) || 30) * 1000;
+  const ms = Math.min(Math.max(0, Number(a.timeTakenMs) || 0), lim);
+  const ok = a.answered !== false && a.selected === cor;
+  return { isCorrect:ok, points: ok ? Math.round(500 + 500 * (1 - ms / lim)) : 0 };
 }
 async function sendLiveAnswer(sessionId, qIndex, rec){
   const ok = await saveLiveAnswer(sessionId, qIndex, liveSlug(), rec);
@@ -8456,6 +8685,8 @@ async function renderLiveStudentReveal(live){
   // O'z javobimiz telefonning o'zida bor — serverga murojaat qilmaymiz (faqat sahifa yangilangan bo'lsa so'raymiz)
   let myAnswer = state.liveMyAnswers[live.qIndex];
   if(!myAnswer && !state.liveTimedOut[live.qIndex]) myAnswer = await getLiveAnswer(live.sessionId, live.qIndex, liveSlug());
+  const cor = secIsNum(q.correct) ? q.correct : (secIsNum(live.correct) ? live.correct : null);
+  if(myAnswer && secureTests()) myAnswer = Object.assign({}, myAnswer, liveEval(myAnswer, q, cor));
   const isLast = live.qIndex === test.questions.length-1;
   let html;
   if(myAnswer && myAnswer.isCorrect){
@@ -8463,7 +8694,7 @@ async function renderLiveStudentReveal(live){
     html = `<div class="live-s-waiting"><div class="stamp"><span class="pct">+${myAnswer.points}</span><span class="lbl">Ball</span></div><div class="lead">To'g'ri! ✓</div></div>`;
   } else {
     playWrongSound();
-    html = `<div class="live-s-waiting"><div class="stamp low"><span class="pct">0</span><span class="lbl">Ball</span></div><div class="lead">Afsuski, xato ✗</div><p class="desc">To'g'ri javob: ${escapeHtml(q.options[q.correct])}</p></div>`;
+    html = `<div class="live-s-waiting"><div class="stamp low"><span class="pct">0</span><span class="lbl">Ball</span></div><div class="lead">Afsuski, xato ✗</div>${cor !== null ? `<p class="desc">To'g'ri javob: ${escapeHtml(q.options[cor])}</p>` : ''}</div>`;
   }
   html += `<p class="desc" style="text-align:center;">${isLast? "Yakuniy natijalarni kuting..." : "Keyingi savolni kuting..."}</p>`;
   document.getElementById('liveStudentBody').innerHTML = html;
@@ -8485,6 +8716,17 @@ async function finalizeLiveResultForStudent(live){
     if(state.liveTimedOut && state.liveTimedOut[i]) return null;
     return await getLiveAnswer(live.sessionId, i, slug);
   }));
+  if(secureTests()){
+    const answers = test.questions.map((q,i)=>{
+      const la = liveAnswers[i];
+      const has = !!la && la.answered !== false && Number.isInteger(la.selected) && la.selected >= 0;
+      return { q:i, s: has ? la.selected : null, o: q.options.map((_,k)=>k), ms: Math.max(0, Math.round(Number(la && la.timeTakenMs) || 0)) };
+    });
+    const rec2 = await srvSubmitWithRetry(test.id, answers, {});
+    if(!rec2){ renderLiveStudentEndedFallback(); return; }
+    await showResult(rec2);
+    return;
+  }
   // questionText/correctText are added so live results feed the same error analysis as normal tests.
   const detail = test.questions.map((q,i)=> ({
     ...(liveAnswers[i] || {qIndex:i, selected:null, isCorrect:false, answered:false, timeTakenMs:0, points:0}),
@@ -8587,7 +8829,7 @@ function ensureAdminAuth(){
           if(error){ errEl.textContent = "Email yoki parol noto'g'ri."; return; }
           try{ localStorage.setItem('ft-admin-remember', document.getElementById('sbRemember').checked ? '1' : '0'); }catch(e){}
           try{ localStorage.setItem('ft-recovery-email', email); }catch(e){}
-          closeModal(); showToast("Supabase hisobi bilan kirdingiz ✓"); resolve(true);
+          closeModal(); showToast("Supabase hisobi bilan kirdingiz ✓"); try{ secReattach().catch(()=>{}); }catch(e){} resolve(true);
         }catch(e){ errEl.textContent = "Ulanishda xatolik. Qayta urinib ko'ring."; }
       }},
       {label:'Keyinroq', onClick: ()=>{ closeModal(); resolve(false); }}
@@ -9078,6 +9320,7 @@ function switchExamsSubTab(tab){
   renderAdminExams();
 }
 function openExamEditor(id){
+  if(secNeedKeys()){ secEnsureKeys().then(ok=>{ if(ok) openExamEditor(id); }); return; }
   const existing = id ? state.examConfig.exams.find(e=>e.id===id) : null;
   window._draftExam = existing ? JSON.parse(JSON.stringify(existing)) : newExamDraft();
   if(!window._draftExam.assignTo) window._draftExam.assignTo = {type:'all', groups:[], accounts:[]};
@@ -9203,6 +9446,7 @@ async function saveDraftExam(){
     for(const q of sec.questions){
       if(!q.text.trim()){ await customAlert(`"${sec.title}" bo'limida bo'sh savol bor.`); return; }
       if(sec.type==='mcq' && q.options.some(o=>!o.trim())){ await customAlert("Test bo'limida barcha variantlarni to'ldiring."); return; }
+      if(sec.type==='mcq' && state.examConfig.secure && !secIsNum(q.correct)){ await customAlert("Test bo'limida har bir savol uchun to'g'ri javobni belgilang."); return; }
       if(sec.type==='practical' && (!/^\d{4}$/.test(q.correctDt) || !/^\d{4}$/.test(q.correctKt))){ await customAlert("Amaliy bo'limda Dt va Kt 4 xonali raqam bo'lishi kerak."); return; }
     }
   }
@@ -9241,7 +9485,7 @@ async function deleteExam(id){
   const backup = state.examConfig.exams;
   state.examConfig.exams = state.examConfig.exams.filter(e=>e.id!==id);
   const ok = await saveExamConfig(state.examConfig);
-  if(ok) showToast("Imtihon o'chirildi ✓");
+  if(ok){ showToast("Imtihon o'chirildi ✓"); if(state.examConfig.secure){ storageDelete(SEC.E + id); if(SEC.rows) delete SEC.rows[SEC.E + id]; } }
   else state.examConfig.exams = backup;
   renderAdminExams();
 }
@@ -9445,11 +9689,12 @@ async function deleteTest(id){
   const backup = state.config.tests;
   state.config.tests = state.config.tests.filter(t=>t.id!==id);
   const ok = await saveConfig(state.config);
-  if(ok) showToast("Test o'chirildi ✓");
+  if(ok){ showToast("Test o'chirildi ✓"); if(state.config.secure){ storageDelete(SEC.T + id); if(SEC.rows) delete SEC.rows[SEC.T + id]; } }
   else state.config.tests = backup;
   renderAdminTests();
 }
 function openTestEditor(id){
+  if(secNeedKeys()){ secEnsureKeys().then(ok=>{ if(ok) openTestEditor(id); }); return; }
   state.editingTestId = id;
   state.testsSubTab = 'create';
   const existing = id ? state.config.tests.find(t=>t.id===id) : null;
@@ -9633,6 +9878,7 @@ async function saveDraftTest(){
       return;
     }
   }
+  if(state.config.secure && d.questions.some(q=> !secIsNum(q.correct))){ await customAlert("Har bir savol uchun to'g'ri javobni belgilang."); return; }
   const saveBtn = document.getElementById('saveTestBtn');
   if(saveBtn){ saveBtn.disabled = true; saveBtn.textContent = 'Saqlanmoqda...'; }
   const backup = state.config.tests.slice();
@@ -9657,6 +9903,7 @@ function cancelDraftTest(){
 
 /* --- Bulk import --- */
 function backupTestsToExcel(){
+  if(secNeedKeys()){ secEnsureKeys().then(ok=>{ if(ok) backupTestsToExcel(); }); return; }
   if(state.config.tests.length===0){ showToast("Zaxiralash uchun test yo'q.", true); return; }
   const rows = [["Mavzu","Sarlavha","Savol","Variant1","Variant2","Variant3","Variant4","ToGriJavob(1-4 yoki A-D)","Vaqt(soniya)"]];
   state.config.tests.forEach(t=>{
@@ -9979,6 +10226,10 @@ const LIVE_HOST_POLL_MS = 1200;
 async function startLiveSession(testId){
   const test = state.config.tests.find(t=>t.id===testId);
   if(!test || test.questions.length===0){ showToast("Testda savol yo'q.", true); return; }
+  if(secureTests()){
+    if(!(await secEnsureKeys())) return;
+    if(!testKeysComplete(test)){ showToast("Bu test uchun javob kalitlari topilmadi.", true); return; }
+  }
   const channelRaw = await customPromptText("Kanal nomi (masalan guruh nomi) — bir nechta guruh bir vaqtda alohida seans o'tkazishi uchun:", test.topic);
   if(channelRaw===null) return; // cancelled
   const channel = slugify(channelRaw || 'asosiy');
@@ -10133,7 +10384,7 @@ async function hostAdvanceQuestion(qIndex){
   if(!live) return;
   state.hostAutoRevealedQIndex = null; state.hostRenderedKey = null; state.hostRevealing = false;
   // Saqlash orqada ketadi, hisoblagich esa shu zahoti boshlanadi (telefonlar bilan bir vaqtda)
-  saveLiveSession(state.hostChannel, {...live, status:'countdown', qIndex, countdownStartedAt: Date.now()}).then(ok=>{ if(!ok) showToast("Seans holatini saqlashda xatolik — internetni tekshiring.", true); });
+  saveLiveSession(state.hostChannel, {...live, status:'countdown', qIndex, countdownStartedAt: Date.now(), correct: undefined}).then(ok=>{ if(!ok) showToast("Seans holatini saqlashda xatolik — internetni tekshiring.", true); });
   runHostCountdown();
 }
 function runHostCountdown(){
@@ -10169,7 +10420,8 @@ async function hostRevealAnswer(){
   state.hostRevealing = true;
   try{
     state.hostAutoRevealedQIndex = live.qIndex;
-    const saving = saveLiveSession(state.hostChannel, {...live, status:'reveal'});
+    const tq = ((state.config.tests.find(t=>t.id===live.testId) || {}).questions || [])[live.qIndex];
+    const saving = saveLiveSession(state.hostChannel, {...live, status:'reveal', ...(secureTests() && tq && secIsNum(tq.correct) ? { correct: tq.correct } : {})});
     saving.then(ok=>{ if(!ok) showToast("Seans holatini saqlashda xatolik — internetni tekshiring.", true); });
     await showHostReveal(liveHostCurrent() || {...live, status:'reveal'}); // keyingi ekranni darhol chizamiz
   } finally {
@@ -10221,9 +10473,14 @@ async function computeCumulativeLeaderboard(sessionId, testId, uptoQIndex, playe
   // Hamma javoblar BITTA so'rovda olinadi va xotirada jamlanadi
   const answers = allAnswers || await storageGetObjects(`live-answer:${sessionId}:`, {fresh:true});
   const score = {};
+  const lt = (state.config.tests||[]).find(t=>t.id===testId);
   answers.forEach(a=>{
     const parts = String(a._key||'').split(':'); // live-answer:<sessionId>:<qIndex>:<slug>
-    if(Number(parts[2]) <= uptoQIndex){ const slug = parts.slice(3).join(':'); score[slug] = (score[slug]||0) + (a.points||0); }
+    if(Number(parts[2]) <= uptoQIndex){
+      const slug = parts.slice(3).join(':');
+      const lq = lt && lt.questions[Number(parts[2])];
+      score[slug] = (score[slug]||0) + (secureTests() ? liveEval(a, lq, lq && lq.correct).points : (a.points||0));
+    }
   });
   return players.map(p=> ({ name:p.name, score: score[p.slug || slugify(p.name)] || 0 })).sort((a,b)=>b.score-a.score);
 }
@@ -11821,6 +12078,13 @@ async function renderOwnerPanel(){
     <div class="row-item"><span class="row-title">Supabase hisobi (yozish uchun)</span><span class="badge" id="sbSessBadge">...</span><button class="btn-ghost btn-small" id="sbSessBtn" onclick="sbSessionAction()">Kirish</button></div>
     <div class="row-meta" id="sbSessNote" style="margin:-4px 0 10px;"></div>
 
+    <div class="lead" style="font-size:1.1rem;margin:26px 0 10px;">Javob kalitlari va serverda baholash</div>
+    <p class="desc">Yoqilgach, to'g'ri javoblar talabaning telefoniga umuman yuborilmaydi, ball serverda hisoblanadi: talaba natijani soxtalashtira olmaydi. Avval <b>baholash.sql</b> faylini Supabase'da ishga tushiring.</p>
+    <div class="row-item"><span class="row-title">Server funksiyalari (baholash.sql)</span><span class="badge" id="secFnBadge">...</span><button class="btn-ghost btn-small" onclick="secCheckUi(true)">Tekshirish</button></div>
+    <div class="row-item"><span class="row-title">To'g'ri javoblar talabadan yashirilgan</span><span class="badge" id="secKeyBadge">...</span><span id="secKeyBtnBox"></span></div>
+    <div class="row-item"><span class="row-title">Natijani faqat server yozadi (baholash-2-qism.sql)</span><span class="badge" id="secWriteBadge">...</span></div>
+    <div class="row-meta" id="secNote" style="margin:-4px 0 10px;"></div>
+
     ${ownerCenterHtml()}
 
     <div class="lead" style="font-size:1.1rem;margin:26px 0 10px;">Sertifikat sozlamalari</div>
@@ -11850,7 +12114,114 @@ async function renderOwnerPanel(){
   `;
   renderCertAssetsBox();
   avHydrate(el);
-  rlsCheckUi(); sbSessionRefresh();
+  rlsCheckUi(); sbSessionRefresh(); secCheckUi();
+}
+
+/* ---- Serverda baholash: holatni tekshirish va yoqish/qaytarish (Rahbar paneli) ---- */
+async function secRpcProbe(){
+  const r = await srvRpc('ft_submit_test', { p_test:'__probe__ yo`q', p_ident:'probe', p_name:'probe', p_group:'', p_answers:[], p_extra:{} });
+  if(r && r.error === 'no_function') return 'missing';
+  if(r && r.error === 'bad_test') return 'ok';
+  return 'unknown';
+}
+/* Sessiyasiz (talaba kabi) so'rov bilan kalit yozuvlari ko'rinadimi? */
+async function secAnonSees(){
+  try{
+    const ctl = new AbortController(); const tm = setTimeout(()=> ctl.abort(), 8000);
+    const r = await fetch(SUPABASE_URL + '/rest/v1/kv_store?select=key&key=like.secret:%25&limit=1', { headers:{ apikey:SUPABASE_ANON_KEY }, signal:ctl.signal });
+    clearTimeout(tm);
+    if(!r.ok) return 'unknown';
+    const j = await r.json();
+    return Array.isArray(j) && j.length ? 'yes' : 'no';
+  }catch(e){ return 'unknown'; }
+}
+/* Sessiyasiz so'rov bilan natija yozuvini qo'shib ko'ramiz: rad etilsa (2-qism) — yopilgan. Qo'shilsa, sinov yozuvi o'chiriladi. */
+async function secWriteProbe(){
+  const key = 'result:__probe__:probe' + Date.now();
+  try{
+    const ctl = new AbortController(); const tm = setTimeout(()=> ctl.abort(), 8000);
+    const r = await fetch(SUPABASE_URL + '/rest/v1/kv_store', { method:'POST', headers:{ apikey:SUPABASE_ANON_KEY, 'Content-Type':'application/json', Prefer:'return=minimal' }, body:JSON.stringify({ key, value:'probe' }), signal:ctl.signal });
+    clearTimeout(tm);
+    if(r.status >= 200 && r.status < 300){ try{ await storageDelete(key); }catch(e){} return 'open'; }
+    if(r.status === 401 || r.status === 403) return 'closed';
+  }catch(e){}
+  return 'unknown';
+}
+async function secCheckUi(force){
+  const fnB = document.getElementById('secFnBadge'); if(!fnB) return;
+  const keyB = document.getElementById('secKeyBadge'), wrB = document.getElementById('secWriteBadge'), note = document.getElementById('secNote'), box = document.getElementById('secKeyBtnBox');
+  [fnB, keyB, wrB].forEach(b=>{ if(b){ b.className = 'badge'; b.textContent = 'Tekshirilmoqda...'; } });
+  if(note) note.textContent = ''; if(box) box.innerHTML = '';
+  const fn = await secRpcProbe();
+  let ec = state.examConfig; if(!ec || ec._loadFailed){ try{ ec = await loadExamConfig(); if(!ec._loadFailed) state.examConfig = ec; }catch(e){} }
+  const tOn = !!(state.config && state.config.secure), eOn = !!(ec && ec.secure), on = tOn && eOn;
+  const anon = on ? await secAnonSees() : 'no';
+  const wr = await secWriteProbe();
+  const fnB2 = document.getElementById('secFnBadge'); if(!fnB2) return;     // panel yopilgan bo'lishi mumkin
+  const keyB2 = document.getElementById('secKeyBadge'), wrB2 = document.getElementById('secWriteBadge'), note2 = document.getElementById('secNote'), box2 = document.getElementById('secKeyBtnBox');
+  if(fn === 'ok'){ fnB2.className = 'badge badge-open'; fnB2.textContent = 'Tayyor ✓'; }
+  else if(fn === 'missing'){ fnB2.className = 'badge badge-closed'; fnB2.textContent = "O'rnatilmagan"; }
+  else { fnB2.className = 'badge'; fnB2.textContent = 'Aniqlanmadi'; }
+  if(on && anon !== 'yes'){ keyB2.className = 'badge badge-open'; keyB2.textContent = 'Ha ✓'; box2.innerHTML = `<button class="btn-ghost btn-small" onclick="secUnmigrate()">Eski holatga qaytarish</button>`; }
+  else if(on){ keyB2.className = 'badge badge-closed'; keyB2.textContent = 'OCHIQ!'; }
+  else if(tOn || eOn){ keyB2.className = 'badge badge-closed'; keyB2.textContent = 'Yarim'; box2.innerHTML = `<button class="btn-owner btn-small" onclick="secMigrate()">Yakunlash</button>`; }
+  else { keyB2.className = 'badge badge-closed'; keyB2.textContent = "Yo'q"; box2.innerHTML = `<button class="btn-owner btn-small" onclick="secMigrate()">Javoblarni yopish</button>`; }
+  if(wr === 'closed'){ wrB2.className = 'badge badge-open'; wrB2.textContent = 'Ha ✓'; }
+  else if(wr === 'open'){ wrB2.className = 'badge badge-closed'; wrB2.textContent = "Yo'q"; }
+  else { wrB2.className = 'badge'; wrB2.textContent = 'Aniqlanmadi'; }
+  let msg = '';
+  if(fn === 'missing') msg = "baholash.sql ni Supabase → SQL Editor'da ishga tushiring, so'ng «Tekshirish»ni bosing.";
+  else if(on && anon === 'yes') msg = "Diqqat: kalit yozuvlarini talaba ham o'qiy oladi. baholash.sql to'liq ishga tushmagan.";
+  else if(!on) msg = "«Javoblarni yopish»ni bosganingizda, hozirgi to'g'ri javoblar serverga ko'chiriladi va talabalar ko'ra olmaydi.";
+  else if(wr === 'open') msg = "Oxirgi qadam: talaba sifatida sinab ko'rgach, baholash-2-qism.sql ni ishga tushiring. Shundan keyin natijani faqat server yoza oladi.";
+  else if(wr === 'closed') msg = "Hammasi yoqilgan: natijani talaba soxtalashtira olmaydi.";
+  if(note2) note2.textContent = msg;
+}
+async function secMigrate(){
+  if(!(await ensureAdminAuth()) || !(await getAdminSession())){ await customAlert("Avval Supabase admin hisobi (email/parol) bilan kiring."); return; }
+  const fn = await secRpcProbe();
+  if(fn !== 'ok'){ await customAlert(fn === 'missing' ? "Server funksiyalari topilmadi. Avval baholash.sql ni Supabase'da ishga tushiring." : "Server bilan aloqa o'rnatilmadi. Internetni tekshirib, qayta urinib ko'ring."); return; }
+  const cfg = await loadConfig(), ec = await loadExamConfig();
+  if(cfg._loadFailed || ec._loadFailed){ await customAlert("Ma'lumotlar yuklanmadi. Internetni tekshirib, qayta urinib ko'ring."); return; }
+  if(cfg.secure && ec.secure){ await customAlert("Javoblar allaqachon yopilgan."); secCheckUi(true); return; }
+  const badT = (cfg.tests||[]).filter(t=> (t.questions||[]).length && !testKeysComplete(t)).map(t=> t.topic || t.title || t.id);
+  const badE = (ec.exams||[]).filter(e=> !examKeysComplete(e)).map(e=> e.title || e.id);
+  if(badT.length || badE.length){
+    await customAlert("To'g'ri javobi to'liq belgilanmagan:\n" + badT.concat(badE).slice(0,8).join('\n') + "\n\nAvval ularni tahrirlab, to'g'ri javobni belgilab saqlang.");
+    return;
+  }
+  const nT = (cfg.tests||[]).length, nE = (ec.exams||[]).length;
+  if(!(await customConfirm(`Javoblar yopiladi: ${nT} ta test, ${nE} ta imtihon. Shundan keyin talabalar to'g'ri javoblarni ko'ra olmaydi, ball serverda hisoblanadi.\n\nTalabalar hozir test topshirmayotganiga ishonch hosil qiling. Davom etamizmi?`))) return;
+  showToast("Javoblar yopilmoqda...");
+  SEC.rows = null;
+  if(!(await secSyncTests(cfg)) || !(await secSyncExams(ec))){ showToast("Kalitlarni serverga yozib bo'lmadi. Hech narsa o'zgarmadi.", true); return; }
+  const rows = await secLoadRows(true);
+  const miss = (cfg.tests||[]).filter(t=> (t.questions||[]).length && !rows[SEC.T + t.id]).length + (ec.exams||[]).filter(e=> !rows[SEC.E + e.id]).length;
+  if(miss){ await customAlert("Kalitlarning bir qismi serverga yozilmadi. Hech narsa o'zgarmadi — qayta urinib ko'ring."); return; }
+  if(await secAnonSees() === 'yes'){ await customAlert("Kalit yozuvlarini talaba ham o'qiy oladi: baholash.sql to'liq ishga tushmagan. To'xtatildi — config o'zgarmadi."); return; }
+  cfg.secure = true; ec.secure = true;
+  const okE = await saveExamConfig(ec);
+  const okC = await saveConfig(cfg);
+  if(okE) state.examConfig = ec;
+  if(okC) state.config = cfg;
+  if(!okE || !okC){ await customAlert("Saqlash to'liq bajarilmadi. Internetni tekshirib, «Yakunlash» tugmasini bosing."); secCheckUi(true); return; }
+  logActivity('settings', 'Serverda baholash yoqildi');
+  showToast("Javoblar yopildi ✓ Endi talaba sifatida bitta testni sinab ko'ring.");
+  secCheckUi(true);
+}
+async function secUnmigrate(){
+  if(await secWriteProbe() === 'closed'){ await customAlert("Natija yozish hozir faqat server orqali ruxsat etilgan. Avval baholash-orqaga.sql faylidagi A blokini ishga tushiring, keyin bu tugmani bosing."); return; }
+  if(!(await customConfirm("Eski holatga qaytarilsa, to'g'ri javoblar yana hamma uchun ochiq bo'ladi va ball talabaning telefonida hisoblanadi. Davom etamizmi?"))) return;
+  if(!(await secEnsureKeys())) return;
+  const cfg = await loadConfig(), ec = await loadExamConfig();
+  if(cfg._loadFailed || ec._loadFailed || !(cfg.tests||[]).every(testKeysComplete) || !(ec.exams||[]).every(examKeysComplete)){ await customAlert("Kalitlar to'liq o'qilmadi, shuning uchun qaytarilmadi."); return; }
+  cfg.secure = false; ec.secure = false;
+  const okC = await saveConfig(cfg), okE = await saveExamConfig(ec);
+  state.config = cfg; state.examConfig = ec;
+  if(!okC || !okE){ await customAlert("Saqlash to'liq bajarilmadi. Qayta urinib ko'ring."); secCheckUi(true); return; }
+  logActivity('settings', 'Serverda baholash o\'chirildi (eski holat)');
+  showToast("Eski holatga qaytarildi.");
+  secCheckUi(true);
 }
 async function saveCertSettings(){
   const prev = state.config.certificate;
