@@ -23,13 +23,17 @@
 <meta name="apple-mobile-web-app-title" content="FINANCE TEAM">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://rktmefpvtztscoxapsok.supabase.co" crossorigin>
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
   :root{
@@ -4509,7 +4513,7 @@ function gmHwHtml(M){
   const sym = st=> `<span class="gm-cell ${GM_HW[st].cls}" title="${escapeAttr(GM_HW[st].txt)}">${GM_HW[st].sym}</span>`;
   const matrix = `<div class="lead" style="font-size:1.05rem;margin:18px 0 8px;">Vazifalar jadvali</div>
     <div class="tbl-wrap"><table class="gm-tbl"><thead><tr><th>Talaba</th>${M.items.map(h=> `<th title="${escapeAttr(h.title)}">${escapeHtml(h.title.length > 14 ? h.title.slice(0, 13) + '…' : h.title)}${h.deadline ? `<br><span class="row-meta">${escapeHtml(gmFmtDay(h.deadline))}</span>` : ''}</th>`).join('')}</tr></thead><tbody>
-    ${M.students.slice().sort((a,b)=> a.name.localeCompare(b.name)).map(s=> `<tr><td class="gm-nm">${escapeHtml(s.name)}</td>${s.hw.cells.map(c=> `<td style="text-align:center;">${sym(c.st)}</td>`).join('')}</tr>`).join('')}
+    ${M.students.slice().sort((a,b)=> a.name.localeCompare(b.name)).map(s=> `<tr><td class="gm-nm">${gmWho(s)}</td>${s.hw.cells.map(c=> `<td style="text-align:center;">${sym(c.st)}</td>`).join('')}</tr>`).join('')}
     </tbody></table></div>
     <div class="gm-legend">${['ok', 'okl', 'check', 'redo', 'miss', 'wait'].map(k=> `<span>${sym(k)} ${GM_HW[k].txt}</span>`).join('')}</div>`;
   const debt = M.students.filter(s=> s.hw.c.miss || s.hw.c.redo).length;
@@ -9824,7 +9828,7 @@ function assignToOptionsHtml(assignTo, kind){
     <div id="${kind}AssignAccountsBox" class="${type==='accounts'?'':'hidden'}" style="margin:0 0 14px;max-width:420px;max-height:200px;overflow-y:auto;">
       ${accounts.length===0 ? `<p class="desc">Hali talaba login yo'q.</p>` : accounts.map(a=>`
         <label style="display:flex;align-items:center;gap:8px;font-weight:400;margin-bottom:4px;">
-          <input type="checkbox" ${selAccounts.includes(a.id)?'checked':''} onchange="toggleAssignItem('${kind}','accounts','${a.id}',this.checked)"> ${escapeHtml(a.fullName)} (${escapeHtml(a.login)})
+          <input type="checkbox" ${selAccounts.includes(a.id)?'checked':''} onchange="toggleAssignItem('${kind}','accounts','${a.id}',this.checked)"> ${avWho(a.fullName, 22)} <span class="row-meta">(${escapeHtml(a.login)})</span>
         </label>`).join('')}
     </div>`;
 }
@@ -10689,6 +10693,7 @@ let _chartInstance = null;
 let _groupChartInstance = null;
 let _progressChartInstance = null;
 let _analyticsResultsCache = null;
+let _analyticsExamCache = null;
 function computeQuestionErrorStats(results){
   const map = {};
   results.forEach(r=>{
@@ -10711,15 +10716,21 @@ function anColors(){
   const cs = getComputedStyle(document.documentElement), g = n=>cs.getPropertyValue(n).trim();
   return { teal:g('--teal')||'#2FC7AE', red:g('--red')||'#E5584B', ink:g('--ink')||'#EAF3F0', soft:g('--ink-soft')||'#93B8B0', edge:g('--edge')||'rgba(255,255,255,0.1)', amber:'#E0A82E', blue:'#4C8DF6' };
 }
-function anDestroy(){ Object.keys(_anCharts).forEach(k=>{ try{ _anCharts[k].destroy(); }catch(e){} delete _anCharts[k]; }); }
+function anDestroy(){ _anWait.cfgs = {}; Object.keys(_anCharts).forEach(k=>{ try{ _anCharts[k].destroy(); }catch(e){} delete _anCharts[k]; }); }
+const _anWait = { cfgs:{}, timer:0 };
 function anMake(id, cfg){
-  const el = document.getElementById(id); if(!el || typeof Chart==='undefined') return;
+  if(typeof Chart==='undefined'){
+    _anWait.cfgs[id] = cfg;
+    if(!_anWait.timer){ let n = 0; _anWait.timer = setInterval(()=>{ if(typeof Chart !== 'undefined' || ++n > 60){ clearInterval(_anWait.timer); _anWait.timer = 0; const w = _anWait.cfgs; _anWait.cfgs = {}; if(typeof Chart !== 'undefined') Object.keys(w).forEach(k=> anMake(k, w[k])); } }, 250); }
+    return;
+  }
+  const el = document.getElementById(id); if(!el) return;
   if(_anCharts[id]) _anCharts[id].destroy();
   _anCharts[id] = new Chart(el.getContext('2d'), cfg);
 }
 function anSet(key, val){ state.an[key] = (state.an[key]===val ? '' : val); state.an.bin = null; drawAnalytics(); }
 function anPeriod(days){ state.an.days = days; state.an.bin = null; drawAnalytics(); }
-function anReset(){ state.an = {group:'', topic:'', days:0, bin:null, student:''}; drawAnalytics(); }
+function anReset(){ state.an = {group:'', topic:'', exam:'', days:0, bin:null, student:'', mode:(state.an && state.an.mode) || 'test'}; drawAnalytics(); }
 function weekStart(ts){ const d = new Date(ts); d.setHours(0,0,0,0); const day = (d.getDay()+6)%7; d.setDate(d.getDate()-day); return d.getTime(); }
 function avgOf(arr){ return arr.length ? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : 0; }
 function sparkSvg(vals, color){
@@ -10822,11 +10833,14 @@ function anInactiveExcel(){
 async function renderAdminAnalytics(){
   const el = document.getElementById('adminTab-analytics');
   el.innerHTML = `<div class="loading">Tahlil tayyorlanmoqda...</div>`;
-  const [results, roster] = await Promise.all([fetchAllResults(), fetchRoster()]);
+  const [results, roster, examRes, ec] = await Promise.all([fetchAllResults(), fetchRoster(), fetchAllExamResultsEvery(), loadExamConfig()]);
   _analyticsResultsCache = results;
+  _analyticsExamCache = examRes;
+  state._anExamTitles = {}; (ec.exams||[]).forEach(e=>{ state._anExamTitles[e.id] = e.title; });
   state._anRoster = roster;
-  if(!state.an) state.an = {group:'', topic:'', days:0, bin:null, student:''};
-  const groupNames = collectAllGroupNames(roster, results);
+  if(!state.an) state.an = {group:'', topic:'', exam:'', days:0, bin:null, student:'', mode:'test'};
+  if(!state.an.mode) state.an.mode = 'test';
+  const groupNames = collectAllGroupNames(roster, results.concat(examRes));
   state._anGroupNames = groupNames;
   el.innerHTML = `<div id="anDash"></div>
     <div id="anInactive" style="margin-top:22px;"></div>
@@ -10855,6 +10869,7 @@ function anFiltered(extra){
 }
 function drawAnalytics(){
   const dash = document.getElementById('anDash'); if(!dash) return;
+  if(state.an && state.an.mode === 'exam'){ drawExamAnalytics(); return; }
   anDestroy();
   const f = state.an, C = anColors();
   const all = _analyticsResultsCache || [];
@@ -10863,6 +10878,7 @@ function drawAnalytics(){
   const chip = (label, active, fn)=> `<button class="tab ${active?'active':''}" onclick="${fn}">${label}</button>`;
   let html = `<div class="lead" style="margin-bottom:4px;">Tahlil paneli</div>
     <p class="desc">Grafik, ustun yoki qatorni bossangiz, tahlil shu bo'yicha filtrlanadi. Qayta bossangiz filtr olib tashlanadi.</p>
+    ${anModeTabs()}
     <div class="tabs" style="margin-bottom:10px;">${chip('Hammasi',!f.days,'anPeriod(0)')}${chip('7 kun',f.days===7,'anPeriod(7)')}${chip('30 kun',f.days===30,'anPeriod(30)')}${chip('90 kun',f.days===90,'anPeriod(90)')}</div>
     <div class="flexrow" style="flex-wrap:wrap;margin-bottom:16px;">
       <select onchange="state.an.group=this.value;state.an.bin=null;drawAnalytics()" style="flex:1 1 180px;"><option value="">Barcha guruhlar</option>${state._anGroupNames.map(g=>`<option value="${escapeAttr(g)}" ${f.group===g?'selected':''}>${escapeHtml(g)}</option>`).join('')}</select>
@@ -10954,6 +10970,104 @@ function drawAnalytics(){
       <div class="tbl-wrap"><table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Mavzu</th><th>Natija</th><th>Sana</th></tr></thead><tbody>${rows.slice(0,50).map(r=>`<tr><td>${avWho(r.studentName, 26)}</td><td>${escapeHtml(r.studentGroup||'—')}</td><td>${escapeHtml(r.topic)}</td><td class="pct-cell ${r.percentage<60?'pct-low':'pct-ok'}">${r.percentage}%</td><td>${new Date(r.timestamp).toLocaleDateString('uz-UZ')}</td></tr>`).join('')}</tbody></table></div></div>`;
   }
   if(state.an.student) anShowStudent(state.an.student);
+}
+/* ---- Imtihon tahlili (guruh / imtihon / davr bo'yicha filtr) ---- */
+function anModeTabs(){
+  const m = (state.an && state.an.mode) || 'test';
+  return `<div class="tabs" style="margin-bottom:12px;"><button class="tab ${m==='test'?'active':''}" onclick="anModeSet('test')">Testlar</button><button class="tab ${m==='exam'?'active':''}" onclick="anModeSet('exam')">Imtihonlar</button></div>`;
+}
+function anModeSet(m){ state.an.mode = m; state.an.bin = null; state.an.student = ''; drawAnalytics(); }
+function anExamFiltered(){
+  const f = state.an, now = Date.now();
+  let list = _analyticsExamCache || [];
+  if(f.group) list = list.filter(r=>(r.studentGroup||"Ko'rsatilmagan")===f.group);
+  if(f.exam) list = list.filter(r=>r.examId===f.exam);
+  if(f.days) list = list.filter(r=> now-new Date(r.timestamp).getTime() <= f.days*86400000);
+  return list;
+}
+function examAutoPct(r){ const m = (r.mcqMax||0) + (r.practicalMax||0); return m > 0 ? Math.round(100 * ((r.mcqScore||0) + (r.practicalScore||0)) / m) : null; }
+function examFinalPct(r){ return (r.openGraded && typeof r.overallPercentage === 'number') ? r.overallPercentage : null; }
+function anSecPct(rows, sc, mx){ const m = rows.reduce((a,r)=> a + (r[mx]||0), 0); return m > 0 ? Math.round(100 * rows.reduce((a,r)=> a + (r[sc]||0), 0) / m) : null; }
+function drawExamAnalytics(){
+  const dash = document.getElementById('anDash'); if(!dash) return;
+  anDestroy();
+  const f = state.an, C = anColors();
+  const all = _analyticsExamCache || [];
+  const list = anExamFiltered();
+  const titles = state._anExamTitles || {};
+  const exTitle = r => titles[r.examId] || r.examTitle || r.examId;
+  const examIds = [...new Set(all.map(r=>r.examId))].sort((a,b)=> String(titles[a]||a).localeCompare(String(titles[b]||b)));
+  const chip = (label, active, fn)=> `<button class="tab ${active?'active':''}" onclick="${fn}">${label}</button>`;
+  let html = `<div class="lead" style="margin-bottom:4px;">Tahlil paneli</div>
+    <p class="desc">Imtihon natijalarini guruh, imtihon va davr bo'yicha ko'ring. Guruh ustunini bossangiz, tahlil shu guruhga filtrlanadi. Qayta bossangiz filtr olib tashlanadi.</p>
+    ${anModeTabs()}
+    <div class="tabs" style="margin-bottom:10px;">${chip('Hammasi',!f.days,'anPeriod(0)')}${chip('7 kun',f.days===7,'anPeriod(7)')}${chip('30 kun',f.days===30,'anPeriod(30)')}${chip('90 kun',f.days===90,'anPeriod(90)')}</div>
+    <div class="flexrow" style="flex-wrap:wrap;margin-bottom:16px;">
+      <select id="anExGroup" onchange="state.an.group=this.value;drawAnalytics()" style="flex:1 1 180px;"><option value="">Barcha guruhlar</option>${(state._anGroupNames||[]).map(g=>`<option value="${escapeAttr(g)}" ${f.group===g?'selected':''}>${escapeHtml(g)}</option>`).join('')}</select>
+      <select id="anExExam" onchange="state.an.exam=this.value;drawAnalytics()" style="flex:1 1 180px;"><option value="">Barcha imtihonlar</option>${examIds.map(id=>`<option value="${escapeAttr(id)}" ${f.exam===id?'selected':''}>${escapeHtml(titles[id]||id)}</option>`).join('')}</select>
+      <button class="btn-ghost btn-small" onclick="anReset()">Filtrlarni tozalash</button>
+    </div>`;
+  if(all.length === 0){ dash.innerHTML = html + `<div class="empty">Hali imtihon topshirilmagan — talabalar imtihon topshirgach, bu yerda tahlil paydo bo'ladi.</div>`; return; }
+  if(list.length === 0){ dash.innerHTML = html + `<div class="empty">Tanlangan filtr bo'yicha imtihon natijasi yo'q. Filtrlarni tozalab ko'ring.</div>`; return; }
+  // ---- KPI ----
+  const graded = list.filter(r=> examFinalPct(r) !== null);
+  const finals = graded.map(examFinalPct);
+  const autos = list.map(examAutoPct).filter(v=> v !== null);
+  const pending = list.filter(r=> (r.openMax||0) > 0 && !r.openGraded).length;
+  const students = new Set(list.map(r=> studentIdentity(r.studentName))).size;
+  const kpi = (label, val, sub)=> `<div class="home-stat-box"><div class="lbl" style="margin:0 0 4px;">${label}</div><div class="num">${val}</div><div class="row-meta">${sub||''}</div></div>`;
+  html += `<div class="home-stat-grid" style="margin-bottom:20px;">
+    ${kpi('Topshirganlar', list.length, `${students} ta talaba`)}
+    ${kpi('Baholanganlar', `${graded.length} / ${list.length}`, pending ? `${pending} ta ochiq javob baholanishini kutmoqda` : 'Hammasi baholangan')}
+    ${kpi("O'rtacha yakuniy natija", finals.length ? avgOf(finals)+'%' : '—', 'Ochiq savollar baholangach')}
+    ${kpi("O'tish darajasi", finals.length ? Math.round(100*finals.filter(p=>p>=60).length/finals.length)+'%' : '—', '60% va undan yuqori (baholanganlar)')}
+    ${kpi("Test + amaliy o'rtachasi", autos.length ? avgOf(autos)+'%' : '—', "Avtomatik tekshirilgan qism (hamma topshirgan)")}
+  </div>`;
+  const box = (title, inner, hint)=> `<div style="border:1px solid var(--edge);border-radius:14px;padding:16px;background:var(--card);min-width:0;"><div style="font-weight:700;margin-bottom:${hint?2:10}px;">${title}</div>${hint?`<div class="row-meta" style="margin-bottom:10px;">${hint}</div>`:''}${inner}</div>`;
+  html += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:14px;">
+    ${box("Guruhlar solishtirmasi", `<canvas id="anExGroups"></canvas>`, "Guruhni bossangiz, tahlil shu guruhga filtrlanadi")}
+    ${box("Imtihonlar solishtirmasi", `<canvas id="anExExams"></canvas>`, "Har bir imtihon bo'yicha o'rtacha natija")}
+    ${box("Bo'limlar bo'yicha o'rtacha", `<canvas id="anExSecs" style="max-height:260px;"></canvas>`, "Qaysi bo'lim qiyin: test, amaliy yoki ochiq savollar")}
+    ${box("Yakuniy natijalar taqsimoti", `<canvas id="anExDist" style="max-height:260px;"></canvas>`, "Faqat baholanganlar")}
+  </div>`;
+  // ---- jadval ----
+  const fmt = (sc, mx)=> (mx||0) > 0 ? `${sc||0}/${mx}` : '—';
+  const rows = [...list].sort((a,b)=> (examFinalPct(b) ?? -1) - (examFinalPct(a) ?? -1) || (examAutoPct(b) ?? -1) - (examAutoPct(a) ?? -1));
+  html += `<div style="border:1px solid var(--edge);border-radius:14px;padding:16px;margin-bottom:14px;"><div style="font-weight:700;margin-bottom:8px;">Natijalar (${rows.length} ta${rows.length>100?', birinchi 100 tasi':''})</div>
+    <div class="tbl-wrap"><table><thead><tr><th>O'quvchi</th><th>Guruh</th><th>Imtihon</th><th>Test</th><th>Amaliy</th><th>Ochiq</th><th>Yakuniy</th><th>Sana</th></tr></thead><tbody>${rows.slice(0,100).map(r=>{
+      const fp = examFinalPct(r);
+      return `<tr><td>${avWho(r.studentName, 26)}</td><td>${escapeHtml(r.studentGroup||'—')}</td><td>${escapeHtml(exTitle(r))}</td><td>${fmt(r.mcqScore, r.mcqMax)}</td><td>${fmt(r.practicalScore, r.practicalMax)}</td><td>${(r.openMax||0) > 0 ? (r.openGraded ? fmt(r.openScore, r.openMax) : '<span class="badge badge-closed">kutilmoqda</span>') : '—'}</td><td>${fp === null ? '<span class="row-meta">—</span>' : pctBar(fp)}</td><td>${new Date(r.timestamp).toLocaleDateString('uz-UZ')}</td></tr>`;
+    }).join('')}</tbody></table></div></div>`;
+  dash.innerHTML = html;
+  avHydrate(dash);
+  const axis = { ticks:{color:C.soft}, grid:{color:C.edge} };
+  // guruhlar
+  const gmap = {}; list.forEach(r=>{ const g = r.studentGroup||"Ko'rsatilmagan"; (gmap[g] = gmap[g] || []).push(r); });
+  const gRows = Object.entries(gmap).map(([g,a])=>{ const fl = a.map(examFinalPct).filter(v=>v!==null), au = a.map(examAutoPct).filter(v=>v!==null); return { g, n:a.length, fin: fl.length ? avgOf(fl) : null, auto: au.length ? avgOf(au) : null }; }).sort((a,b)=> (b.fin ?? b.auto ?? 0) - (a.fin ?? a.auto ?? 0));
+  const gcv = document.getElementById('anExGroups'); if(gcv) gcv.parentElement.style.minHeight = (70 + gRows.length*44)+'px';
+  anMake('anExGroups', { type:'bar', data:{ labels:gRows.map(r=>r.g), datasets:[
+      { label:'Yakuniy %', data:gRows.map(r=>r.fin), backgroundColor:gRows.map(r=> f.group===r.g ? C.amber : C.teal), borderRadius:5 },
+      { label:'Test + amaliy %', data:gRows.map(r=>r.auto), backgroundColor:C.blue, borderRadius:5 } ] },
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:C.soft}}, tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.x === null ? '—' : c.parsed.x+'%'} (${gRows[c.dataIndex].n} ta topshirgan)`}}},
+      onClick:(e,els)=>{ if(els.length){ const v = gRows[els[0].index].g; setTimeout(()=>{ state.an.group = state.an.group===v ? '' : v; drawAnalytics(); },0); } },
+      scales:{ x:{...axis, min:0, max:100}, y:{ticks:{color:C.soft}, grid:{display:false}} } } });
+  // imtihonlar
+  const emap = {}; list.forEach(r=>{ (emap[r.examId] = emap[r.examId] || []).push(r); });
+  const eRows = Object.entries(emap).map(([id,a])=>{ const fl = a.map(examFinalPct).filter(v=>v!==null), au = a.map(examAutoPct).filter(v=>v!==null); return { t:titles[id]||id, n:a.length, fin: fl.length ? avgOf(fl) : null, auto: au.length ? avgOf(au) : null }; });
+  const ecv = document.getElementById('anExExams'); if(ecv) ecv.parentElement.style.minHeight = (70 + eRows.length*44)+'px';
+  anMake('anExExams', { type:'bar', data:{ labels:eRows.map(r=>r.t), datasets:[
+      { label:'Yakuniy %', data:eRows.map(r=>r.fin), backgroundColor:C.teal, borderRadius:5 },
+      { label:'Test + amaliy %', data:eRows.map(r=>r.auto), backgroundColor:C.blue, borderRadius:5 } ] },
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:C.soft}}, tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.x === null ? '—' : c.parsed.x+'%'} (${eRows[c.dataIndex].n} ta topshirgan)`}}},
+      scales:{ x:{...axis, min:0, max:100}, y:{ticks:{color:C.soft}, grid:{display:false}} } } });
+  // bo'limlar
+  const secVals = [ ['Test (MCQ)', anSecPct(list,'mcqScore','mcqMax')], ['Amaliy', anSecPct(list,'practicalScore','practicalMax')], ['Ochiq savollar', anSecPct(graded,'openScore','openMax')] ];
+  anMake('anExSecs', { type:'bar', data:{ labels:secVals.map(x=>x[0]), datasets:[{ data:secVals.map(x=>x[1]), backgroundColor:secVals.map(x=> x[1] !== null && x[1] < 60 ? C.red : C.teal), borderRadius:6 }] },
+    options:{ responsive:true, plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>` ${c.parsed.y === null ? "ma'lumot yo'q" : c.parsed.y+'%'}`}}}, scales:{ y:{...axis, min:0, max:100}, x:{ticks:{color:C.soft}, grid:{display:false}} } } });
+  // taqsimot
+  const bins = [0,0,0,0,0]; finals.forEach(p=>{ bins[Math.min(4, Math.floor(p/20))]++; });
+  anMake('anExDist', { type:'bar', data:{ labels:['0–19%','20–39%','40–59%','60–79%','80–100%'], datasets:[{ data:bins, backgroundColor:bins.map((_,i)=> i<3 ? C.red : C.teal), borderRadius:6 }] },
+    options:{ responsive:true, plugins:{legend:{display:false}}, scales:{ y:{...axis, beginAtZero:true, ticks:{color:C.soft, precision:0}}, x:{ticks:{color:C.soft}, grid:{display:false}} } } });
 }
 function anPickStudent(name){ state.an.student = state.an.student===name ? '' : name; if(state.an.student) anShowStudent(name); else { const e=document.getElementById('anStudent'); if(e) e.innerHTML=''; if(_anCharts.anStu){ _anCharts.anStu.destroy(); delete _anCharts.anStu; } } }
 function anShowStudent(name){
@@ -11140,7 +11254,7 @@ async function renderAdminBlock(){
         blocked.map(slug=>{
           const r = rosterMap[slug];
           const label = r ? `${r.name}${r.group?` (${r.group})`:''}` : slug;
-          return `<div class="row-item"><span class="row-title">${escapeHtml(label)}</span><button class="btn-ghost btn-small" onclick="removeBlock('${slug}')">Blokdan chiqarish</button></div>`;
+          return `<div class="row-item"><span class="row-title">${r ? avWho(r.name, 28, label, slug) : escapeHtml(label)}</span><button class="btn-ghost btn-small" onclick="removeBlock('${slug}')">Blokdan chiqarish</button></div>`;
         }).join('')}
     </div>
   `;
