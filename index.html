@@ -628,7 +628,7 @@
         <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         <span>Google bilan kirish</span>
       </button>
-      <div class="join-or"><span>yoki kod / login bilan</span></div>
+      <div class="join-or"><span id="joinOrText">yoki kod / login bilan</span></div>
     </div>
     <div class="tabs" id="joinModeTabs" style="margin-bottom:16px;">
       <button class="tab active" id="joinModeTab-code" onclick="switchJoinMode('code')">Kirish kodi bilan</button>
@@ -1573,11 +1573,22 @@ async function storageGetMany(keys, batchSize){
   }
   return out;
 }
+/* Demo hisob (reklama/ko'rsatish uchun): natijalari reyting, tahlil va ro'yxatlarni buzmaydi. O'zining ekranida o'zi ko'radi. */
+function demoIdents(){
+  const set = new Set();
+  try{ ((state.config && state.config.studentAccounts) || []).forEach(a=>{ if(a && a.demo === true) set.add(studentIdentity(a.fullName)); }); }catch(e){}
+  return set;
+}
+function hideDemo(list, identOf){
+  const d = demoIdents(); if(!d.size) return list;
+  const me = state.studentName ? studentIdentity(state.studentName) : null;
+  return list.filter(r=>{ const id = identOf(r); return !d.has(id) || id === me; });
+}
 async function fetchAllResults(){
-  return dedupeAttempts(await storageGetObjects('result:'), 'testId', 'test');
+  return hideDemo(dedupeAttempts(await storageGetObjects('result:'), 'testId', 'test'), r=> studentIdentity(r && r.studentName));
 }
 async function fetchAllExamResultsEvery(){
-  return dedupeAttempts(await storageGetObjects('exam-result:'), 'examId', 'exam');
+  return hideDemo(dedupeAttempts(await storageGetObjects('exam-result:'), 'examId', 'exam'), r=> studentIdentity(r && r.studentName));
 }
 /* Talabaning shu test/imtihon bo'yicha yagona (eng birinchi) natijasi — kirish usulidan (kod/login/havola) qat'i nazar. */
 async function findMyAttempt(kind, id){
@@ -2336,7 +2347,7 @@ async function upsertRosterEntry(slug, name, group, deviceId){
   await storageSet(`roster:${slug}`, JSON.stringify({name, group, slug, deviceId: deviceId||null, ts: Date.now()}));
 }
 async function fetchRoster(){
-  const out = await storageGetObjects('roster:');
+  const out = hideDemo(await storageGetObjects('roster:'), r=> studentIdentity(r && r.name));
   return out.sort((a,b)=> a.name.localeCompare(b.name));
 }
 
@@ -3548,7 +3559,7 @@ async function prRenderBoard(body){
   if(!state.prBoard) state.prBoard = { mode:'week', scope:'group' };
   const B = state.prBoard;
   body.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
-  const rows = await storageGetObjects('pboard:');
+  const rows = hideDemo(await storageGetObjects('pboard:'), r=> String((r && r.identity) || ''));
   const wk = weekKey(), myId = myIdentity();
   let all = rows.map(r=>({ id:r.identity||'', name:r.name||'', group:r.group||'', pts: B.mode==='week' ? ((r.week && r.week.k===wk) ? (r.week.pts||0) : 0) : (r.pts||0) })).filter(r=>r.id);
   if(!all.some(r=>r.id===myId)) all.push({ id:myId, name:state.studentName, group:state.studentGroup||'', pts:0 });
@@ -6106,6 +6117,7 @@ async function restoreStudentSession(){
     if(credFp(a) !== s.fp) return bad("Login yoki parol o'zgartirilgan. Iltimos, qayta kiring.");
     name = a.fullName; slug = 'acct-' + slugify(a.login); group = a.group || ''; accountId = a.id;
   } else if(s.mode === 'code'){
+    if(cfg.codeLoginOff) return bad("Guruh kodi bilan kirish o'chirilgan. Google yoki shaxsiy login bilan kiring.");
     const codeObj = (cfg.accessCodes || []).find(c=> c.code === s.code);
     if(!codeObj || !codeObj.active) return bad("Kirish kodi o'zgargan yoki faol emas. Iltimos, qayta kiring.");
     name = s.name;
@@ -6165,10 +6177,19 @@ async function goHome(){
     showJoin();
   }
 }
+/* Guruh kodi bilan kirish (ismni o'zi yozadi) admin tomonidan o'chirilishi mumkin: shunda faqat Google va shaxsiy login qoladi */
+function codeLoginOff(){ return !!(state.config && state.config.codeLoginOff); }
+function applyJoinModes(){
+  const off = codeLoginOff();
+  const tabs = document.getElementById('joinModeTabs'); if(tabs) tabs.classList.toggle('hidden', off);
+  const orT = document.getElementById('joinOrText'); if(orT) orT.textContent = off ? 'yoki login bilan' : 'yoki kod / login bilan';
+  if(off) switchJoinMode('account');
+}
 function showJoin(){
   hideAll();
   showScreen('screen-join');
   try{ const gb = document.getElementById('googleJoinBox'); if(gb) gb.classList.toggle('hidden', !(state.config && state.config.googleLogin)); }catch(e){}
+  try{ applyJoinModes(); }catch(e){}
   document.getElementById('masthead-sub').textContent = "Talaba rejimi";
   refreshInstallUi();
 }
@@ -6190,6 +6211,11 @@ async function handleJoin(){
 
   await googleDropStudent();
   state.config = await loadConfig();
+  if(state.config.codeLoginOff){
+    try{ applyJoinModes(); }catch(e){}
+    await customAlert("Guruh kodi bilan kirish o'chirilgan. Google yoki shaxsiy login bilan kiring.");
+    return;
+  }
   const codeObj = (state.config.accessCodes||[]).find(c => c.code===codeEntered);
   if(!codeObj || !codeObj.active){
     logActivity('student_login_failed', `Noto'g'ri kirish kodi: ${first} ${last}`, '—');
@@ -11952,10 +11978,11 @@ async function renderAdminAccounts(){
     accounts.filter(a=> gf==='*' || (a.group||'')===gf).sort((a,b)=>(a.group||'').localeCompare(b.group||'') || a.fullName.localeCompare(b.fullName)).forEach(a=>{
       const known = knownPassword(a);
       html += `<div class="row-item">
-        <span class="row-title">${avWho(a.fullName, 30)} ${a.blocked?'<span class="badge badge-closed" style="margin-left:6px;">Bloklangan</span>':''}
+        <span class="row-title">${avWho(a.fullName, 30)} ${a.blocked?'<span class="badge badge-closed" style="margin-left:6px;">Bloklangan</span>':''}${a.demo?'<span class="badge badge-open" style="margin-left:6px;">Demo</span>':''}
           <br><span class="row-meta">Login: <b>${escapeHtml(a.login)}</b> · Parol: ${known ? `<b>${escapeHtml(known)}</b>` : (a.pwEnc ? "<i>saqlangan — ko'rish uchun rahbar ruxsat berishi kerak</i>" : '<i>shifrlangan (ko\'rib bo\'lmaydi — «Parolni yangilash» bosing)</i>')} · Guruh: ${escapeHtml(a.group||'—')}</span></span>
         ${known ? `<button class="btn-ghost btn-small" onclick="copyAccountCreds('${a.id}')">${icon('link')}Nusxalash</button>` : ''}
         <button class="btn-ghost btn-small" onclick="resetAccountPassword('${a.id}')">Parolni yangilash</button>
+        <button class="btn-${a.demo?'primary':'ghost'} btn-small" onclick="toggleAccountDemo('${a.id}')" title="Demo hisob natijalari reyting va tahlilga qo'shilmaydi">${a.demo?'Demo ✓':'Demo'}</button>
         <button class="btn-${a.blocked?'ghost':'danger'} btn-small" onclick="toggleAccountBlock('${a.id}')">${a.blocked?"Blokdan chiqarish":"Bloklash"}</button>
         <button class="btn-danger btn-small" onclick="deleteAccount('${a.id}')">${icon('trash')}O'chirish</button>
       </div>`;
@@ -11999,6 +12026,22 @@ async function googleToggle(){
   cfg.googleLogin = on;
   if(!(await saveConfig(cfg))){ cfg.googleLogin = !on; return; }
   showToast(on ? "Google bilan kirish yoqildi ✓" : "Google bilan kirish o'chirildi ✓");
+  googleBoxRender();
+}
+async function codeLoginToggle(){
+  const cfg = state.config; if(!cfg) return;
+  const off = !cfg.codeLoginOff;
+  if(off){
+    const n = (cfg.studentAccounts || []).length;
+    const msg = n
+      ? `Guruh kodi bilan kirish o'chiriladi. Talabalar faqat Google yoki shaxsiy login/parol bilan kira oladi (hozir ${n} ta login bor). Gmail'i yo'q har bir talabaning shaxsiy logini borligiga ishonchingiz komilmi?`
+      : "Hali birorta shaxsiy login yaratilmagan. Kodni o'chirsangiz, Gmail'i yo'q talabalar kira olmaydi. Baribir o'chiraymi?";
+    if(!(await customConfirm(msg))) return;
+  }
+  cfg.codeLoginOff = off;
+  if(!(await saveConfig(cfg))){ cfg.codeLoginOff = !off; return; }
+  showToast(off ? "Guruh kodi bilan kirish o'chirildi ✓" : "Guruh kodi bilan kirish yoqildi ✓");
+  logActivity(off ? 'code_login_off' : 'code_login_on', off ? "Guruh kodi bilan kirish o'chirildi" : 'Guruh kodi bilan kirish yoqildi');
   googleBoxRender();
 }
 async function geAdd(){
@@ -12065,9 +12108,14 @@ async function googleBoxRender(){
     <p class="desc" style="margin:0 0 10px;">Talaba Google hisobi bilan kiradi. Emaili quyidagi ro'yxatga kiritilgan talaba nomidan boshqa hech kim test yoki imtihon topshira olmaydi. Emaili kiritilmagan talabalar avvalgidek kod yoki login bilan kiraveradi.</p>
     <div class="flexrow" style="align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
       <span>Server funksiyalari: ${badge(installed, installed ? 'Tayyor ✓' : "O'rnatilmagan")}</span>
-      <span>Kirish tugmasi: ${badge(!!cfg.googleLogin, cfg.googleLogin ? 'Yoqilgan' : "O'chirilgan")}</span>
+      <span>Kirish tugmasi: <span id="gbGoogleState">${badge(!!cfg.googleLogin, cfg.googleLogin ? 'Yoqilgan' : "O'chirilgan")}</span></span>
       <button class="btn-${cfg.googleLogin ? 'ghost' : 'primary'} btn-small" onclick="googleToggle()">${cfg.googleLogin ? "O'chirish" : 'Yoqish'}</button>
-    </div>`;
+    </div>
+    <div class="flexrow" style="align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <span>Guruh kodi bilan kirish: <span id="gbCodeState">${badge(!cfg.codeLoginOff, cfg.codeLoginOff ? "O'chirilgan" : 'Yoqilgan')}</span></span>
+      <button class="btn-${cfg.codeLoginOff ? 'primary' : 'ghost'} btn-small" onclick="codeLoginToggle()">${cfg.codeLoginOff ? 'Yoqish' : "O'chirish"}</button>
+    </div>
+    <p class="desc" style="margin:-4px 0 12px;font-size:0.82rem;">Guruh kodi bilan talaba ismni o'zi yozib kiradi, shuning uchun boshqa talaba nomidan kirish mumkin. O'chirsangiz, faqat Google va shaxsiy login/parol qoladi.</p>`;
   if(!installed){
     box.innerHTML = `<div class="qeditor">${head}<p class="desc" style="margin:0;color:var(--red);">Avval <b>google-kirish.sql</b> ni Supabase → SQL Editor'da ishga tushiring (qo'llanmaga qarang).</p></div>`;
     return;
@@ -12082,9 +12130,9 @@ async function googleBoxRender(){
   const roster = await fetchRoster();
   const have = new Set(list.map(x=> x.ident));
   const seen = new Set(), missing = [];
-  roster.concat((cfg.studentAccounts || []).map(a=> ({ name:a.fullName, group:a.group }))).forEach(x=>{ const id = studentIdentity(x.name); if(!seen.has(id)){ seen.add(id); if(!have.has(id)) missing.push(x.name); } });
+  roster.concat((cfg.studentAccounts || []).filter(a=> !a.demo).map(a=> ({ name:a.fullName, group:a.group }))).forEach(x=>{ const id = studentIdentity(x.name); if(!seen.has(id)){ seen.add(id); if(!have.has(id)) missing.push(x.name); } });
   const groupNames = (cfg.groups || []).map(g=> g.name).concat(collectAllGroupNames(roster, [])).filter((v, i, a)=> v && a.indexOf(v) === i);
-  const nameOpts = roster.map(x=> x.name).concat((cfg.studentAccounts || []).map(a=> a.fullName)).filter((v, i, a)=> v && a.indexOf(v) === i);
+  const nameOpts = roster.map(x=> x.name).concat((cfg.studentAccounts || []).filter(a=> !a.demo).map(a=> a.fullName)).filter((v, i, a)=> v && a.indexOf(v) === i);
   box.innerHTML = `<div class="qeditor">${head}
     <details style="margin-bottom:10px;"><summary style="cursor:pointer;font-weight:600;">Bitta email qo'shish</summary>
       <div class="flexrow" style="margin-top:8px;">
@@ -12160,6 +12208,16 @@ async function addBulkAccounts(){
     statusEl.innerHTML = `<div style="color:var(--red);">Saqlashda xatolik yuz berdi.</div>`;
     return;
   }
+  renderAdminAccounts();
+}
+async function toggleAccountDemo(id){
+  const a = state.config.studentAccounts.find(x=>x.id===id);
+  if(!a) return;
+  const backup = a.demo;
+  a.demo = !a.demo;
+  const ok = await saveConfig(state.config);
+  if(ok){ showToast(a.demo ? "Demo hisob qilindi ✓ (natijalari reyting va tahlilga qo'shilmaydi)" : "Oddiy hisobga qaytarildi ✓"); logActivity('account_demo', `${a.demo?'Demo qilindi':'Demo olib tashlandi'}: ${a.fullName} (${a.login})`); }
+  else a.demo = backup;
   renderAdminAccounts();
 }
 async function toggleAccountBlock(id){
