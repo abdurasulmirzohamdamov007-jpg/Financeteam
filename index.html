@@ -6385,7 +6385,10 @@ async function googleBoot(){
   try{ localStorage.removeItem('ft-google-pending'); }catch(e){}
   const sess = await rawSession();
   if(ret){ try{ history.replaceState(history.state, '', location.pathname + location.search); }catch(e){} }   // token manzil qatorida qolmasin
-  if(ret && ret.error) return { ok:false, msg:"Google bilan kirish amalga oshmadi (bekor qilingan bo'lishi mumkin). Qayta urinib ko'ring yoki kod/login bilan kiring." };
+  if(ret && ret.error){
+    const why = String(ret.error || '').replace(/\s+/g, ' ').trim().slice(0, 200);       // Supabase/Google bergan sabab (tashxis uchun)
+    return { ok:false, msg:"Google bilan kirish amalga oshmadi (bekor qilingan bo'lishi mumkin). Qayta urinib ko'ring yoki kod/login bilan kiring." + (why && why !== 'error' ? " [Sabab: " + why + "]" : '') };
+  }
   if(!sess) return { ok:false, msg: ret ? "Google bilan kirish amalga oshmadi. Qayta urinib ko'ring." : '' };
   if(!(state.config && state.config.googleLogin)) return { ok:false };
   const w = await googleWhoami();
