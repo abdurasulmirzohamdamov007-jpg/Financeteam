@@ -224,6 +224,9 @@
   .tab{padding:10px 18px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid var(--edge);color:var(--ink-soft);font-size:0.85rem;font-weight:600;cursor:pointer;flex:0 0 auto;white-space:nowrap;}
   .tab.active{background:var(--teal);color:#06231E;border-color:var(--teal);}
   .tab.owner-tab.active{background:var(--white-ac);color:#0F2A26;border-color:var(--white-ac);}
+  .btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;border-radius:12px;border:1px solid #dadce0;background:#fff;color:#1f1f1f;font:600 0.98rem/1.2 inherit;font-family:inherit;cursor:pointer;transition:box-shadow .15s,transform .05s;}
+  .btn-google:hover{box-shadow:0 2px 10px rgba(0,0,0,.25);} .btn-google:active{transform:scale(.99);} .btn-google[disabled]{opacity:.6;cursor:wait;}
+  .join-or{display:flex;align-items:center;gap:10px;margin-top:14px;color:var(--ink-soft);font-size:0.8rem;} .join-or::before,.join-or::after{content:"";flex:1;height:1px;background:var(--edge);}
   .tbl-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   table{width:100%;border-collapse:collapse;font-size:0.87rem;display:table;table-layout:auto;white-space:nowrap;}
   th{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:0.7rem;text-transform:uppercase;color:var(--ink-soft);padding:9px 8px;border-bottom:1px solid var(--edge);}
@@ -620,6 +623,13 @@
   <div id="screen-join" class="card tilt">
     <div class="lead">FINANCE TEAM platformasiga xush kelibsiz</div>
     <p class="desc hidden" id="joinLockedNote" style="color:var(--teal);font-weight:600;"></p>
+    <div id="googleJoinBox" class="hidden" style="margin-bottom:16px;">
+      <button type="button" class="btn-google" id="googleJoinBtn" onclick="googleSignIn()">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        <span>Google bilan kirish</span>
+      </button>
+      <div class="join-or"><span>yoki kod / login bilan</span></div>
+    </div>
     <div class="tabs" id="joinModeTabs" style="margin-bottom:16px;">
       <button class="tab active" id="joinModeTab-code" onclick="switchJoinMode('code')">Kirish kodi bilan</button>
       <button class="tab" id="joinModeTab-account" onclick="switchJoinMode('account')">Shaxsiy login bilan</button>
@@ -870,7 +880,17 @@
 <script>
 /* ============ CONFIG (initial defaults — Rahbar can change codes from the Rahbar tab) ============ */
 /* ============ SUPABASE CONNECTION ============ */
-const BOOT_HASH = String(window.location.hash || '');   // emaildagi kirish havolasi tokeni shu yerda keladi (Supabase uni o'chirib yuborishidan oldin olamiz)
+const BOOT_HASH = String(window.location.hash || '');
+/* Google orqali kirish: tugma bosilganda shu yerga belgi qo'yiladi. Google qaytgach manzil #hash ichida token bilan keladi. */
+const GOOGLE_PENDING_INFO = (()=>{ try{ const o = JSON.parse(localStorage.getItem('ft-google-pending') || 'null'); if(o && o.t && Date.now() - o.t < 15 * 60 * 1000) return o; }catch(e){} return null; })();
+const GOOGLE_RETURN = (()=>{
+  try{
+    const p = new URLSearchParams(String(BOOT_HASH || '').replace(/^#/, ''));
+    const g = p.get('provider_token') || p.get('provider_refresh_token') || (GOOGLE_PENDING_INFO && !p.get('type') && (p.get('access_token') || p.get('error') || p.get('error_code')));
+    if(!g) return null;
+    return p.get('access_token') ? { ok:true } : { error: p.get('error_description') || p.get('error') || 'error' };
+  }catch(e){ return null; }
+})();   // emaildagi kirish havolasi tokeni shu yerda keladi (Supabase uni o'chirib yuborishidan oldin olamiz)
 const SUPABASE_URL = "https://rktmefpvtztscoxapsok.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_n5yQngiqNBVD8VCQyCauTg_ge9BICJL";
 // Ba'zi o'ralgan (sandbox) oynalarda fetch postMessage orqali o'tadi va Headers obyektini ko'chira olmaydi
@@ -1727,6 +1747,7 @@ async function srvRpc(fn, args){
 function srvErrText(r){
   const e = r && r.error;
   if(e === 'no_function') return "Server hali tayyor emas (baholash.sql ishga tushirilmagan). Administratorga xabar bering.";
+  if(e === 'google_required') return "Bu ism Google hisobiga bog'langan, shuning uchun faqat Google orqali topshirish mumkin. Profil menyusidan «Chiqish» ni bosing va «Google bilan kirish» tugmasi orqali qayta kiring.";
   if(e === 'no_key') return "Bu test uchun javob kaliti serverda topilmadi. Administratorga xabar bering.";
   if(e === 'count_mismatch' || e === 'bad_answers') return "Test siz yechayotganingizda o'zgartirilgan ko'rinadi. Administratorga xabar bering.";
   if(e === 'network') return "Internet bilan aloqa yo'q. Javoblaringiz telefonda saqlangan — internetni tekshirib, qayta urining.";
@@ -2410,14 +2431,21 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   const logoImg = document.querySelector('.brand img');
   const faviconLink = document.getElementById('faviconLink');
   if(logoImg && faviconLink) faviconLink.href = logoImg.src;
-  const urlParams = new URLSearchParams(window.location.search);
+  const urlParams = new URLSearchParams(window.location.search || (GOOGLE_RETURN && GOOGLE_PENDING_INFO && GOOGLE_PENDING_INFO.q) || '');
   const liveSid = urlParams.get('live'), liveCh = urlParams.get('ch');
   const saved = (liveSid && liveCh) ? null : readStudentSession();
-  if(saved) bootSplash(true);                       // kirish oynasi bir lahza ko'rinib qolmasin
+  if(saved || (!(liveSid && liveCh) && googleSessionHint())) bootSplash(true);                       // kirish oynasi bir lahza ko'rinib qolmasin
   const [cfg, ec] = await Promise.all([ loadConfig(), loadExamConfig() ]);
   state.config = cfg; state.examConfig = ec;
   state.lockedTestId = urlParams.get('test') || null;
   if(liveSid && liveCh){ state.liveLink = { sessionId: liveSid, channel: liveCh }; await showLiveLink(); return; }
+  let gmsg = null;
+  if(!saved){
+    let g = { ok:false };
+    try{ g = await googleBoot(); }catch(e){ console.error('googleBoot', e); }
+    if(g.ok){ try{ await studentEnterAfterLogin(); return; }catch(e){ console.error('enter', e); } }
+    gmsg = g.msg || null;
+  }
   if(saved){
     let r = { ok:false };
     try{ r = await restoreStudentSession(); }catch(e){ console.error('restore', e); }
@@ -2427,6 +2455,7 @@ window.addEventListener('DOMContentLoaded', async ()=>{
     showJoin();
     if(r.msg) showToast(r.msg, !!r.keep);
   } else showJoin();
+  if(gmsg) customAlert(gmsg);
   if(state.lockedTestId){
     const t = state.config.tests.find(x=>x.id===state.lockedTestId);
     const noteEl = document.getElementById('joinLockedNote');
@@ -6139,6 +6168,7 @@ async function goHome(){
 function showJoin(){
   hideAll();
   showScreen('screen-join');
+  try{ const gb = document.getElementById('googleJoinBox'); if(gb) gb.classList.toggle('hidden', !(state.config && state.config.googleLogin)); }catch(e){}
   document.getElementById('masthead-sub').textContent = "Talaba rejimi";
   refreshInstallUi();
 }
@@ -6158,6 +6188,7 @@ async function handleJoin(){
   if(last.length < 3){ await customAlert("Familiyangizni to'liq kiriting (kamida 3 ta harf)."); return; }
   if(!codeEntered){ await customAlert("Kirish kodini kiriting."); return; }
 
+  await googleDropStudent();
   state.config = await loadConfig();
   const codeObj = (state.config.accessCodes||[]).find(c => c.code===codeEntered);
   if(!codeObj || !codeObj.active){
@@ -6292,12 +6323,89 @@ function switchJoinMode(mode){
   document.getElementById('joinMode-code').classList.toggle('hidden', mode!=='code');
   document.getElementById('joinMode-account').classList.toggle('hidden', mode!=='account');
 }
+/* ============ GOOGLE ORQALI KIRISH (talaba) ============
+   Talaba Google hisobi bilan kiradi. Qaysi talaba ekanini email bo'yicha SERVER aniqlaydi (ft_whoami; ro'yxat — faqat xodimlar ko'radigan "secret:emails").
+   Test va imtihon natijasida ism/guruh ham serverda shu ro'yxatdan olinadi, shuning uchun boshqa talaba nomidan yozib bo'lmaydi. */
+function googleSessionHint(){
+  if(GOOGLE_RETURN) return true;
+  try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && /^sb-.*-auth-token$/.test(k)) return true; } }catch(e){}
+  return false;
+}
+async function googleSignIn(){
+  if(!supabaseClient.auth || !supabaseClient.auth.signInWithOAuth){ await customAlert("Bu qurilmada Google orqali kirish ishlamaydi. Kod yoki login bilan kiring."); return; }
+  const btn = document.getElementById('googleJoinBtn'); if(btn) btn.disabled = true;
+  try{ localStorage.setItem('ft-google-pending', JSON.stringify({ t: Date.now(), q: String(location.search || '') })); }catch(e){}
+  try{
+    const { error } = await supabaseClient.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: rkRedirectUrl(), queryParams:{ prompt:'select_account' } } });
+    if(error) throw error;
+    setTimeout(()=>{ if(btn) btn.disabled = false; }, 5000);       // Google ochilmasa (yoki «Orqaga» bosilsa) tugma yana ishlasin
+  }catch(e){
+    try{ localStorage.removeItem('ft-google-pending'); }catch(_){}
+    if(btn) btn.disabled = false;
+    await customAlert("Google bilan ulanib bo'lmadi. Birozdan keyin qayta urinib ko'ring yoki kod/login bilan kiring.");
+  }
+}
+async function googleWhoami(){
+  try{
+    const { data, error } = await withTimeout(supabaseClient.rpc('ft_whoami'), 12000);
+    if(error) return null;
+    return (data && typeof data === 'object') ? data : null;
+  }catch(e){ return null; }
+}
+/* Xodim bo'lmagan (talaba) Google sessiyasini yopadi. Xodim sessiyasiga hech qachon tegmaydi. */
+async function googleDropStudent(){
+  try{
+    if(!supabaseClient.auth || !googleSessionHint()) return;
+    const sess = await rawSession(); if(!sess) return;
+    if(await sbIsStaff(sess)) return;
+    await supabaseClient.auth.signOut();
+  }catch(e){}
+}
+async function googleEnterStudent(w){
+  const name = String(w.name || '').trim(), group = String(w.group || '');
+  const cfg = state.config || {};
+  const slug = slugify(name);
+  const acct = (cfg.studentAccounts || []).find(a=> studentIdentity(a.fullName) === studentIdentity(name));
+  if((acct && acct.blocked) || isStudentBlocked(cfg, slug, getDeviceId())){
+    logActivity('student_login_blocked', `Bloklangan talaba Google bilan kirishga urindi: ${name}`, '—');
+    try{ await supabaseClient.auth.signOut(); }catch(e){}
+    return { ok:false, msg:"Kirish bloklangan. Iltimos, o'qituvchingiz bilan bog'laning." };
+  }
+  state.studentName = name; state.studentSlug = slug; state.studentGroup = group; state.deviceId = getDeviceId(); state.accountId = null;
+  upsertRosterEntry(slug, name, group, state.deviceId);
+  logActivity('student_login', `Kirdi (Google): ${name} · ${group}`);
+  state._sdCache = null;
+  clearStudentSession();
+  return { ok:true };
+}
+/* Sahifa ochilganda: Google sessiyasi bor bo'lsa, talabani avtomatik kiritadi. { ok:true } | { ok:false, msg? } */
+async function googleBoot(){
+  if(!googleSessionHint()) return { ok:false };
+  const ret = GOOGLE_RETURN;
+  try{ localStorage.removeItem('ft-google-pending'); }catch(e){}
+  const sess = await rawSession();
+  if(ret){ try{ history.replaceState(history.state, '', location.pathname + location.search); }catch(e){} }   // token manzil qatorida qolmasin
+  if(ret && ret.error) return { ok:false, msg:"Google bilan kirish amalga oshmadi (bekor qilingan bo'lishi mumkin). Qayta urinib ko'ring yoki kod/login bilan kiring." };
+  if(!sess) return { ok:false, msg: ret ? "Google bilan kirish amalga oshmadi. Qayta urinib ko'ring." : '' };
+  if(!(state.config && state.config.googleLogin)) return { ok:false };
+  const w = await googleWhoami();
+  if(!w) return { ok:false, msg: ret ? "Server bilan bog'lanib bo'lmadi. Internetni tekshirib, qayta urinib ko'ring." : '' };
+  if(w.status === 'staff') return { ok:false, msg: ret ? "Bu email boshqaruv (admin) hisobiga tegishli. Talaba sifatida kod yoki login bilan kiring; admin sifatida «Boshqaruv paneli» orqali kiring." : '' };
+  if(w.status === 'not_registered'){
+    try{ await supabaseClient.auth.signOut(); }catch(e){}
+    return { ok:false, msg:"Bu Google hisobi (" + String(w.email || '') + ") talabalar ro'yxatida yo'q. O'qituvchingizga shu emailni ayting yoki kirish kodi / login bilan kiring." };
+  }
+  if(w.status !== 'ok' || !w.name) return { ok:false };
+  return await googleEnterStudent(w);
+}
+
 async function handleAccountLogin(){
   const login = document.getElementById('studentLoginInput').value.trim();
   const password = document.getElementById('studentPasswordInput').value;
   if(!login){ await customAlert("Login kiriting."); return; }
   if(!password){ await customAlert("Parol kiriting."); return; }
 
+  await googleDropStudent();
   state.config = await loadConfig();
   if(state.config._loadFailed){ await customAlert("Serverga ulanib bo'lmadi. Internetni tekshirib, qayta urinib ko'ring."); return; }
   const account = (state.config.studentAccounts||[]).find(a => a.login.toLowerCase()===login.toLowerCase());
@@ -6767,7 +6875,7 @@ function openStudentMenu(){
   prLoad().then(p=>{ const e = document.getElementById('stuMenuLevel'); if(e && p && !p._loadFailed) e.innerHTML = studentLevelChip(p); }).catch(()=>{});
 }
 function logoutStudent(keepSession){
-  if(keepSession !== true) clearStudentSession();
+  if(keepSession !== true){ clearStudentSession(); googleDropStudent().catch(()=>{}); }
   state._sdCache = null;
   state.liveGuest = false; state.studentView = 'home'; state._lastStudentNew = 0;
   prFlush(); state.progress = null; state.practiceCfg = null; state.provCfg = null; state._badgeExtra = null; state._hw = null; state._hwMemo = null; state._attMemo = null; state.prBoard = null; state.pr = null; state.prov = null;
@@ -8816,8 +8924,29 @@ function toggleCodeVisibility(inputId, btn){
   }
 }
 /* --- Admin Supabase hisobi (RLS himoyasi uchun): bazaga YOZISH faqat shu sessiya bilan mumkin --- */
-async function getAdminSession(){
+async function rawSession(){
   try{ if(!supabaseClient.auth) return null; const r = await supabaseClient.auth.getSession(); return (r && r.data && r.data.session) || null; }catch(e){ return null; }
+}
+/* Sessiya xodimniki (admin/rahbar) mi? Google bilan kirgan talaba ham sessiyaga ega, lekin xodim emas.
+   Server funksiyasi (google-kirish.sql) hali yo'q bo'lsa — eskicha: har qanday sessiya xodimniki hisoblanadi. */
+async function sbIsStaff(sess){
+  const uid = sess && sess.user && sess.user.id;
+  const c = state._staffC;
+  if(c && c.uid === uid && Date.now() - c.t < 600000) return c.ok;
+  let ok = true, keep = true;
+  try{
+    const { data, error } = await withTimeout(supabaseClient.rpc('ft_is_staff'), 8000);
+    if(error){
+      const m = String(error.message || '') + ' ' + String(error.code || '');
+      if(!(error.code === 'PGRST202' || error.code === '42883' || /could not find the function|does not exist/i.test(m))) keep = false;
+    } else ok = (data === true);
+  }catch(e){ keep = false; }
+  if(keep) state._staffC = { uid, ok, t: Date.now() };
+  return ok;
+}
+async function getAdminSession(){
+  const sess = await rawSession(); if(!sess) return null;
+  return (await sbIsStaff(sess)) ? sess : null;
 }
 function ensureAdminAuth(){
   return new Promise(async resolve=>{
@@ -8831,6 +8960,8 @@ function ensureAdminAuth(){
         try{
           const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
           if(error){ errEl.textContent = "Email yoki parol noto'g'ri."; return; }
+          state._staffC = null;
+          if(!(await getAdminSession())){ try{ await supabaseClient.auth.signOut(); }catch(e){} errEl.textContent = "Bu hisob xodimlar ro'yxatida yo'q (admin emas)."; return; }
           try{ localStorage.setItem('ft-admin-remember', document.getElementById('sbRemember').checked ? '1' : '0'); }catch(e){}
           try{ localStorage.setItem('ft-recovery-email', email); }catch(e){}
           closeModal(); showToast("Supabase hisobi bilan kirdingiz ✓"); try{ secReattach().catch(()=>{}); }catch(e){} resolve(true);
@@ -11785,6 +11916,8 @@ async function renderAdminAccounts(){
       </div>
     </div>` : ''}
 
+    <div id="googleBox" style="margin-bottom:16px;"></div>
+
     <div class="qeditor" style="margin-bottom:16px;">
       <div style="font-weight:700;margin-bottom:8px;">Bitta talaba qo'shish</div>
       <div class="flexrow">
@@ -11827,6 +11960,151 @@ async function renderAdminAccounts(){
   }
   html += `</div>`;
   el.innerHTML = html;
+  googleBoxRender().catch(e=> console.error('googleBox', e));
+}
+/* ============ GOOGLE ORQALI KIRISH (admin: talabalar emaillari) ============
+   Ro'yxat bazada "secret:emails" yozuvida: { v:1, map:{ "email": { ident, name, group } } }. Uni faqat xodimlar o'qiy va yoza oladi.
+   Talaba nomi/guruhi test va imtihon natijasiga shu ro'yxatdan olinadi (server tomonida). */
+const GE_KEY = 'secret:emails';
+function geNorm(v){ return String(v || '').trim().toLowerCase(); }
+function geEmailOk(e){ return /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]{2,}$/.test(e) && e.length <= 120; }
+function geCleanName(v){ return String(v || '').replace(/\s+/g, ' ').trim(); }
+async function geRead(){
+  const r = await storageGetStrict(GE_KEY);
+  if(!r.ok) return { ok:false, map:{} };
+  let map = {};
+  if(r.value){ try{ const o = JSON.parse(r.value); if(o && o.map && typeof o.map === 'object') map = o.map; }catch(e){} }
+  return { ok:true, map };
+}
+function geWrite(map){ return storageSet(GE_KEY, JSON.stringify({ v:1, map, t: Date.now() })); }
+/* Ism bo'yicha ro'yxatdagi (login) yozuv bo'lsa, undagi yozilish va guruh olinadi — kod bilan kirgandagi ism bilan bir xil bo'lishi uchun */
+function geEntry(name, group){
+  const nm = geCleanName(name);
+  const ident = studentIdentity(nm);
+  if(!nm || !/[a-z0-9]/.test(ident) || ident === 'student' && !/student/i.test(nm)) return null;
+  const acct = ((state.config && state.config.studentAccounts) || []).find(a=> studentIdentity(a.fullName) === ident);
+  return { ident, name: acct ? acct.fullName : nm, group: String(group || (acct && acct.group) || '').trim().slice(0, 120) };
+}
+async function googleToggle(){
+  const cfg = state.config; if(!cfg) return;
+  const on = !cfg.googleLogin;
+  if(on){
+    const w = await srvRpc('ft_whoami', {});
+    if(w && w.error === 'no_function'){ await customAlert("Avval google-kirish.sql ni Supabase'da ishga tushiring. Aks holda Google tugmasi ishlamaydi."); return; }
+    if(!(await customConfirm("Google bilan kirish tugmasi talabalarga ko'rinadi. Supabase'da Google provayderi yoqilganiga ishonch hosil qildingizmi?"))) return;
+  }
+  cfg.googleLogin = on;
+  if(!(await saveConfig(cfg))){ cfg.googleLogin = !on; return; }
+  showToast(on ? "Google bilan kirish yoqildi ✓" : "Google bilan kirish o'chirildi ✓");
+  googleBoxRender();
+}
+async function geAdd(){
+  const name = document.getElementById('geName').value, group = document.getElementById('geGroup').value.trim();
+  const email = geNorm(document.getElementById('geEmail').value);
+  const ent = geEntry(name, group);
+  if(!ent || geCleanName(name).length < 3){ showToast("Talabaning ism-familiyasini to'liq yozing.", true); return; }
+  if(!geEmailOk(email)){ showToast("Email noto'g'ri yozilgan.", true); return; }
+  if(!(await ensureAdminAuth())) return;
+  const r = await geRead(); if(!r.ok){ showToast("Ro'yxatni o'qib bo'lmadi. Internetni tekshiring.", true); return; }
+  r.map[email] = ent;
+  if(!(await geWrite(r.map))){ showToast("Saqlab bo'lmadi. Supabase hisobi bilan kirganingizni tekshiring.", true); return; }
+  showToast("Qo'shildi ✓");
+  googleBoxRender();
+}
+async function geBulk(){
+  const text = document.getElementById('geBulk').value, defGroup = document.getElementById('geBulkGroup').value.trim();
+  const lines = text.split(/\r?\n/).map(l=> l.trim()).filter(Boolean);
+  if(!lines.length){ showToast("Ro'yxatni kiriting.", true); return; }
+  const good = [], bad = [];
+  lines.forEach((ln, i)=>{
+    const parts = ln.split(/\t|;|,/).map(p=> p.trim()).filter(Boolean);
+    const email = geNorm(parts.find(p=> p.indexOf('@') >= 0));
+    const rest = parts.filter(p=> p.indexOf('@') < 0);
+    const ent = geEntry(rest[0], rest[1] || defGroup);
+    if(!ent || !geEmailOk(email)) bad.push(i + 1); else good.push({ email, ent });
+  });
+  const st = document.getElementById('geBulkStatus');
+  if(!good.length){ st.innerHTML = `<span style="color:var(--red);">Hech qaysi qator o'qilmadi. Format: Ism Familiya; guruh; email</span>`; return; }
+  if(!(await ensureAdminAuth())) return;
+  const r = await geRead(); if(!r.ok){ showToast("Ro'yxatni o'qib bo'lmadi. Internetni tekshiring.", true); return; }
+  good.forEach(g=> { r.map[g.email] = g.ent; });
+  if(!(await geWrite(r.map))){ showToast("Saqlab bo'lmadi. Supabase hisobi bilan kirganingizni tekshiring.", true); return; }
+  showToast(`${good.length} ta email qo'shildi ✓` + (bad.length ? ` (${bad.length} ta qator o'tkazib yuborildi)` : ''), bad.length > 0);
+  await googleBoxRender();
+  if(bad.length){
+    /* Qayta chizilgach bo'lim yopilib qoladi — xabar ko'rinishi va xato qatorlar tuzatilishi uchun ochamiz */
+    const box2 = document.getElementById('geBulkBox'); if(box2) box2.open = true;
+    const ta = document.getElementById('geBulk'); if(ta) ta.value = bad.map(n=> lines[n - 1]).join('\n');
+    const gi = document.getElementById('geBulkGroup'); if(gi) gi.value = defGroup;
+    const st2 = document.getElementById('geBulkStatus'); if(st2) st2.innerHTML = `<span style="color:var(--red);">O'qilmagan qatorlar: ${bad.join(', ')}. Ular pastdagi maydonda qoldi — tuzatib, yana bosing. Format: Ism Familiya; guruh; email</span>`;
+  }
+}
+async function geRemove(email){
+  if(!(await customConfirm(`${email} ro'yxatdan olib tashlansinmi? Shundan keyin bu talaba nomidan Google'siz ham topshirish mumkin bo'ladi.`))) return;
+  if(!(await ensureAdminAuth())) return;
+  const r = await geRead(); if(!r.ok){ showToast("Ro'yxatni o'qib bo'lmadi. Internetni tekshiring.", true); return; }
+  delete r.map[email];
+  if(!(await geWrite(r.map))){ showToast("Saqlab bo'lmadi.", true); return; }
+  showToast("Olib tashlandi ✓");
+  googleBoxRender();
+}
+async function geUnlock(){ if(await ensureAdminAuth()) googleBoxRender(); }
+async function googleBoxRender(){
+  const box = document.getElementById('googleBox'); if(!box) return;
+  box.innerHTML = `<div class="qeditor"><div style="font-weight:700;">Google orqali kirish</div><div class="loading">Yuklanmoqda...</div></div>`;
+  const cfg = state.config || {};
+  const srv = await srvRpc('ft_whoami', {});
+  const installed = !(srv && srv.error === 'no_function');
+  const sess = await getAdminSession(), rls = await rlsProbe();
+  const locked = installed && rls === 'on' && !sess;
+  const badge = (ok, t)=> `<span class="badge ${ok ? 'badge-open' : 'badge-closed'}">${t}</span>`;
+  let head = `<div style="font-weight:700;margin-bottom:6px;">Google orqali kirish</div>
+    <p class="desc" style="margin:0 0 10px;">Talaba Google hisobi bilan kiradi. Emaili quyidagi ro'yxatga kiritilgan talaba nomidan boshqa hech kim test yoki imtihon topshira olmaydi. Emaili kiritilmagan talabalar avvalgidek kod yoki login bilan kiraveradi.</p>
+    <div class="flexrow" style="align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <span>Server funksiyalari: ${badge(installed, installed ? 'Tayyor ✓' : "O'rnatilmagan")}</span>
+      <span>Kirish tugmasi: ${badge(!!cfg.googleLogin, cfg.googleLogin ? 'Yoqilgan' : "O'chirilgan")}</span>
+      <button class="btn-${cfg.googleLogin ? 'ghost' : 'primary'} btn-small" onclick="googleToggle()">${cfg.googleLogin ? "O'chirish" : 'Yoqish'}</button>
+    </div>`;
+  if(!installed){
+    box.innerHTML = `<div class="qeditor">${head}<p class="desc" style="margin:0;color:var(--red);">Avval <b>google-kirish.sql</b> ni Supabase → SQL Editor'da ishga tushiring (qo'llanmaga qarang).</p></div>`;
+    return;
+  }
+  if(locked){
+    box.innerHTML = `<div class="qeditor">${head}<p class="desc" style="margin:0 0 10px;">Emaillar ro'yxatini ko'rish va o'zgartirish uchun Supabase admin hisobi bilan kiring.</p><button class="btn-primary btn-small" onclick="geUnlock()">Supabase hisobi bilan kirish</button></div>`;
+    return;
+  }
+  const r = await geRead();
+  if(!r.ok){ box.innerHTML = `<div class="qeditor">${head}<p class="desc" style="margin:0;color:var(--red);">Ro'yxatni o'qib bo'lmadi. Internetni tekshirib, sahifani yangilang.</p></div>`; return; }
+  const list = Object.entries(r.map).map(([email, v])=> Object.assign({ email }, v)).sort((a, b)=> String(a.group || '').localeCompare(String(b.group || '')) || String(a.name || '').localeCompare(String(b.name || '')));
+  const roster = await fetchRoster();
+  const have = new Set(list.map(x=> x.ident));
+  const seen = new Set(), missing = [];
+  roster.concat((cfg.studentAccounts || []).map(a=> ({ name:a.fullName, group:a.group }))).forEach(x=>{ const id = studentIdentity(x.name); if(!seen.has(id)){ seen.add(id); if(!have.has(id)) missing.push(x.name); } });
+  const groupNames = (cfg.groups || []).map(g=> g.name).concat(collectAllGroupNames(roster, [])).filter((v, i, a)=> v && a.indexOf(v) === i);
+  const nameOpts = roster.map(x=> x.name).concat((cfg.studentAccounts || []).map(a=> a.fullName)).filter((v, i, a)=> v && a.indexOf(v) === i);
+  box.innerHTML = `<div class="qeditor">${head}
+    <details style="margin-bottom:10px;"><summary style="cursor:pointer;font-weight:600;">Bitta email qo'shish</summary>
+      <div class="flexrow" style="margin-top:8px;">
+        <div class="field"><label>F.I.Sh</label><input type="text" id="geName" list="geNames" placeholder="Masalan: Aziza Karimova"></div>
+        <div class="field"><label>Guruh</label><input type="text" id="geGroup" list="geGroups" placeholder="Masalan: BUX-21"></div>
+        <div class="field"><label>Gmail</label><input type="email" id="geEmail" placeholder="aziza@gmail.com" autocapitalize="off"></div>
+      </div>
+      <datalist id="geNames">${nameOpts.map(n=> `<option value="${escapeAttr(n)}">`).join('')}</datalist>
+      <datalist id="geGroups">${groupNames.map(g=> `<option value="${escapeAttr(g)}">`).join('')}</datalist>
+      <button class="btn-primary btn-small" onclick="geAdd()">${icon('plus')}Qo'shish</button>
+    </details>
+    <details id="geBulkBox" style="margin-bottom:12px;"><summary style="cursor:pointer;font-weight:600;">Ko'plab email qo'shish (Excel'dan nusxalab qo'ying)</summary>
+      <p class="desc" style="margin:8px 0;">Har bir qatorga: <b>Ism Familiya; guruh; email</b>. Excel'dan 3 ta ustunni nusxalab qo'ysangiz ham bo'ladi. Guruh yozilmasa, quyidagi guruh olinadi.</p>
+      <div class="field"><label>Umumiy guruh (ixtiyoriy)</label><input type="text" id="geBulkGroup" list="geGroups" placeholder="Masalan: BUX-21"></div>
+      <div class="field"><textarea id="geBulk" rows="5" placeholder="Aziza Karimova; BUX-21; aziza@gmail.com&#10;Jasur Toshmatov; BUX-21; jasur@gmail.com"></textarea></div>
+      <button class="btn-primary btn-small" onclick="geBulk()">${icon('plus')}Hammasini qo'shish</button>
+      <div id="geBulkStatus" style="margin-top:8px;"></div>
+    </details>
+    <div style="font-weight:600;margin-bottom:6px;">Ro'yxatga kiritilgan emaillar: ${list.length} ta</div>
+    ${list.length ? list.map(x=> `<div class="row-item"><span class="row-title">${avWho(x.name, 28, undefined, x.ident)}<br><span class="row-meta">${escapeHtml(x.group || 'guruhsiz')} · ${escapeHtml(x.email)}</span></span><button class="btn-danger btn-small" onclick="geRemove(${jsArg(x.email)})">${icon('trash')}Olib tashlash</button></div>`).join('') : `<div class="empty">Hali email kiritilmagan.</div>`}
+    ${missing.length ? `<details style="margin-top:10px;"><summary style="cursor:pointer;color:var(--ink-soft);">Emaili kiritilmagan talabalar: ${missing.length} ta (ular hozircha kod/login bilan kiradi)</summary><div class="row-meta" style="margin-top:6px;line-height:1.7;">${missing.map(n=> escapeHtml(n)).join(', ')}</div></details>` : ''}
+  </div>`;
+  avHydrate(box);
 }
 function clearFreshCreds(){ state.freshCreds = {}; renderAdminAccounts(); }
 async function buildAccount(fullName, group, existingLogins){
@@ -12671,6 +12949,7 @@ async function rkKeyFlow(){
 // Sahifa emaildagi havola orqali ochilganmi? Supabase tokenni #hash ichida qaytaradi (sahifa yuklanganda BOOT_HASH ga olingan)
 const RK_LINK = (()=>{
   try{
+    if(GOOGLE_RETURN) return null;
     const p = new URLSearchParams(String(BOOT_HASH || '').replace(/^#/, ''));
     if(p.get('access_token')) return { token: p.get('access_token') };
     if(p.get('error') || p.get('error_code')) return { error: p.get('error_code') || p.get('error') };
