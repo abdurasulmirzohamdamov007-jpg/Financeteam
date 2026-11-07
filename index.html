@@ -1491,7 +1491,7 @@ function customConfirm(message){
     ]);
   });
 }
-function customPromptText(message, defaultValue){
+function customPromptText(message, defaultValue, okLabel){
   return new Promise(resolve=>{
     document.getElementById('modalMessage').innerHTML = `${escapeHtml(message)}<br><input type="text" id="modalPromptInput" value="${escapeAttr(defaultValue||'')}" style="margin-top:10px;">`;
     const actionsEl = document.getElementById('modalActions');
@@ -1502,7 +1502,7 @@ function customPromptText(message, defaultValue){
     cancelBtn.onclick = ()=>{ closeModal(); resolve(null); };
     const okBtn = document.createElement('button');
     okBtn.className = 'btn-primary';
-    okBtn.textContent = 'Boshlash';
+    okBtn.textContent = okLabel || 'Boshlash';
     okBtn.onclick = ()=>{
       const val = document.getElementById('modalPromptInput').value.trim();
       closeModal();
@@ -1581,7 +1581,8 @@ function demoIdents(){
 }
 function hideDemo(list, identOf){
   const d = demoIdents(); if(!d.size) return list;
-  const me = state.studentName ? studentIdentity(state.studentName) : null;
+  /* «O'zi» faqat talaba rejimida: admin/rahbar paneliga shu brauzerda o'tilgan bo'lsa, talabaning eski ismi hisobga olinmaydi */
+  const me = (!state.role && state.studentName) ? studentIdentity(state.studentName) : null;
   return list.filter(r=>{ const id = identOf(r); return !d.has(id) || id === me; });
 }
 async function fetchAllResults(){
@@ -11953,6 +11954,11 @@ async function renderAdminAccounts(){
         <div class="field"><label>F.I.Sh</label><input type="text" id="newAcctName" placeholder="Masalan: Aziza Karimova"></div>
         <div class="field"><label>Guruh</label><input type="text" id="newAcctGroup" placeholder="Masalan: BUX-21" list="acctGroupList"></div>
       </div>
+      <div class="flexrow">
+        <div class="field"><label>Login (ixtiyoriy)</label><input type="text" id="newAcctLogin" placeholder="Bo'sh qolsa, avtomatik" autocapitalize="off" autocorrect="off"></div>
+        <div class="field"><label>Parol (ixtiyoriy)</label><input type="text" id="newAcctPass" placeholder="Bo'sh qolsa, avtomatik" autocapitalize="off" autocorrect="off"></div>
+      </div>
+      <label class="remember" style="margin:0 0 10px;"><input type="checkbox" id="newAcctDemo"> Demo hisob (ko'rsatish uchun): natijalari reyting va tahlilga qo'shilmaydi, parol 4 ta belgidan boshlanadi</label>
       <datalist id="acctGroupList">${groupOptions.map(g=>`<option value="${escapeAttr(g)}">`).join('')}</datalist>
       <button class="btn-primary btn-small" onclick="addSingleAccount()">${icon('plus')}Login yaratish</button>
     </div>
@@ -11981,6 +11987,7 @@ async function renderAdminAccounts(){
         <span class="row-title">${avWho(a.fullName, 30)} ${a.blocked?'<span class="badge badge-closed" style="margin-left:6px;">Bloklangan</span>':''}${a.demo?'<span class="badge badge-open" style="margin-left:6px;">Demo</span>':''}
           <br><span class="row-meta">Login: <b>${escapeHtml(a.login)}</b> · Parol: ${known ? `<b>${escapeHtml(known)}</b>` : (a.pwEnc ? "<i>saqlangan — ko'rish uchun rahbar ruxsat berishi kerak</i>" : '<i>shifrlangan (ko\'rib bo\'lmaydi — «Parolni yangilash» bosing)</i>')} · Guruh: ${escapeHtml(a.group||'—')}</span></span>
         ${known ? `<button class="btn-ghost btn-small" onclick="copyAccountCreds('${a.id}')">${icon('link')}Nusxalash</button>` : ''}
+        <button class="btn-ghost btn-small" onclick="setAccountPassword('${a.id}')">Parol belgilash</button>
         <button class="btn-ghost btn-small" onclick="resetAccountPassword('${a.id}')">Parolni yangilash</button>
         <button class="btn-${a.demo?'primary':'ghost'} btn-small" onclick="toggleAccountDemo('${a.id}')" title="Demo hisob natijalari reyting va tahlilga qo'shilmaydi">${a.demo?'Demo ✓':'Demo'}</button>
         <button class="btn-${a.blocked?'ghost':'danger'} btn-small" onclick="toggleAccountBlock('${a.id}')">${a.blocked?"Blokdan chiqarish":"Bloklash"}</button>
@@ -12158,14 +12165,30 @@ async function googleBoxRender(){
   avHydrate(box);
 }
 function clearFreshCreds(){ state.freshCreds = {}; renderAdminAccounts(); }
-async function buildAccount(fullName, group, existingLogins){
-  const password = genPassword();
+/* Parol/login qoidalari. Oddiy hisob: kamida 6 ta belgi. Demo hisob (faqat ko'rsatish uchun): 4 ta yetadi (masalan PIN). */
+function pwProblem(pw, demo){
+  const min = demo ? 4 : 6;
+  if(/\s/.test(pw)) return "Parolda bo'sh joy bo'lmasin.";
+  if(pw.length < min) return `Parol kamida ${min} ta belgidan iborat bo'lsin${demo ? '' : " (demo hisob uchun 4 ta yetadi)"}.`;
+  if(pw.length > 40) return "Parol 40 ta belgidan oshmasin.";
+  return '';
+}
+function loginProblem(login, existingLower){
+  if(!/^[a-z0-9._-]{3,20}$/.test(login)) return "Login 3–20 ta belgi bo'lsin: kichik lotin harflari, raqamlar, nuqta yoki chiziq.";
+  if(existingLower.has(login)) return "Bu login band. Boshqasini tanlang.";
+  return '';
+}
+async function buildAccount(fullName, group, existingLogins, opts){
+  const o = opts || {};
+  const password = o.password || genPassword();
+  if(o.login) existingLogins.add(o.login);
   const account = {
     id: 'acct_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
-    login: genLoginFromName(fullName, existingLogins),
+    login: o.login || genLoginFromName(fullName, existingLogins),
     secret: await makeSecret(password),
     fullName, group, blocked:false, createdAt: Date.now()
   };
+  if(o.demo) account.demo = true;
   const enc = await vaultEncrypt(password); if(enc) account.pwEnc = enc;
   if(!state.freshCreds) state.freshCreds = {};
   state.freshCreds[account.id] = { fullName, login: account.login, password, group };
@@ -12176,13 +12199,18 @@ async function addSingleAccount(){
   const groupInput = document.getElementById('newAcctGroup');
   const fullName = nameInput.value.trim();
   const group = groupInput.value.trim();
+  const loginEl = document.getElementById('newAcctLogin'), passEl = document.getElementById('newAcctPass'), demoEl = document.getElementById('newAcctDemo');
+  const wantLogin = loginEl ? loginEl.value.trim().toLowerCase() : '', wantPass = passEl ? passEl.value.trim() : '', wantDemo = !!(demoEl && demoEl.checked);
   if(fullName.length<3){ showToast("F.I.Shni to'liq kiriting.", true); return; }
   if(!cryptoAvailable()){ await customAlert("Brauzer shifrlashni qo'llamaydi. Saytni HTTPS orqali oching."); return; }
   const existingLogins = new Set(state.config.studentAccounts.map(a=>a.login));
-  const account = await buildAccount(fullName, group, existingLogins);
+  const existingLower = new Set(state.config.studentAccounts.map(a=> String(a.login).toLowerCase()));
+  if(wantLogin){ const lp = loginProblem(wantLogin, existingLower); if(lp){ showToast(lp, true); return; } }
+  if(wantPass){ const pp = pwProblem(wantPass, wantDemo); if(pp){ showToast(pp, true); return; } }
+  const account = await buildAccount(fullName, group, existingLogins, { login: wantLogin || null, password: wantPass || null, demo: wantDemo });
   state.config.studentAccounts.push(account);
   const ok = await saveConfig(state.config);
-  if(ok){ showToast("Login yaratildi ✓"); nameInput.value=''; groupInput.value=''; logActivity('account_create', `Login yaratildi: ${account.login} (${fullName})`); }
+  if(ok){ showToast("Login yaratildi ✓"); nameInput.value=''; groupInput.value=''; if(loginEl) loginEl.value=''; if(passEl) passEl.value=''; if(demoEl) demoEl.checked=false; logActivity('account_create', `Login yaratildi: ${account.login} (${fullName})${account.demo ? ' · demo' : ''}`); }
   else { state.config.studentAccounts.pop(); delete state.freshCreds[account.id]; }
   renderAdminAccounts();
 }
@@ -12238,6 +12266,34 @@ async function deleteAccount(id){
   const ok = await saveConfig(state.config);
   if(ok){ showToast("Login o'chirildi ✓"); if(gone) logActivity('account_delete', `Login o'chirildi: ${gone.fullName} (${gone.login})`); }
   else state.config.studentAccounts = backup;
+  renderAdminAccounts();
+}
+async function setAccountPassword(id){
+  const a = state.config.studentAccounts.find(x=>x.id===id);
+  if(!a) return;
+  if(!cryptoAvailable()){ await customAlert("Brauzer shifrlashni qo'llamaydi. Saytni HTTPS orqali oching."); return; }
+  const demo = !!a.demo;
+  let msg = `${a.fullName} uchun o'zingiz parol yozing (${demo ? 'kamida 4 ta belgi, masalan PIN yoki raqam+harf' : 'kamida 6 ta belgi'}, bo'sh joysiz). Eski parol ishlamay qoladi.`;
+  let password = null;
+  for(;;){
+    const v = await customPromptText(msg, '', 'Saqlash');
+    if(v === null) return;
+    const pr = pwProblem(v, demo);
+    if(!pr){ password = v; break; }
+    msg = pr + ' Qayta yozing.';
+  }
+  const prev = { secret:a.secret, password:a.password };
+  a.secret = await makeSecret(password);
+  delete a.password;
+  const prevEnc = a.pwEnc; delete a.pwEnc; const enc = await vaultEncrypt(password); if(enc) a.pwEnc = enc;
+  if(state.vaultPw) delete state.vaultPw[a.id];
+  const ok = await saveConfig(state.config);
+  if(ok){
+    if(!state.freshCreds) state.freshCreds = {};
+    state.freshCreds[a.id] = { fullName:a.fullName, login:a.login, password, group:a.group };
+    showToast("Parol belgilandi ✓");
+    logActivity('account_setpw', `Parol qo'lda belgilandi: ${a.fullName} (${a.login})`);
+  } else { a.secret = prev.secret; if(prev.password!==undefined) a.password = prev.password; if(prevEnc) a.pwEnc = prevEnc; }
   renderAdminAccounts();
 }
 async function resetAccountPassword(id){
