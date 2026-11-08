@@ -27,13 +27,8 @@
 <link rel="preconnect" href="https://rktmefpvtztscoxapsok.supabase.co" crossorigin>
 <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
   :root{
@@ -906,6 +901,64 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
   } }
 });
 
+/* ============ KUTUBXONALAR: kerak bo'lganda yuklanadi ============
+   Excel, PDF, Word, diagramma va QR kutubxonalari (~3 MB) oldin sayt ochilganda har safar yuklanardi va ishga tushishni kechiktirardi.
+   Endi ular fonda (sahifa ochilgandan keyin) yoki tegishli tugma bosilganda yuklanadi. Tayyor bo'lsa, hammasi avvalgidek ishlaydi. */
+const CDNJS = 'https://cdnjs.cloudflare.com/ajax/libs/';
+const LIBS = {
+  chart:   { url: CDNJS+'Chart.js/4.4.1/chart.umd.min.js',        ok:()=> typeof window.Chart !== 'undefined' },
+  xlsx:    { url: CDNJS+'xlsx/0.18.5/xlsx.full.min.js',            ok:()=> !!window.XLSX },
+  qr:      { url: CDNJS+'qrcodejs/1.0.0/qrcode.min.js',            ok:()=> typeof window.QRCode !== 'undefined' },
+  jspdf:   { url: CDNJS+'jspdf/2.5.1/jspdf.umd.min.js',            ok:()=> !!window.jspdf },
+  pdfjs:   { url: CDNJS+'pdf.js/3.11.174/pdf.min.js',              ok:()=> typeof window.pdfjsLib !== 'undefined' },
+  mammoth: { url: CDNJS+'mammoth/1.6.0/mammoth.browser.min.js',    ok:()=> !!window.mammoth }
+};
+const _libLoad = {};
+function libReady(n){ try{ return !!(LIBS[n] && LIBS[n].ok()); }catch(e){ return false; } }
+function needLib(n){
+  if(libReady(n)) return Promise.resolve(true);
+  if(_libLoad[n]) return _libLoad[n];
+  const L = LIBS[n]; if(!L) return Promise.resolve(false);
+  const p = new Promise(res=>{
+    try{
+      const sc = document.createElement('script'); sc.src = L.url; sc.async = true;
+      sc.onload = ()=> res(libReady(n));
+      sc.onerror = ()=>{ try{ sc.remove(); }catch(e){} res(false); };
+      document.head.appendChild(sc);
+    }catch(e){ res(false); }
+  }).then(ok=>{ if(!ok) delete _libLoad[n]; return ok; });
+  _libLoad[n] = p; return p;
+}
+/* Sahifa ochilib bo'lgach, bo'sh vaqtda fonda yuklab qo'yadi (sekin/tejamkor internetda yuklamaydi) */
+function libsIdle(names, delay){
+  try{
+    const c = navigator.connection || {};
+    if(c.saveData || /(^|-)2g$/.test(c.effectiveType || '')) return;
+  }catch(e){}
+  setTimeout(()=>{
+    const go = ()=>{ names.reduce((p, n)=> p.then(()=> needLib(n)), Promise.resolve()).catch(()=>{}); };
+    if('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 6000 }); else go();
+  }, delay || 3000);
+}
+/* Funksiyani o'rab oladi: kerakli kutubxona hali yuklanmagan bo'lsa, avval yuklab, keyin ishga tushiradi. Yuklangan bo'lsa — hech narsa o'zgarmaydi. */
+function withLibs(fnName, names){
+  const orig = window[fnName];
+  if(typeof orig !== 'function') return;
+  window[fnName] = function(){
+    const args = arguments, self = this;
+    const need = names.filter(n=> !libReady(n));
+    if(!need.length) return orig.apply(self, args);
+    try{ showToast('Tayyorlanmoqda...'); }catch(e){}
+    return Promise.all(need.map(needLib)).then(()=> orig.apply(self, args));
+  };
+}
+[ ['xlsx', ['gmExcel','fvRenderSheet','hwAdminExport','prAdminExcelImport','prAdminExport','prErrExcel','backupTestsToExcel','downloadTemplateExcel','handleExcelImport','handleExamMcqExcelImport','downloadExamMcqTemplate','exportResultsToExcel','anInactiveExcel','generateReportExcel','downloadGroupReport','downloadAccountsExcel']],
+  ['jspdf', ['gmPdf','generateCertificatePDF','generateReportPDF']],
+  ['pdfjs', ['renderPdfPages','fvRenderPdf','extractTextFromPdf']],
+  ['mammoth', ['fvRenderDocx','extractTextFromDocx']],
+  ['qr', ['renderLiveHostLobby']]
+].forEach(([lib, fns])=> fns.forEach(f=> withLibs(f, [lib])));
+
 const DEFAULT_ADMIN_CODE = "buxgalteriya2026";
 const DEFAULT_RAHBAR_CODE = "rahbar-2026-ega";
 
@@ -1065,11 +1118,15 @@ function withTimeout(promise, ms){
    Yozish/o'chirishda tegishli kesh darhol tozalanadi, shuning uchun admin o'z o'zgarishini darhol ko'radi. */
 const _CFG_KEYS = new Set(['app-config','exam-config','materials-config','practice-config','prov-config','homework-config']);
 const _cfgCache = new Map();   // key -> {t, p}
-const _rowsCache = new Map();  // prefix -> {t, p}
-const CFG_TTL = 4000, ROWS_TTL = 6000;
+const _rowsCache = new Map();  // prefix -> {t, p, ttl}
+const _inflightGet = new Map(); // key -> Promise (bir vaqtda ketayotgan bir xil o'qish)
+let _chCache = null;            // faol jonli kanallar ro'yxati (juda qisqa muddat)
+const CFG_TTL = 4000, ROWS_TTL = 6000, CH_TTL = 5000;
 function invalidateCaches(key){
-  if(key===undefined){ _cfgCache.clear(); _rowsCache.clear(); return; }
-  _cfgCache.delete(key);
+  if(key===undefined){ _cfgCache.clear(); _rowsCache.clear(); _inflightGet.clear(); _chCache = null; return; }
+  _cfgCache.delete(key); _inflightGet.delete(key);
+  if(String(key).startsWith('live-channel-active:')) _chCache = null;
+  if(String(key).startsWith('chat:')){ try{ state._chatSoft = null; }catch(e){} }
   for(const pre of [..._rowsCache.keys()]) if(String(key).startsWith(pre)) _rowsCache.delete(pre);
 }
 async function storageGetStrict(key){
@@ -1083,7 +1140,16 @@ async function storageGetStrict(key){
   }
   return _storageGetStrictRaw(key);
 }
-async function _storageGetStrictRaw(key){
+/* Bir xil kalit bir vaqtda ikki marta so'ralsa, bitta so'rov yuboriladi (yozilganda yoki tugagach darhol tozalanadi). */
+function _storageGetStrictRaw(key){
+  const f = _inflightGet.get(key); if(f) return f;
+  const p = _storageGetStrictFetch(key);
+  _inflightGet.set(key, p);
+  const done = ()=>{ if(_inflightGet.get(key)===p) _inflightGet.delete(key); };
+  p.then(done, done);
+  return p;
+}
+async function _storageGetStrictFetch(key){
   for(let attempt=0; attempt<=2; attempt++){
     try{
       const { data, error } = await withTimeout(supabaseClient.from('kv_store').select('value').eq('key', key).maybeSingle(), 8000);
@@ -1246,7 +1312,7 @@ async function storageGetObjects(prefix, opts){
   const cacheable = opts.fresh!==true;
   if(cacheable){
     const c = _rowsCache.get(prefix);
-    if(c && Date.now()-c.t < ROWS_TTL) return c.p.then(a=>a.slice());
+    if(c && Date.now()-c.t < (c.ttl || ROWS_TTL)){ c.ttl = 0; return c.p.then(a=>a.slice()); }   // oldindan so'ralgan javob bir marta uzoqroq ishlatiladi
   }
   const p = (async()=>{
     let rows;
@@ -1263,6 +1329,15 @@ async function storageGetObjects(prefix, opts){
     p.then(a=>{ if(!a.length) _rowsCache.delete(prefix); }, ()=>_rowsCache.delete(prefix));
   }
   return p.then(a=>a.slice());
+}
+
+/* Sahifa ochilishi bilan kerak bo'ladigan jadvalni oldindan so'rab qo'yadi; keyingi o'qish shu javobni ishlatadi. */
+function warmRows(prefix, ttl){
+  try{
+    const p = storageGetObjects(prefix);
+    const c = _rowsCache.get(prefix); if(c) c.ttl = ttl || 20000;
+    p.catch(()=>{});
+  }catch(e){}
 }
 
 /* ============ ACTIVITY LOG ============
@@ -2401,8 +2476,12 @@ async function saveLiveSession(channel, obj){
   return await storageSet(`live-session:${channel}`, JSON.stringify(obj));
 }
 async function listActiveChannels(){
-  const keys = await storageListKeys('live-channel-active:');
-  return keys.map(k=>k.replace('live-channel-active:',''));
+  // Bir necha joydan ketma-ket chaqirilganda bitta so'rov ketadi (5 soniya; yozilganda darhol tozalanadi)
+  if(_chCache && Date.now()-_chCache.t < CH_TTL) return _chCache.p.then(a=>a.slice());
+  const p = storageListKeys('live-channel-active:').then(keys=> keys.map(k=>k.replace('live-channel-active:','')));
+  const e = _chCache = { t: Date.now(), p };
+  p.catch(()=>{ if(_chCache===e) _chCache = null; });
+  return p.then(a=>a.slice());
 }
 async function joinLiveSession(sessionId, slug, name, group){
   // Faqat yangi yozuv qo'shiladi; shu talaba bu seansga allaqachon qo'shilgan bo'lsa ham bu muvaffaqiyat hisoblanadi
@@ -2447,6 +2526,10 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   const liveSid = urlParams.get('live'), liveCh = urlParams.get('ch');
   const saved = (liveSid && liveCh) ? null : readStudentSession();
   if(saved || (!(liveSid && liveCh) && googleSessionHint())) bootSplash(true);                       // kirish oynasi bir lahza ko'rinib qolmasin
+  if(!(liveSid && liveCh)){
+    if(saved || googleSessionHint()){ warmRows('result:', 20000); warmRows('exam-result:', 20000); listActiveChannels().catch(()=>{}); }   // sozlama bilan bir vaqtda
+    else joinFlagsFromCache();
+  }
   const [cfg, ec] = await Promise.all([ loadConfig(), loadExamConfig() ]);
   state.config = cfg; state.examConfig = ec;
   state.lockedTestId = urlParams.get('test') || null;
@@ -6180,6 +6263,20 @@ async function goHome(){
 }
 /* Guruh kodi bilan kirish (ismni o'zi yozadi) admin tomonidan o'chirilishi mumkin: shunda faqat Google va shaxsiy login qoladi */
 function codeLoginOff(){ return !!(state.config && state.config.codeLoginOff); }
+/* Kirish oynasi sozlamalari (Google tugmasi, kod yorlig'i) oxirgi marta ko'rilgandek darhol chiziladi; sozlama kelgach yangilanadi.
+   Shunda oyna birdan o'zgarib ketmaydi. */
+function joinFlagsFromCache(){
+  try{
+    const jf = JSON.parse(localStorage.getItem('ft-join-flags') || 'null'); if(!jf) return;
+    const gb = document.getElementById('googleJoinBox'); if(gb) gb.classList.toggle('hidden', !jf.g);
+    const tabs = document.getElementById('joinModeTabs'); if(tabs) tabs.classList.toggle('hidden', !!jf.c);
+    const orT = document.getElementById('joinOrText'); if(orT) orT.textContent = jf.c ? 'yoki login bilan' : 'yoki kod / login bilan';
+    if(jf.c) switchJoinMode('account');
+  }catch(e){}
+}
+function joinFlagsSave(){
+  try{ if(state.config && !state.config._loadFailed) localStorage.setItem('ft-join-flags', JSON.stringify({ g: !!state.config.googleLogin, c: !!codeLoginOff() })); }catch(e){}
+}
 function applyJoinModes(){
   const off = codeLoginOff();
   const tabs = document.getElementById('joinModeTabs'); if(tabs) tabs.classList.toggle('hidden', off);
@@ -6191,6 +6288,7 @@ function showJoin(){
   showScreen('screen-join');
   try{ const gb = document.getElementById('googleJoinBox'); if(gb) gb.classList.toggle('hidden', !(state.config && state.config.googleLogin)); }catch(e){}
   try{ applyJoinModes(); }catch(e){}
+  joinFlagsSave();
   document.getElementById('masthead-sub').textContent = "Talaba rejimi";
   refreshInstallUi();
 }
@@ -6954,6 +7052,12 @@ async function renderTestList(){
   const sc = state._sdCache;
   const warm = !!state.studentSlug && !!sc && sc.k === state.studentSlug && Date.now() - sc.t < 180000
     && !!state.config && !state.config._loadFailed && !!state.examConfig && !state.examConfig._loadFailed;
+  let cfgP = null;
+  if(!warm){
+    // Oldin bular ketma-ket edi (jonli seans ro'yxati → sozlama → natijalar). Endi hammasi bir vaqtda so'raladi.
+    cfgP = Promise.all([ loadConfig(), loadExamConfig() ]); cfgP.catch(()=>{});
+    if(state.studentSlug) sdStartPrefetch();
+  }
   if(state.studentSlug && !warm){
     const channels = await listActiveChannels();
     if(channels.length===1){
@@ -6970,12 +7074,32 @@ async function renderTestList(){
   document.getElementById('studentGreeting').textContent = `${state.studentName} · ${state.studentGroup||'guruhsiz'}`;
   refreshStudentAvatar();
   if(!warm){
-    const [cfg, ec] = await Promise.all([ loadConfig(), loadExamConfig() ]);
+    const [cfg, ec] = await cfgP;
     state.config = cfg; state.examConfig = ec;
   }
   if(!state.studentView) state.studentView = 'home';
   await renderStudentView();
   if(warm) navLiveCheckSoon();
+}
+/* Talaba ma'lumotlari va bosh sahifa uchun kerakli so'rovlarni oldindan boshlaydi (ro'yxat ekrani chizilishini kutmaydi). Bir marta ishlatiladi. */
+function sdStartPrefetch(){
+  try{
+    const k = state.studentSlug; if(!k) return;
+    const pre = state._sdPre;
+    if(pre && pre.k===k && Date.now()-pre.t < 15000) return;
+    const e = state._sdPre = { k, t: Date.now(), p: loadStudentData() };
+    e.p.catch(()=>{ if(state._sdPre===e) state._sdPre = null; });
+    if((state.studentView||'home')==='home') homeExtraStart();
+  }catch(err){}
+}
+function homeExtraStart(){
+  try{
+    const id = myIdentity(), cur = state._homeExtraP;
+    if(cur && cur.k===id && Date.now()-cur.t < 15000) return cur;
+    const e = state._homeExtraP = { k:id, t:Date.now(), p: Promise.all([ prLoad(false), attLoadMine().catch(()=>null), hwLoadMine().catch(()=>null) ]) };
+    e.p.catch(()=>{ if(state._homeExtraP===e) state._homeExtraP = null; });
+    return e;
+  }catch(err){ return null; }
 }
 /* Ro'yxat keshdan tez chizilganda jonli seans bor-yo'qligi fonda tekshiriladi */
 function navLiveCheckSoon(){
@@ -7107,16 +7231,22 @@ async function renderStudentView(opts){
   if(warm) data = c.data;
   else {
     holder.innerHTML = `<div class="loading">Yuklanmoqda...</div>`;
-    data = await loadStudentData();
+    // Natijalar yuklanayotgan paytda bosh sahifa va yorliqlar uchun so'rovlar ham ketadi (ketma-ket kutmaymiz)
+    const pre = state._sdPre; state._sdPre = null;
+    const usePre = !!(!opts.force && pre && pre.k===state.studentSlug && Date.now()-pre.t < 20000);
+    if(v==='home'){ if(opts.force) state._homeExtraP = null; homeExtraStart(); }
+    refreshStudentChatBadge(false, true);
+    updateMaterialsBadge();
+    data = await (usePre ? pre.p : loadStudentData());
     if(token !== state._svToken) return;
     state._sdCache = { k: state.studentSlug, t: Date.now(), data };
   }
   state._studentData = data;
   await drawStudentView(v, data);
   renderStudentNotifications(data).catch(()=>{});
-  refreshStudentChatBadge(false);
-  updateMaterialsBadge();
+  if(warm){ refreshStudentChatBadge(false, true); updateMaterialsBadge(); }
   updateStudentNewBadges();
+  if(!state._libsIdleStudent){ state._libsIdleStudent = true; libsIdle(['pdfjs','jspdf'], 6000); }
   if(warm) sdRefreshInBackground(token, v, data);
 }
 function sdRefreshInBackground(token, v, shownData){
@@ -7285,7 +7415,9 @@ async function renderStudentHome(data){
   const level = avg===null ? 'Birinchi testingizni topshiring' : avg>=90 ? "A'lo daraja!" : avg>=80 ? 'Juda yaxshi, shunday davom eting' : avg>=60 ? "Yaxshi, yana biroz harakat" : "Mashq qilsangiz, tez o'sasiz";
   let extra = { p:null, att:null, hw:null };
   try{
-    const [p, att, hw] = await Promise.all([ prLoad(false), attLoadMine().catch(()=>null), hwLoadMine().catch(()=>null) ]);
+    const ex = state._homeExtraP; state._homeExtraP = null;
+    const useEx = !!(ex && ex.k===myIdentity() && Date.now()-ex.t < 20000);
+    const [p, att, hw] = await (useEx ? ex.p : Promise.all([ prLoad(false), attLoadMine().catch(()=>null), hwLoadMine().catch(()=>null) ]));
     extra = { p, att, hw };
     if(hw && !hw.failed) state._hw = hw;
     state._badgeExtra = { att: att ? { counted:att.counted, pct:att.pct } : null, hw: hw ? hwSummaryOf(hw) : { submitted:0, onTime:0, best:0 } };
@@ -7438,7 +7570,7 @@ async function renderStudentNotifications(data){
     }
   }
   if(state.studentSlug){
-    const chatThread = await loadChatThread(state.studentSlug);
+    const chatThread = await loadChatThreadSoft(state.studentSlug);
     const lastMsg = chatThread.messages[chatThread.messages.length-1];
     if(lastMsg && lastMsg.from==='admin' && lastMsg.ts>lastSeen){
       items.push(`Administratordan yangi javob keldi — "Savol-javob" bo'limini tekshiring`);
@@ -7483,10 +7615,17 @@ async function markStudentChatRead(){
   await storageSet(`chat:${state.studentSlug}`, JSON.stringify(th));
   setBadge('studentChatBadge', 0); updateDocTitle(0); state._lastStudentUnread = 0;
 }
-async function refreshStudentChatBadge(announce){
+function loadChatThreadSoft(slug){
+  const m = state._chatSoft;
+  if(m && m.k===slug && Date.now()-m.t < 4000) return m.p;
+  const e = state._chatSoft = { k:slug, t:Date.now(), p: loadChatThread(slug) };
+  e.p.then(th=>{ if((!th || th._loadFailed) && state._chatSoft===e) state._chatSoft = null; }, ()=>{ if(state._chatSoft===e) state._chatSoft = null; });
+  return e.p;
+}
+async function refreshStudentChatBadge(announce, soft){
   if(!state.studentSlug || state.role) return;
   try{
-    const th = await loadChatThread(state.studentSlug);
+    const th = await (soft ? loadChatThreadSoft(state.studentSlug) : loadChatThread(state.studentSlug));
     if(th._loadFailed) return;
     const chatOpen = !document.getElementById('screen-chat').classList.contains('hidden');
     if(chatOpen){
@@ -9167,6 +9306,7 @@ function logoutAdmin(){
   showJoin();
 }
 async function openAdminDashboard(){
+  libsIdle(['chart','xlsx','pdfjs','jspdf','mammoth','qr'], 2500);
   state.config = await loadConfig();
   hideAll();
   showScreen('screen-admin-dashboard');
@@ -10881,6 +11021,7 @@ function anDestroy(){ _anWait.cfgs = {}; Object.keys(_anCharts).forEach(k=>{ try
 const _anWait = { cfgs:{}, timer:0 };
 function anMake(id, cfg){
   if(typeof Chart==='undefined'){
+    needLib('chart');
     _anWait.cfgs[id] = cfg;
     if(!_anWait.timer){ let n = 0; _anWait.timer = setInterval(()=>{ if(typeof Chart !== 'undefined' || ++n > 60){ clearInterval(_anWait.timer); _anWait.timer = 0; const w = _anWait.cfgs; _anWait.cfgs = {}; if(typeof Chart !== 'undefined') Object.keys(w).forEach(k=> anMake(k, w[k])); } }, 250); }
     return;
